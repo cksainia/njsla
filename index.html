@@ -120,6 +120,14 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .std-row.strength{border-color:var(--green)}.std-row.needs{border-color:var(--red)}
 .std-bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}.std-bar>span{display:block;height:100%;background:var(--indigo)}.std-val{white-space:nowrap;font-weight:700}
 .item-table{border-collapse:collapse;width:100%;margin-top:8px;font-size:.9rem}.item-table th,.item-table td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+/* Phase 2 item types */
+.ebsr-part{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:12px}.ebsr-label{font-weight:800;color:var(--indigo);margin-bottom:8px}.stem.sub{font-size:1em;font-weight:600;margin:6px 0 10px}
+.hot-text{font-size:1.2em;line-height:2.2}.ht-token{cursor:pointer;padding:2px 4px;border-radius:6px;border:1px dashed transparent}.ht-token:hover{border-color:var(--indigo)}.ht-token.sel{background:var(--amber-bg);border-color:var(--amber);border-style:solid;font-weight:700}
+.inline-stem{font-size:1.2em;line-height:2.4}.inline-dd{font:inherit;font-size:.9em;padding:6px 8px;border:2px solid var(--indigo);border-radius:8px;background:#eef2ff;margin:0 4px}
+.dnd-tokens{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.dnd-token{font:inherit;font-size:1.1em;padding:12px 18px;border:2px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}.dnd-token.picked{border-color:var(--indigo);background:#eef2ff;box-shadow:0 0 0 3px rgba(79,70,229,.2)}.dnd-token.placed{opacity:.35;cursor:default}
+.dnd-zones{display:flex;gap:16px;flex-wrap:wrap}.dnd-zone{flex:1;min-width:160px;min-height:110px;border:2px dashed var(--indigo);border-radius:12px;padding:10px;cursor:pointer;background:#fafbff}.dz-label{font-weight:700;color:var(--indigo);margin-bottom:8px}.dz-drop{display:flex;flex-wrap:wrap;gap:8px}.dz-chip{background:var(--indigo);color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+.match-grid{border-collapse:collapse;margin:12px 0}.match-grid th,.match-grid td{border:1px solid var(--line);padding:10px 18px;text-align:center}.match-grid .mg-row{text-align:left;font-weight:600}.match-grid input{width:20px;height:20px}
+.plotline .plot-hit:hover{fill:rgba(79,70,229,.12)}
 @media(max-width:760px){.test-cards{grid-template-columns:1fr}.tds-body.two-pane{flex-direction:column}.tds-mid{display:none}.divider{display:none}}
   </style>
 </head>
@@ -393,7 +401,51 @@ function transformLegacyStimuli() {
 }
 transformLegacyStimuli();
 
-const ITEMS = [...FORM_A_ITEMS, ...transformLegacy()];
+// ---- Phase 2: seed items showcasing the tech-enhanced types (spec C.4) ----
+const PHASE2_ITEMS = [
+  { id: 'p2-ebsr-1', subject: 'ela_reading', grade: 3, standard: 'RL.3.1', domain: DOMAIN_NAMES.RL, skill: 'text evidence', type: 'evidence_two_part', difficulty: 1, stage_band: 'hard', stimulus_ref: 'passage-never',
+    stem: 'Answer Part A and Part B.',
+    interaction: {
+      partA: { options: [
+        { id: 'A', text: 'His mother speaks Esan and is learning English.' },
+        { id: 'B', text: 'His mother cannot read in any language.' },
+        { id: 'C', text: 'Jatto does not like to read.' },
+        { id: 'D', text: 'The book is written in Esan.' }] },
+      partB: { stem: 'Which detail from the story BEST supports the answer to Part A?', multi: false, options: [
+        { id: 'A', text: '“What is this word?” she asked.' },
+        { id: 'B', text: 'A leaf came loose from the tree.' },
+        { id: 'C', text: 'Jatto closed his book and listened.' },
+        { id: 'D', text: 'He gave her an example about a bird.' }] },
+    },
+    answer_key: { partA: 'A', partB: 'A' }, scoring: { points: 2, rule: 'ebsr' }, rationale: 'Her asking what the word means shows she is still learning English.', calculator: false },
+
+  { id: 'p2-hot-1', subject: 'ela_reading', grade: 3, standard: 'L.3.1', domain: DOMAIN_NAMES.L, skill: 'identify adjectives', type: 'hot_text', difficulty: 0, stage_band: 'medium', stimulus_ref: null,
+    stem: 'Click the TWO adjectives in the sentence below.',
+    interaction: { tokens: [{ id: 't1', text: 'The' }, { id: 't2', text: 'happy' }, { id: 't3', text: 'puppy' }, { id: 't4', text: 'chased' }, { id: 't5', text: 'a' }, { id: 't6', text: 'red' }, { id: 't7', text: 'ball.' }] },
+    answer_key: { correct: ['t2', 't6'] }, scoring: { points: 1, rule: 'all_or_nothing' }, rationale: '“happy” and “red” are adjectives that describe nouns.', calculator: false },
+
+  { id: 'p2-dd-1', subject: 'ela_reading', grade: 3, standard: 'L.3.1', domain: DOMAIN_NAMES.L, skill: 'subject-verb agreement', type: 'inline_dropdown', difficulty: 1, stage_band: 'hard', stimulus_ref: null,
+    stem: 'Choose the words that complete the sentence correctly.',
+    interaction: { template: 'The dog {{d1}} in the yard while the cats {{d2}} on the porch.', dropdowns: { d1: { options: ['run', 'runs'] }, d2: { options: ['sleep', 'sleeps'] } } },
+    answer_key: { d1: 'runs', d2: 'sleep' }, scoring: { points: 2, rule: 'partial' }, rationale: 'Singular “dog” takes “runs”; plural “cats” takes “sleep”.', calculator: false },
+
+  { id: 'p2-dnd-1', subject: 'math', grade: 3, standard: '3.OA.D.9', domain: DOMAIN_NAMES.OA, skill: 'even and odd', type: 'drag_and_drop', difficulty: 0, stage_band: 'medium', stimulus_ref: null,
+    stem: 'Place each number into the correct group.',
+    interaction: { tokens: [{ id: 'n3', text: '3' }, { id: 'n4', text: '4' }, { id: 'n6', text: '6' }, { id: 'n7', text: '7' }], zones: [{ id: 'even', label: 'Even' }, { id: 'odd', label: 'Odd' }] },
+    answer_key: { even: ['n4', 'n6'], odd: ['n3', 'n7'] }, scoring: { points: 1, rule: 'exact' }, rationale: '4 and 6 are even; 3 and 7 are odd.', calculator: false },
+
+  { id: 'p2-grid-1', subject: 'math', grade: 3, standard: '3.NF.A.3', domain: DOMAIN_NAMES.NF, skill: 'compare fractions (true/false)', type: 'matching_grid', difficulty: 1, stage_band: 'hard', stimulus_ref: null,
+    stem: 'Tell whether each comparison is True or False.',
+    interaction: { mode: 'radio', rows: [{ id: 'r1', text: '1/2 = 2/4' }, { id: 'r2', text: '1/3 > 1/2' }, { id: 'r3', text: '3/4 > 1/4' }], cols: [{ id: 'T', text: 'True' }, { id: 'F', text: 'False' }] },
+    answer_key: { r1: 'T', r2: 'F', r3: 'T' }, scoring: { points: 1, rule: 'partial' }, rationale: '1/2 = 2/4 (true); 1/3 > 1/2 (false); 3/4 > 1/4 (true).', calculator: false },
+
+  { id: 'p2-plot-1', subject: 'math', grade: 3, standard: '3.NF.A.2', domain: DOMAIN_NAMES.NF, skill: 'plot a fraction', type: 'graph_point_plot', difficulty: 0, stage_band: 'medium', stimulus_ref: null,
+    stem: 'Plot 1/2 on the number line. Tap the correct mark.',
+    interaction: { line: { min: 0, max: 1, ticks: 4 } },
+    answer_key: { value: 0.5, tol: 0.01 }, scoring: { points: 1, rule: 'exact' }, rationale: '1/2 is halfway, the 2nd of 4 marks.', calculator: false },
+];
+
+const ITEMS = [...FORM_A_ITEMS, ...PHASE2_ITEMS, ...transformLegacy()];
 
 // quick index
 const ITEMS_BY_ID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
@@ -499,6 +551,48 @@ function scoreItem(item, response) {
     case 'extended_writing': {
       // Not auto-scored for correctness; handled by rubric/LLM elsewhere.
       return { correct: null, partial: 0, points: 0, max };
+    }
+    // ---- Phase 2: tech-enhanced types (spec C.4) ----
+    case 'evidence_two_part': {
+      const aOK = !!response && response.a === ak.partA;
+      const bExp = ak.partB;
+      const bOK = aOK && (Array.isArray(bExp) ? setsEqual(response.b, bExp) : (response.b === bExp));
+      const correct = aOK && bOK;
+      return { correct, partial: aOK ? (bOK ? 1 : 0.5) : 0, points: correct ? max : 0, max };
+    }
+    case 'hot_text': {
+      const correct = setsEqual(response, ak.correct);
+      let partial = correct ? 1 : 0;
+      if (!correct && Array.isArray(response)) {
+        const good = response.filter((r) => ak.correct.includes(r)).length;
+        const bad = response.filter((r) => !ak.correct.includes(r)).length;
+        partial = Math.max(0, (good - bad) / ak.correct.length);
+      }
+      return { correct, partial, points: correct ? max : 0, max };
+    }
+    case 'inline_dropdown': {
+      const keys = Object.keys(ak); let got = 0;
+      for (const k of keys) if (response && response[k] === ak[k]) got += 1;
+      const correct = got === keys.length && keys.length > 0;
+      return { correct, partial: keys.length ? got / keys.length : 0, points: correct ? max : 0, max };
+    }
+    case 'drag_and_drop': {
+      const zones = Object.keys(ak); let got = 0;
+      for (const z of zones) { const exp = [].concat(ak[z]); const cur = [].concat((response && response[z]) || []); if (setsEqual(cur, exp)) got += 1; }
+      const correct = got === zones.length && zones.length > 0;
+      return { correct, partial: zones.length ? got / zones.length : 0, points: correct ? max : 0, max };
+    }
+    case 'matching_grid': {
+      const rows = Object.keys(ak); let got = 0;
+      for (const r of rows) { const exp = ak[r]; const cur = response && response[r]; const okk = Array.isArray(exp) ? setsEqual([].concat(cur || []), exp) : cur === exp; if (okk) got += 1; }
+      const correct = got === rows.length && rows.length > 0;
+      return { correct, partial: rows.length ? got / rows.length : 0, points: correct ? max : 0, max };
+    }
+    case 'graph_point_plot': {
+      const tol = ak.tol != null ? ak.tol : 1e-9;
+      const a = parseFrac(response && response.pos != null ? response.pos : response);
+      const correct = !Number.isNaN(a) && Math.abs(a - ak.value) <= tol;
+      return { correct, partial: correct ? 1 : 0, points: correct ? max : 0, max };
     }
     default:
       return { correct: false, partial: 0, points: 0, max };
@@ -727,9 +821,62 @@ function interactionHTML(item) {
       return barGraphHTML(item);
     case 'extended_writing':
       return writingHTML(item);
+    // ---- Phase 2 types ----
+    case 'evidence_two_part': {
+      const pa = item.interaction.partA, pb = item.interaction.partB;
+      return `<div class="ebsr">
+        <div class="ebsr-part"><div class="ebsr-label">Part A</div>${choiceList(pa.options, 'radio', 'a')}</div>
+        <div class="ebsr-part"><div class="ebsr-label">Part B</div><div class="stem sub">${mathRender(pb.stem)}</div>${choiceList(pb.options, pb.multi ? 'checkbox' : 'radio', 'b')}</div>
+      </div>`;
+    }
+    case 'hot_text':
+      return `<div class="hint">Click to select. Click again to unselect.</div>
+        <div class="hot-text">${item.interaction.tokens.map((t) => `<span class="ht-token" data-id="${t.id}">${esc(t.text)}</span>`).join(' ')}</div>`;
+    case 'inline_dropdown': {
+      let t = mathRender(item.interaction.template);
+      for (const [k, d] of Object.entries(item.interaction.dropdowns)) {
+        const sel = `<select class="inline-dd" data-dd="${k}"><option value=""></option>${d.options.map((o) => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>`;
+        t = t.replace('{{' + k + '}}', sel);
+      }
+      return `<div class="inline-stem">${t}</div>`;
+    }
+    case 'drag_and_drop':
+      return `<div class="hint">Tap a tile, then tap a box to place it. Tap a placed tile to remove it.</div>
+        <div class="dnd-tokens">${item.interaction.tokens.map((t) => `<button type="button" class="dnd-token" data-id="${t.id}">${esc(t.text)}</button>`).join('')}</div>
+        <div class="dnd-zones">${item.interaction.zones.map((z) => `<div class="dnd-zone" data-zone="${z.id}"><div class="dz-label">${esc(z.label)}</div><div class="dz-drop"></div></div>`).join('')}</div>`;
+    case 'matching_grid': {
+      const { rows, cols, mode } = item.interaction;
+      const head = `<tr><th></th>${cols.map((c) => `<th>${esc(c.text)}</th>`).join('')}</tr>`;
+      const body = rows.map((r) => `<tr><td class="mg-row">${esc(r.text)}</td>${cols.map((c) => `<td><input type="${mode === 'checkbox' ? 'checkbox' : 'radio'}" name="mg-${r.id}" data-row="${r.id}" data-col="${c.id}" aria-label="${esc(r.text)} ${esc(c.text)}"></td>`).join('')}</tr>`).join('');
+      return `<table class="match-grid">${head}${body}</table>`;
+    }
+    case 'graph_point_plot':
+      return plotLineHTML(item.interaction.line);
     default:
       return `<div class="muted">Unsupported item type: ${esc(item.type)}</div>`;
   }
+}
+
+function choiceList(options, kind, group) {
+  return `<div class="choices" data-group="${group}">` + options.map((o) => `
+    <label class="choice">
+      <input type="${kind}" name="choice-${group}" value="${o.id}" aria-label="Option ${o.id}" />
+      <span class="choice-letter">${o.id}</span><span class="choice-text">${mathRender(o.text)}</span>
+    </label>`).join('') + `</div>`;
+}
+
+function plotLineHTML(f) {
+  const W = 460, pad = 40, y = 50, ticks = f.ticks;
+  const x = (i) => pad + (i / ticks) * (W - 2 * pad);
+  let parts = `<line x1="${pad}" y1="${y}" x2="${W - pad}" y2="${y}" stroke="currentColor" stroke-width="2"/>`;
+  for (let i = 0; i <= ticks; i++) {
+    parts += `<line x1="${x(i)}" y1="${y - 9}" x2="${x(i)}" y2="${y + 9}" stroke="currentColor" stroke-width="2"/>`;
+    const lbl = i === 0 ? String(f.min) : i === ticks ? String(f.max) : '';
+    if (lbl) parts += `<text x="${x(i)}" y="${y + 28}" text-anchor="middle" font-size="14">${lbl}</text>`;
+    parts += `<circle class="plot-hit" data-i="${i}" cx="${x(i)}" cy="${y}" r="14" fill="transparent" style="cursor:pointer"/>`;
+  }
+  parts += `<circle class="plot-pt hidden" cx="0" cy="${y}" r="8" fill="var(--indigo,#4f46e5)"/>`;
+  return `<svg class="figure plotline" viewBox="0 0 ${W} 80" data-ticks="${ticks}" data-pad="${pad}" data-w="${W}" role="group" aria-label="number line — tap to plot">${parts}</svg>`;
 }
 
 function choiceHTML(item, kind) {
@@ -815,6 +962,52 @@ function wireItem(item, run, qEl, onChange) {
     count();
     ed.addEventListener('input', () => { count(); report(ed.innerHTML); });
     qEl.querySelectorAll('.wtool').forEach((b) => { b.onclick = () => { document.execCommand(b.dataset.cmd, false, null); ed.focus(); count(); report(ed.innerHTML); }; });
+  } else if (item.type === 'evidence_two_part') {
+    const multi = item.interaction.partB.multi;
+    const collect = () => {
+      const a = qEl.querySelector('input[name="choice-a"]:checked');
+      const b = multi ? [...qEl.querySelectorAll('input[name="choice-b"]:checked')].map((x) => x.value)
+                      : (qEl.querySelector('input[name="choice-b"]:checked') || {}).value;
+      return { a: a ? a.value : null, b: b === undefined ? null : b };
+    };
+    if (prev) {
+      if (prev.a) { const el = qEl.querySelector(`input[name="choice-a"][value="${prev.a}"]`); if (el) el.checked = true; }
+      if (prev.b != null) [].concat(prev.b).forEach((v) => { const el = qEl.querySelector(`input[name="choice-b"][value="${v}"]`); if (el) el.checked = true; });
+    }
+    qEl.querySelectorAll('input[name^="choice-"]').forEach((inp) => { inp.onchange = () => { paintChoices(qEl); report(collect()); }; });
+    paintChoices(qEl);
+  } else if (item.type === 'hot_text') {
+    const sel = new Set(Array.isArray(prev) ? prev : []);
+    const paint = () => qEl.querySelectorAll('.ht-token').forEach((t) => t.classList.toggle('sel', sel.has(t.dataset.id)));
+    qEl.querySelectorAll('.ht-token').forEach((t) => { t.onclick = () => { const id = t.dataset.id; sel.has(id) ? sel.delete(id) : sel.add(id); paint(); report([...sel]); }; });
+    paint();
+  } else if (item.type === 'inline_dropdown') {
+    const dds = [...qEl.querySelectorAll('.inline-dd')];
+    const collect = () => Object.fromEntries(dds.map((d) => [d.dataset.dd, d.value]));
+    if (prev) dds.forEach((d) => { if (prev[d.dataset.dd] != null) d.value = prev[d.dataset.dd]; });
+    dds.forEach((d) => { d.onchange = () => report(collect()); });
+  } else if (item.type === 'drag_and_drop') {
+    const state = (prev && typeof prev === 'object') ? { ...prev } : {};
+    let picked = null;
+    const tokenText = Object.fromEntries(item.interaction.tokens.map((t) => [t.id, t.text]));
+    const repaint = () => {
+      qEl.querySelectorAll('.dnd-token').forEach((b) => { const placed = Object.values(state).some((arr) => (arr || []).includes(b.dataset.id)); b.classList.toggle('placed', placed); b.classList.toggle('picked', picked === b.dataset.id); });
+      qEl.querySelectorAll('.dnd-zone').forEach((z) => { const arr = state[z.dataset.zone] || []; z.querySelector('.dz-drop').innerHTML = arr.map((id) => `<span class="dz-chip" data-id="${id}">${esc(tokenText[id])}</span>`).join(''); });
+      qEl.querySelectorAll('.dz-chip').forEach((ch) => { ch.onclick = (e) => { e.stopPropagation(); for (const z of Object.keys(state)) state[z] = (state[z] || []).filter((x) => x !== ch.dataset.id); repaint(); report(state); }; });
+    };
+    qEl.querySelectorAll('.dnd-token').forEach((b) => { b.onclick = () => { const placed = Object.values(state).some((arr) => (arr || []).includes(b.dataset.id)); if (placed) return; picked = picked === b.dataset.id ? null : b.dataset.id; repaint(); }; });
+    qEl.querySelectorAll('.dnd-zone').forEach((z) => { z.onclick = () => { if (!picked) return; const zid = z.dataset.zone; state[zid] = (state[zid] || []).concat(picked); picked = null; repaint(); report(state); }; });
+    repaint();
+  } else if (item.type === 'matching_grid') {
+    const collect = () => { const out = {}; item.interaction.rows.forEach((r) => { const checked = [...qEl.querySelectorAll(`input[data-row="${r.id}"]:checked`)].map((i) => i.dataset.col); out[r.id] = item.interaction.mode === 'checkbox' ? checked : (checked[0] || null); }); return out; };
+    if (prev) item.interaction.rows.forEach((r) => { const v = prev[r.id]; if (v == null) return; [].concat(v).forEach((col) => { const el = qEl.querySelector(`input[data-row="${r.id}"][data-col="${col}"]`); if (el) el.checked = true; }); });
+    qEl.querySelectorAll('.match-grid input').forEach((inp) => { inp.onchange = () => report(collect()); });
+  } else if (item.type === 'graph_point_plot') {
+    const svg = qEl.querySelector('.plotline'); const ticks = +svg.dataset.ticks; const pad = +svg.dataset.pad; const W = +svg.dataset.w;
+    const pt = svg.querySelector('.plot-pt');
+    const place = (i) => { const x = pad + (i / ticks) * (W - 2 * pad); pt.setAttribute('cx', x); pt.classList.remove('hidden'); report({ pos: i / ticks }); };
+    if (prev && prev.pos != null) place(Math.round(prev.pos * ticks));
+    svg.querySelectorAll('.plot-hit').forEach((h) => { h.addEventListener('click', () => place(+h.dataset.i)); });
   }
 }
 
