@@ -120,6 +120,16 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .std-row.strength{border-color:var(--green)}.std-row.needs{border-color:var(--red)}
 .std-bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}.std-bar>span{display:block;height:100%;background:var(--indigo)}.std-val{white-space:nowrap;font-weight:700}
 .item-table{border-collapse:collapse;width:100%;margin-top:8px;font-size:.9rem}.item-table th,.item-table td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+/* dashboard */
+.dash-cards{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 6px}.dash-card{flex:1;min-width:130px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow)}.dc-num{font-size:2rem;font-weight:900;color:var(--indigo)}.dc-lbl{color:var(--muted);font-size:.85rem}
+.dash-subjects{display:flex;flex-direction:column;gap:12px}
+.dash-subject{background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 18px}.ds-head{display:flex;justify-content:space-between;align-items:center}.ds-title{font-weight:700}
+.ds-body{margin-top:8px}.ds-trend{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.spark{width:240px;height:60px}.ds-trend-meta{font-size:.95rem}
+.delta{font-weight:800;margin-left:6px}.delta.up{color:var(--green)}.delta.down{color:var(--red)}.delta.flat{color:var(--muted)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
+.item-table tr.strength td{background:#f0fdf4}.item-table tr.needs td{background:#fef2f2}.item-table tr.developing td{background:#fffbeb}
+@media(max-width:760px){.two-col{grid-template-columns:1fr}}
+
 /* Phase 2 item types */
 .ebsr-part{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:12px}.ebsr-label{font-weight:800;color:var(--indigo);margin-bottom:8px}.stem.sub{font-size:1em;font-weight:600;margin:6px 0 10px}
 .hot-text{font-size:1.2em;line-height:2.2}.ht-token{cursor:pointer;padding:2px 4px;border-radius:6px;border:1px dashed transparent}.ht-token:hover{border-color:var(--indigo)}.ht-token.sel{background:var(--amber-bg);border-color:var(--amber);border-style:solid;font-weight:700}
@@ -460,13 +470,55 @@ const BLUEPRINT = {
   ela_writing: { domains: ['W'], sessions: 1, itemsPerSession: 1, setSize: 1 },
 };
 
-// Fixed "Form A" sequences (reproduce the observed practice tests exactly).
+// ---- forms ----
+// Keyed by `${subject}__${formKey}`. Form A reproduces the observed practice
+// tests; mock1..mock5 are five distinct fixed mock tests assembled from the
+// pool with blueprint coverage and (mostly) distinct items/passages.
+function domainCodeOf(it) {
+  const s = it.standard || '';
+  if (s.startsWith('3.')) return s.split('.')[1];
+  const m = s.match(/^(RL|RI|RF|L|W|SL)/);
+  return m ? m[1] : '';
+}
+function seeded(n) { let x = (n * 9301 + 49297) % 233280; return () => { x = (x * 9301 + 49297) % 233280; return x / 233280; }; }
+function shuffle(arr, rnd) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
 const FORMS = {
-  reading_formA: { subject: 'ela_reading', title: 'NJSLA-A Grade 3 Reading Practice Test (Form A)', items: ['rA-1', 'rA-2', 'rA-3', 'rA-4', 'rA-5', 'rA-6', 'rA-7'] },
-  writing_formA: { subject: 'ela_writing', title: 'NJSLA-A Grade 3 Writing Practice Test (Form A)', items: ['wA-1'] },
-  math_formA: { subject: 'math', title: 'NJSLA-A Grade 3 Mathematics Practice Test (Form A)', items: ['mA-1', 'mA-2', 'mA-3', 'mA-4', 'mA-5', 'mA-6', 'mA-7', 'mA-8', 'mA-9', 'mA-10', 'mA-11'] },
+  'ela_reading__formA': { subject: 'ela_reading', title: 'NJSLA-A Grade 3 Reading Practice Test (Form A)', items: ['rA-1', 'rA-2', 'rA-3', 'rA-4', 'rA-5', 'rA-6', 'rA-7'] },
+  'ela_writing__formA': { subject: 'ela_writing', title: 'NJSLA-A Grade 3 Writing Practice Test (Form A)', items: ['wA-1'] },
+  'math__formA': { subject: 'math', title: 'NJSLA-A Grade 3 Mathematics Practice Test (Form A)', items: ['mA-1', 'mA-2', 'mA-3', 'mA-4', 'mA-5', 'mA-6', 'mA-7', 'mA-8', 'mA-9', 'mA-10', 'mA-11'] },
 };
 
+(function buildMockForms() {
+  // MATH: round-robin the five domains, ~12 items, advancing a cursor so the
+  // five mocks draw largely distinct items.
+  const mdoms = ['OA', 'NBT', 'NF', 'MD', 'G'];
+  const mpool = {}; mdoms.forEach((d) => { mpool[d] = shuffle(ITEMS.filter((it) => it.subject === 'math' && domainCodeOf(it) === d), seeded(7 + d.length)); });
+  const mcur = { OA: 0, NBT: 0, NF: 0, MD: 0, G: 0 };
+  for (let m = 1; m <= 5; m++) {
+    const items = []; let di = 0;
+    while (items.length < 12 && di < 300) { const d = mdoms[di % 5]; di++; const arr = mpool[d]; if (!arr.length) continue; const it = arr[mcur[d] % arr.length]; mcur[d]++; if (!items.includes(it.id)) items.push(it.id); }
+    FORMS['math__mock' + m] = { subject: 'math', title: 'Mock Test ' + m + ' — Mathematics', items };
+  }
+  // READING: two passages (with up to 4 items each) + two language items per mock.
+  const byPassage = {};
+  ITEMS.filter((it) => it.subject === 'ela_reading' && it.stimulus_ref && (domainCodeOf(it) === 'RL' || domainCodeOf(it) === 'RI'))
+    .forEach((it) => { (byPassage[it.stimulus_ref] = byPassage[it.stimulus_ref] || []).push(it); });
+  const passages = shuffle(Object.keys(byPassage), seeded(11));
+  const lpool = shuffle(ITEMS.filter((it) => it.subject === 'ela_reading' && domainCodeOf(it) === 'L'), seeded(13));
+  let pc = 0, lc = 0;
+  for (let m = 1; m <= 5; m++) {
+    const items = [];
+    for (let k = 0; k < 2 && passages.length; k++) { const pid = passages[pc % passages.length]; pc++; (byPassage[pid] || []).slice(0, 4).forEach((it) => items.push(it.id)); }
+    for (let k = 0; k < 2 && lpool.length; k++) { items.push(lpool[lc % lpool.length].id); lc++; }
+    FORMS['ela_reading__mock' + m] = { subject: 'ela_reading', title: 'Mock Test ' + m + ' — Reading', items };
+  }
+  // WRITING: one distinct prompt per mock.
+  const wpool = shuffle(ITEMS.filter((it) => it.subject === 'ela_writing'), seeded(17));
+  for (let m = 1; m <= 5; m++) FORMS['ela_writing__mock' + m] = { subject: 'ela_writing', title: 'Mock Test ' + m + ' — Writing', items: [wpool[(m - 1) % wpool.length].id] };
+})();
+
+const MOCKS = [1, 2, 3, 4, 5];
 const DOMAIN_LABEL = DOMAIN_NAMES;
 
 /* ===== app/scoring.js ===== */
@@ -1066,10 +1118,13 @@ class TestRun {
     this.responses = {};              // id -> { response, score, flagged, notepad, time, answeredAt }
     this.sessionIndex = 0;
 
-    if (mode === 'formA') {
-      const form = Object.values(FORMS).find((f) => f.subject === subject);
+    this.isFixed = mode !== 'adaptive';     // 'formA' | 'mock1'..'mock5' are fixed forms
+    this.formKey = this.isFixed ? mode : null;
+    if (this.isFixed) {
+      const form = FORMS[`${subject}__${mode}`] || Object.values(FORMS).find((f) => f.subject === subject);
+      this.form = form;
       this.formItems = form ? form.items.slice() : [];
-      this.itemsPerSession = Math.ceil(this.formItems.length / this.sessions);
+      this.itemsPerSession = Math.max(1, Math.ceil(this.formItems.length / this.sessions));
       this.totalItems = this.formItems.length;
     } else {
       this.itemsPerSession = this.bp.itemsPerSession;
@@ -1086,7 +1141,7 @@ class TestRun {
 
   advanceSession() {
     this.sessionIndex += 1;
-    if (this.mode === 'adaptive') { this.band = 'medium'; } // re-establish medium each session
+    if (!this.isFixed) { this.band = 'medium'; } // re-establish medium each session
   }
 
   // ---- delivery ----
@@ -1097,12 +1152,12 @@ class TestRun {
     const idxInSession = this.deliveredCountInSession();
 
     // Route at set boundaries (adaptive only), based on the just-finished set.
-    if (this.mode === 'adaptive' && idxInSession > 0 && idxInSession % this.setSize === 0) {
+    if (!this.isFixed && idxInSession > 0 && idxInSession % this.setSize === 0) {
       this._routeBand(idxInSession);
     }
 
     let item;
-    if (this.mode === 'formA') {
+    if (this.isFixed) {
       const id = this.formItems[this.delivered.length];
       item = ITEMS_BY_ID[id];
     } else {
@@ -1238,7 +1293,9 @@ function startPlayer(opts) {
   const app = document.getElementById('app');
   const run = new TestRun({ subject: opts.subject, mode: opts.mode || 'adaptive' });
   const SUBJ = { ela_reading: 'Reading', ela_writing: 'Writing', math: 'Mathematics' };
-  const title = `NJSLA-A Grade 3 ${SUBJ[opts.subject] || ''} Practice Test` + (run.mode === 'formA' ? ' (Form A)' : '');
+  const fk = run.formKey || '';
+  const formLabel = fk === 'formA' ? ' (Form A)' : /^mock\d$/.test(fk) ? ' (Mock Test ' + fk.slice(4) + ')' : '';
+  const title = `NJSLA-A Grade 3 ${SUBJ[opts.subject] || ''} Practice Test` + formLabel;
   const forced = opts.attributes ? opts.attributes.forced !== false : true;
   let cur = 0;            // index within the current session's delivered list
   let itemStart = Date.now();
@@ -1505,6 +1562,116 @@ function renderReport(rep, title, student) {
   </div>`;
 }
 
+/* ===== app/dashboard.js ===== */
+// Detailed parent dashboard: aggregates saved attempts into score trends,
+// first→latest progress, and strengths vs. areas to improve.
+
+const SUBJ = { math: 'Mathematics', ela_reading: 'Reading', ela_writing: 'Writing' };
+const ICON = { math: '➗', ela_reading: '📖', ela_writing: '✍️' };
+
+function computeDashboard(attempts) {
+  const bySubject = {};
+  for (const a of attempts) (bySubject[a.subject] = bySubject[a.subject] || []).push(a);
+  for (const k in bySubject) bySubject[k].sort((x, y) => new Date(x.date) - new Date(y.date));
+
+  const stdAgg = {}, domAgg = {}; let totalTime = 0, scaleSum = 0, scaleN = 0;
+  for (const a of attempts) {
+    for (const s of (a.byStandard || [])) {
+      const k = s.standard || s.domain;
+      (stdAgg[k] = stdAgg[k] || { standard: k, domain: s.domain, total: 0, correct: 0 });
+      stdAgg[k].total += s.total; stdAgg[k].correct += s.correct;
+      (domAgg[s.domain] = domAgg[s.domain] || { domain: s.domain, total: 0, correct: 0 });
+      domAgg[s.domain].total += s.total; domAgg[s.domain].correct += s.correct;
+    }
+    for (const p of (a.perItem || [])) totalTime += p.timeMs || 0;
+    if (typeof a.scaleScore === 'number') { scaleSum += a.scaleScore; scaleN += 1; }
+  }
+  const acc = (o) => (o.total ? o.correct / o.total : 0);
+  const doms = Object.values(domAgg).map((d) => ({ ...d, accuracy: acc(d) }));
+  const stds = Object.values(stdAgg).map((s) => ({ ...s, accuracy: acc(s) }));
+  return {
+    count: attempts.length, bySubject, totalTime,
+    avgScale: scaleN ? Math.round(scaleSum / scaleN) : 0,
+    domains: doms, standards: stds,
+    strengths: doms.filter((d) => d.accuracy >= 0.75).sort((a, b) => b.accuracy - a.accuracy),
+    weak: doms.filter((d) => d.accuracy < 0.5).sort((a, b) => a.accuracy - b.accuracy),
+    developing: doms.filter((d) => d.accuracy >= 0.5 && d.accuracy < 0.75).sort((a, b) => a.accuracy - b.accuracy),
+  };
+}
+
+function sparkline(scores) {
+  if (scores.length === 0) return '';
+  const W = 240, H = 60, pad = 6;
+  const min = 650, max = 850;
+  const x = (i) => pad + (scores.length === 1 ? (W - 2 * pad) / 2 : (i / (scores.length - 1)) * (W - 2 * pad));
+  const y = (v) => pad + (1 - (v - min) / (max - min)) * (H - 2 * pad);
+  const pts = scores.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  const dots = scores.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="var(--indigo,#4f46e5)"/>`).join('');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="score trend">
+    ${scores.length > 1 ? `<polyline points="${pts}" fill="none" stroke="var(--indigo,#4f46e5)" stroke-width="2.5"/>` : ''}${dots}</svg>`;
+}
+
+function fmtTime(ms) { const min = Math.round(ms / 60000); return min < 60 ? `${min} min` : `${Math.floor(min / 60)}h ${min % 60}m`; }
+
+function renderDashboard(attempts, student) {
+  if (!attempts.length) {
+    return `<div class="report"><header class="app-header"><div class="brand"><span>👪 Parent Dashboard</span></div><button class="btn ghost" id="dash-back">← Back</button></header>
+      <main class="report-main"><p class="muted">No saved attempts yet. Finish a test and tap <strong>Save</strong> on the report to start tracking progress here.</p></main></div>`;
+  }
+  const d = computeDashboard(attempts);
+
+  const subjectBlocks = Object.keys(d.bySubject).map((subj) => {
+    const list = d.bySubject[subj];
+    const scores = list.map((a) => a.scaleScore);
+    const first = list[0], last = list[list.length - 1];
+    const delta = last.scaleScore - first.scaleScore;
+    const arrow = delta > 0 ? `<span class="delta up">▲ +${delta}</span>` : delta < 0 ? `<span class="delta down">▼ ${delta}</span>` : `<span class="delta flat">▬ 0</span>`;
+    const accAvg = Math.round(list.reduce((s, a) => s + (a.accuracy || 0), 0) / list.length);
+    return `<div class="dash-subject">
+      <div class="ds-head"><span class="ds-title">${ICON[subj] || ''} ${esc(SUBJ[subj] || subj)}</span><span class="muted">${list.length} attempt${list.length === 1 ? '' : 's'}</span></div>
+      <div class="ds-body">
+        <div class="ds-trend">${sparkline(scores)}<div class="ds-trend-meta">latest <strong class="level-${last.level}">${last.scaleScore}</strong> ${list.length > 1 ? arrow : ''}<div class="muted small">avg accuracy ${accAvg}%</div></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const domBar = (arr, cls) => arr.length ? `<div class="std-list">${arr.map((x) => {
+    const a = Math.round(x.accuracy * 100);
+    return `<div class="std-row ${cls}"><span class="std-name">${esc(x.domain)}</span><span class="std-bar"><span style="width:${a}%"></span></span><span class="std-val">${a}% <span class="muted">(${x.correct}/${x.total})</span></span></div>`;
+  }).join('')}</div>` : '<p class="muted">—</p>';
+
+  // per-standard table (most-practiced first)
+  const stdRows = d.standards.sort((a, b) => b.total - a.total).slice(0, 14).map((s) => {
+    const a = Math.round(s.accuracy * 100);
+    const cls = a >= 75 ? 'strength' : a < 50 ? 'needs' : 'developing';
+    return `<tr class="${cls}"><td>${esc(s.standard)}</td><td>${esc(s.domain)}</td><td>${a}%</td><td>${s.correct}/${s.total}</td></tr>`;
+  }).join('');
+
+  return `<div class="report dashboard-view">
+    <header class="app-header"><div class="brand"><span>👪 Parent Dashboard</span></div><button class="btn ghost" id="dash-back">← Back</button></header>
+    <main class="report-main">
+      <h1>${esc(student || 'Student')} — Progress Overview</h1>
+      <div class="dash-cards">
+        <div class="dash-card"><div class="dc-num">${d.count}</div><div class="dc-lbl">tests taken</div></div>
+        <div class="dash-card"><div class="dc-num">${d.avgScale}</div><div class="dc-lbl">avg scale score</div></div>
+        <div class="dash-card"><div class="dc-num">${fmtTime(d.totalTime)}</div><div class="dc-lbl">time on task</div></div>
+      </div>
+
+      <h2>📈 Score progression</h2>
+      <div class="dash-subjects">${subjectBlocks}</div>
+
+      <div class="two-col">
+        <div><h2>💪 Strong areas</h2>${domBar(d.strengths, 'strength')}</div>
+        <div><h2>🎯 Areas to improve</h2>${domBar(d.weak.length ? d.weak : d.developing, d.weak.length ? 'needs' : 'developing')}</div>
+      </div>
+
+      <h2>🧾 By standard (most practiced)</h2>
+      <table class="item-table"><tr><th>Standard</th><th>Domain</th><th>Accuracy</th><th>Items</th></tr>${stdRows}</table>
+      <p class="muted small">Accuracy aggregates every saved attempt. Green ≥ 75%, amber 50–74%, red &lt; 50%.</p>
+    </main>
+  </div>`;
+}
+
 /* ===== app/main.js ===== */
 // App shell + pre-test flow (spec A.2/A.3) and a simple parent dashboard.
 // Sign-in/Guest → Your Tests → Choose Testing Attributes → (Reading) A/V Check
@@ -1566,10 +1733,11 @@ function catalog() {
       <main class="catalog">
         <div class="catalog-top">
           <label class="inline">Grade Level <select id="grade"><option>3</option><option disabled>4</option><option disabled>5</option></select></label>
-          <label class="inline">Mode
+          <label class="inline">Test
             <select id="mode">
               <option value="adaptive" ${state.mode === 'adaptive' ? 'selected' : ''}>Adaptive (computer-adaptive)</option>
               <option value="formA" ${state.mode === 'formA' ? 'selected' : ''}>Form A (observed items)</option>
+              ${MOCKS.map((m) => `<option value="mock${m}" ${state.mode === 'mock' + m ? 'selected' : ''}>Mock Test ${m}</option>`).join('')}
             </select>
           </label>
         </div>
@@ -1584,7 +1752,7 @@ function catalog() {
         </div>
 
         <section class="dashboard">
-          <h2>👪 Parent Dashboard <span class="muted">(${attempts.length} attempt${attempts.length === 1 ? '' : 's'})</span>${attempts.length ? ' <button class="btn ghost danger" id="clear">Clear all</button>' : ''}</h2>
+          <h2>👪 Parent Dashboard <span class="muted">(${attempts.length} attempt${attempts.length === 1 ? '' : 's'})</span>${attempts.length ? ' <button class="btn primary" id="open-dash">📊 Detailed Dashboard</button> <button class="btn ghost danger" id="clear">Clear all</button>' : ''}</h2>
           ${attempts.length ? attempts.map(attemptRow).join('') : '<p class="muted">No attempts yet. Finish a test to see a detailed report here.</p>'}
         </section>
       </main>
@@ -1594,6 +1762,12 @@ function catalog() {
   document.querySelectorAll('[data-report]').forEach((el) => { el.onclick = () => { const a = loadAttempts().find((x) => x.id === el.dataset.report); showReport(a); }; });
   document.querySelectorAll('[data-del]').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); deleteAttempt(el.dataset.del); catalog(); }; });
   const clr = document.getElementById('clear'); if (clr) clr.onclick = () => { if (confirm('Delete all saved attempts?')) { localStorage.removeItem(ATTEMPTS_KEY); catalog(); } };
+  const od = document.getElementById('open-dash'); if (od) od.onclick = dashboardScreen;
+}
+
+function dashboardScreen() {
+  app.innerHTML = renderDashboard(loadAttempts(), state.student);
+  document.getElementById('dash-back').onclick = catalog;
 }
 
 function attemptRow(a) {
