@@ -1,5 +1,4 @@
-// Auto-generated from js/questions.js — the Grade 3 question bank + passages.
-// Defines globals: SUBJECTS, DOMAINS, PASSAGES, QUESTIONS (consumed by index.html).
+// Legacy Grade 3 question bank (globals) reused as the adaptive item pool.
 // Built-in Grade 3 question bank for offline use, structured to match the
 // 2026 NJSLA-Adaptive format: three separate assessments — Mathematics,
 // ELA-Reading, and ELA-Writing.

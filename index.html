@@ -2,1773 +2,1517 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="NJSLA G3" />
-  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-title" content="NJSLA-A G3" />
+  <meta name="theme-color" content="#1e293b" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="icon" href="icon.svg" />
-  <title>NJSLA-Adaptive Grade 3 Practice</title>
+  <title>NJSLA-Adaptive Grade 3 Practice Test</title>
   <style>
-/* NJSLA Grade 3 Mock Test — iPad-first, kid-friendly UI */
-:root {
-  --indigo: #4f46e5;
-  --indigo-dark: #4338ca;
-  --green: #16a34a;
-  --green-bg: #dcfce7;
-  --red: #dc2626;
-  --red-bg: #fee2e2;
-  --amber: #d97706;
-  --amber-bg: #fef3c7;
-  --ink: #1e293b;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --radius: 18px;
-  --shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
-}
+:root{--indigo:#4f46e5;--indigo-d:#4338ca;--green:#16a34a;--green-bg:#dcfce7;--red:#dc2626;--red-bg:#fee2e2;--amber:#d97706;--amber-bg:#fef3c7;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;--radius:16px;--shadow:0 6px 24px rgba(15,23,42,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased}
+#app{min-height:100vh}
+h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{margin:0 0 .3em}
+.muted{color:var(--muted)}.small{font-size:.85rem}.hint{color:var(--muted);font-style:italic;margin-bottom:8px}.hidden{display:none!important}
+.btn{font:inherit;font-weight:600;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:11px 18px;cursor:pointer;min-height:46px;transition:transform .08s}
+.btn:active{transform:scale(.97)}.btn.primary{background:var(--indigo);color:#fff;border-color:var(--indigo);box-shadow:var(--shadow)}.btn.primary:hover{background:var(--indigo-d)}.btn.primary:disabled{opacity:.5}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--indigo)}.btn.danger{color:var(--red)}
+.btn-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.field{display:block;margin:14px 0}.field>span{display:block;font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;font:inherit;padding:12px;border:2px solid var(--line);border-radius:10px;background:#fff}
+.check{display:flex;align-items:center;gap:10px;margin:10px 0;cursor:pointer}.check input{width:20px;height:20px}
+.inline{font-weight:600;display:inline-flex;align-items:center;gap:8px}.inline select{font:inherit;padding:8px;border:2px solid var(--line);border-radius:8px}
+.help{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--line);color:var(--muted);text-align:center;font-size:.75rem;line-height:18px}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{font-weight:800;font-size:1.15rem;display:flex;gap:8px;align-items:center}.brand span{color:var(--indigo)}
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 19px;
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-}
-#app { min-height: 100vh; max-width: 1100px; margin: 0 auto; padding: env(safe-area-inset-top) 0 0; }
+/* flow / cards */
+.flow{min-height:100vh;display:flex;flex-direction:column}
+.flow:not(.wide){align-items:center;justify-content:center;padding:20px}
+.flow-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px;max-width:560px;width:100%;text-align:center}
+.seal{font-size:3rem}.instructions{text-align:left;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px;line-height:1.6}
+.attr-view{text-align:left;margin-top:14px}.attr-view ul{margin:8px 0}
+.av-sample{background:#0f172a;color:#fff;border-radius:12px;height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:8px;margin:16px 0}
+.av-play{font-size:2.4rem}.av-sample.played{outline:3px solid var(--green)}
 
-h1 { font-size: 2rem; margin: 0 0 .3em; }
-h2 { font-size: 1.4rem; margin: 1.2em 0 .4em; }
-h3 { font-size: 1.15rem; margin: 0 0 .4em; }
-.muted { color: var(--muted); }
-.small { font-size: .85rem; }
-.hidden { display: none !important; }
+/* catalog */
+.catalog{padding:10px 22px 50px;max-width:1000px;margin:0 auto;width:100%}
+.catalog-top{display:flex;gap:24px;flex-wrap:wrap;margin:10px 0}
+.test-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.test-card{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:22px;cursor:pointer;box-shadow:var(--shadow);transition:transform .1s,border-color .15s}
+.test-card:hover{border-color:var(--indigo);transform:translateY(-3px)}.tc-icon{font-size:2.2rem}.tc-title{font-weight:700;margin-top:8px}.tc-meta{color:var(--muted);font-size:.85rem;margin-top:6px}
+.dashboard{margin-top:30px}.attempt{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;cursor:pointer}.attempt:hover{border-color:var(--indigo)}
+.att-main{display:flex;justify-content:space-between;font-weight:600}.att-sub{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;margin-top:4px}
+.att-score{font-weight:800}.link-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem}
 
-/* ---------- buttons ---------- */
-.btn {
-  font: inherit; font-weight: 600;
-  border: 2px solid var(--line); background: var(--card); color: var(--ink);
-  border-radius: 14px; padding: 12px 20px; cursor: pointer;
-  transition: transform .08s ease, background .15s, box-shadow .15s;
-  min-height: 52px;
-}
-.btn:active { transform: scale(.97); }
-.btn.primary { background: var(--indigo); color: #fff; border-color: var(--indigo); box-shadow: var(--shadow); }
-.btn.primary:hover { background: var(--indigo-dark); }
-.btn.primary:disabled { opacity: .6; cursor: default; }
-.btn.ghost { background: transparent; border-color: transparent; color: var(--indigo); }
-.btn.big { font-size: 1.2rem; padding: 18px 32px; width: 100%; max-width: 380px; }
-.btn-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
-.btn.danger { color: var(--red); }
-.btn.tiny { min-height: 0; padding: 6px 12px; font-size: .8rem; border-radius: 10px; }
-.btn.shake { animation: shake .4s; border-color: var(--red); color: var(--red); }
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+/* TDS player */
+.tds{min-height:100vh;display:flex;flex-direction:column;font-size:calc(17px*var(--zoom,1));background:#fff}
+.tds.contrast-wb{background:#0f172a;color:#e2e8f0}.tds.contrast-wb .pane,.tds.contrast-wb .passage{background:#0f172a;color:#e2e8f0}
+.tds.contrast-yb{background:#000;color:#fde047}
+.tds-top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1e293b;color:#fff;padding:8px 14px}
+.tds-left{display:flex;align-items:center;gap:12px;flex:1}.tds-mid{font-weight:700;text-align:center;flex:1;font-size:.95em}.tds-right{display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end}
+.tds-stu{font-size:.78rem;opacity:.85}
+.tds-btn{font:inherit;background:#334155;color:#fff;border:1px solid #475569;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.85em}
+.tds-btn.primary{background:var(--green);border-color:var(--green);font-weight:700}.tds-btn:disabled{opacity:.5;cursor:default}.tds-btn.shake{animation:shake .4s;background:var(--red)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.items-menu{position:relative}.items-pop{position:absolute;top:38px;left:0;background:#fff;color:var(--ink);border-radius:10px;box-shadow:var(--shadow);padding:12px;width:320px;z-index:20}
+.items-legend{font-size:.8rem;color:var(--muted);margin-bottom:8px}.warn{color:var(--red)}
+.items-chips{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow:auto}
+.chip{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;min-width:38px}.chip.cur{border-color:var(--indigo);background:#eef2ff;font-weight:700}.chip.done{background:#dcfce7}
+.tds-progress{flex:1;max-width:240px;height:8px;background:#475569;border-radius:99px;overflow:hidden}.tds-progress-fill{height:100%;background:var(--green)}.tds-pct{font-size:.85em;font-variant-numeric:tabular-nums}
+.tds-toolbar{display:flex;gap:8px;padding:6px 14px;background:#f1f5f9;border-bottom:1px solid var(--line)}
+.tds.contrast-wb .tds-toolbar,.tds.contrast-yb .tds-toolbar{background:#1e293b}
+.tds-tool{font:inherit;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.85em}.tds-tool.active{background:var(--amber-bg);border-color:var(--amber)}
+.tds-body{flex:1;display:flex;flex-direction:column;padding:18px;max-width:1100px;margin:0 auto;width:100%}
+.tds-body.two-pane{flex-direction:row;gap:0;max-width:1300px}
+.pane{flex:1;overflow:auto;padding:6px 18px}.stimulus-pane{border-right:0}.divider{width:3px;background:var(--line);cursor:col-resize}
+.tds-body.line-reader .question-pane{background:linear-gradient(transparent 0,transparent 100%)}
+.passage-title{color:var(--indigo);font-size:1.1rem}.passage-author{color:var(--muted);margin-bottom:10px}
+.para{position:relative;padding-left:30px;margin:10px 0}.pnum{position:absolute;left:0;color:var(--muted);font-size:.8rem;font-weight:700}
+.passage-credit{margin-top:14px;color:var(--muted);font-size:.78rem;font-style:italic}
+.q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.q-num{background:var(--indigo);color:#fff;font-weight:800;border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.q-menu{position:relative}.ctx-pop{position:absolute;right:0;top:40px;background:#fff;color:var(--ink);border-radius:10px;box-shadow:var(--shadow);z-index:20;display:flex;flex-direction:column;min-width:200px}
+.ctx-pop button{text-align:left;background:none;border:none;border-bottom:1px solid var(--line);padding:12px 14px;cursor:pointer;font:inherit}.ctx-pop button:hover{background:#eef2ff}
+.flag-banner{background:var(--amber-bg);color:var(--amber);border-radius:8px;padding:6px 10px;font-size:.85rem;margin-bottom:10px}
+.notepad{margin-top:12px}.notepad textarea{width:100%;min-height:80px;border:2px solid var(--amber);border-radius:10px;padding:10px;font:inherit;background:#fffbeb}
+.stem{font-size:1.15em;font-weight:600;margin-bottom:14px}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:12px;padding:13px 15px;background:#fff;cursor:pointer}
+.choice:hover{border-color:var(--indigo)}.choice.selected{border-color:var(--indigo);background:#eef2ff}.choice.correct{border-color:var(--green);background:var(--green-bg)}.choice.wrong{border-color:var(--red);background:var(--red-bg)}
+.choice input{width:20px;height:20px;flex-shrink:0}.choice-letter{font-weight:800;color:var(--indigo);width:22px}
+.num-input{font:inherit;font-size:1.3em;padding:12px;border:2px solid var(--line);border-radius:10px;max-width:260px;width:100%}.num-input.small{max-width:90px;font-size:1.1em;display:inline-block;margin:0 6px;vertical-align:middle}
+.blank-row{font-size:1.2em;margin:12px 0}
+.keypad{display:grid;grid-template-columns:repeat(3,64px);gap:8px;margin-top:16px}
+.kp{font:inherit;font-size:1.2rem;height:54px;border:2px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}.kp:active{background:#eef2ff}.kp-back{grid-column:span 1}
+.figure{max-width:100%;height:auto;color:var(--ink);margin:10px 0}.figure-wrap{margin:12px 0}
+.frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1}.frac .num{border-bottom:2px solid currentColor;padding:0 5px}.frac .den{padding:0 5px}
+.math{font-variant-numeric:tabular-nums}
+.data-table{border-collapse:collapse;margin:12px 0}.data-table th,.data-table td{border:1px solid var(--line);padding:8px 14px;text-align:center}
+.bargraph .bg-hit:hover{fill:rgba(79,70,229,.06)}
+.weditor-toolbar{display:flex;gap:4px;flex-wrap:wrap;margin:10px 0;border:1px solid var(--line);border-radius:8px;padding:6px}
+.wtool{font:inherit;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;min-width:34px}
+.weditor{min-height:240px;border:2px solid var(--line);border-radius:10px;padding:14px;background:#fff;font-size:1.05em}.weditor:focus{outline:none;border-color:var(--indigo)}
+.wcount{color:var(--muted);font-size:.85rem;margin-top:6px}.wplan,.wcheck,.wfmt{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0}.wcheck ul{margin:6px 0}
+.tds-bottom{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line);background:#f8fafc}
+.tds-bottom .primary{margin-left:auto}.save-msg{color:var(--green);font-weight:600;font-size:.85rem}
 
-/* ---------- header / footer ---------- */
-.app-header, .test-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 22px; gap: 12px;
-}
-.brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
-.brand span { color: var(--indigo); }
-.app-footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 30px 20px; }
-
-/* ---------- home ---------- */
-.home { padding: 10px 22px 40px; }
-.hero { text-align: center; padding: 14px 0 8px; }
-.hero .sub { color: var(--muted); margin: 0 0 14px; }
-.api-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; font-size: .9rem; font-weight: 600; }
-.api-pill.on { background: var(--green-bg); color: var(--green); }
-.api-pill.off { background: #e0e7ff; color: var(--indigo); }
-
-.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
-.subject-card {
-  text-align: left; border: 2px solid var(--line); background: var(--card);
-  border-radius: var(--radius); padding: 26px; cursor: pointer; font: inherit;
-  box-shadow: var(--shadow); transition: transform .1s, border-color .15s;
-}
-.subject-card:hover { border-color: var(--indigo); transform: translateY(-3px); }
-.subject-card:active { transform: scale(.98); }
-.card-icon { font-size: 2.6rem; }
-.card-title { font-size: 1.4rem; font-weight: 700; margin-top: 6px; }
-.card-meta { color: var(--muted); font-size: .92rem; margin-top: 4px; }
-.card-go { color: var(--indigo); font-weight: 700; margin-top: 14px; }
-
-.resume-banner {
-  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
-  background: var(--amber-bg); border: 2px solid var(--amber); border-radius: var(--radius);
-  padding: 16px 20px; margin: 10px 0 18px;
-}
-.resume-text { display: flex; flex-direction: column; }
-.resume-text strong { font-size: 1.1rem; }
-.resume-actions { display: flex; gap: 10px; }
-
-.battery-card {
-  display: flex; align-items: center; gap: 16px; width: 100%; text-align: left;
-  font: inherit; cursor: pointer; margin: 0 0 22px;
-  border: 2px solid var(--indigo); border-radius: var(--radius); padding: 18px 22px;
-  background: linear-gradient(100deg, #eef2ff, #faf5ff); box-shadow: var(--shadow);
-  transition: transform .1s;
-}
-.battery-card:hover { transform: translateY(-2px); }
-.battery-card:active { transform: scale(.99); }
-.battery-icon { font-size: 2.2rem; }
-.battery-text { display: flex; flex-direction: column; flex: 1; }
-.battery-text strong { font-size: 1.2rem; }
-.battery-card .card-go { margin: 0; }
-.battery-result { margin-top: 22px; padding-top: 6px; border-top: 2px dashed var(--line); }
-.battery-result h2 { margin-top: 8px; }
-
-.mode-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
-.mode-label { font-weight: 700; }
-.radio, .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
-.radio input, .check input { width: 20px; height: 20px; }
-
-.history-block { margin-top: 30px; }
-.history-list { display: flex; flex-direction: column; gap: 10px; }
-.history-item {
-  background: var(--card); border: 2px solid var(--line); border-radius: 14px;
-  padding: 14px 18px; cursor: pointer; transition: border-color .15s;
-}
-.history-item:hover { border-color: var(--indigo); }
-.hi-main { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-.hi-score { font-weight: 800; }
-.hi-sub { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .85rem; margin-top: 4px; }
-.link-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: .85rem; }
-
-/* ---------- settings ---------- */
-.settings { padding: 10px 22px 50px; max-width: 640px; margin: 0 auto; }
-.field { display: block; margin: 16px 0; }
-.field span { display: block; font-weight: 600; margin-bottom: 6px; }
-.field input, .field select {
-  width: 100%; font: inherit; padding: 14px; border: 2px solid var(--line);
-  border-radius: 12px; background: #fff;
-}
-.field input:focus, .field select:focus { outline: none; border-color: var(--indigo); }
-.divider { margin: 26px 0 6px; font-weight: 800; color: var(--indigo); border-top: 2px solid var(--line); padding-top: 18px; }
-.status { margin-top: 14px; font-weight: 600; min-height: 24px; }
-.status.ok { color: var(--green); }
-.status.err { color: var(--red); }
-
-/* ---------- unit intro / break ---------- */
-.unit-intro { display: flex; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; }
-.intro-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px; text-align: center; max-width: 560px; width: 100%; }
-.intro-card .card-icon { font-size: 3.4rem; }
-.intro-points { text-align: left; max-width: 420px; margin: 18px auto 26px; padding-left: 0; list-style: none; }
-.intro-points li { padding: 8px 0; border-bottom: 1px solid var(--line); }
-
-/* ---------- test / question ---------- */
-.test-header { background: var(--card); border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; font-weight: 700; }
-.th-mid { flex: 1; text-align: center; }
-.diff-pill { background: #e0e7ff; color: var(--indigo); padding: 6px 14px; border-radius: 999px; font-size: .85rem; }
-#timer { font-variant-numeric: tabular-nums; }
-#timer.low { color: var(--red); }
-.progress { height: 8px; background: var(--line); }
-.progress-fill { height: 100%; background: var(--indigo); transition: width .3s; }
-
-.question-screen { padding: 22px; max-width: 800px; margin: 0 auto; }
-.passage { background: #fff; border: 2px solid var(--line); border-left: 6px solid var(--indigo); border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; }
-.passage h3 { color: var(--indigo); }
-.stem { font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; }
-
-.answer-area { display: flex; flex-direction: column; gap: 12px; }
-.hint { color: var(--muted); font-size: .9rem; font-style: italic; }
-.choice {
-  display: flex; align-items: center; gap: 14px; padding: 16px 18px;
-  border: 2px solid var(--line); border-radius: 14px; background: #fff; cursor: pointer;
-  transition: border-color .12s, background .12s;
-}
-.choice:hover { border-color: var(--indigo); }
-.choice.selected { border-color: var(--indigo); background: #eef2ff; }
-.choice input { width: 22px; height: 22px; flex-shrink: 0; }
-.choice-letter { font-weight: 800; color: var(--indigo); width: 26px; }
-.choice.correct { border-color: var(--green); background: var(--green-bg); }
-.choice.wrong { border-color: var(--red); background: var(--red-bg); }
-.num-input, .writing-input {
-  width: 100%; font: inherit; padding: 16px; border: 2px solid var(--line); border-radius: 12px;
-}
-.num-input { font-size: 1.4rem; max-width: 280px; }
-.num-input:focus, .writing-input:focus { outline: none; border-color: var(--indigo); }
-
-.feedback { margin-top: 20px; padding: 18px; border-radius: 14px; border: 2px solid var(--line); }
-.feedback.ok { background: var(--green-bg); border-color: var(--green); }
-.feedback.no { background: var(--red-bg); border-color: var(--red); }
-.feedback.writing { background: var(--amber-bg); border-color: var(--amber); }
-.fb-head { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
-.fb-head.ok { color: var(--green); }
-.fb-head.no { color: var(--red); }
-.fb-exp { margin-top: 6px; }
-.action-row { margin-top: 24px; display: flex; justify-content: center; }
-
-/* ---------- loading ---------- */
-.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 18px; color: var(--muted); }
-.spinner { width: 54px; height: 54px; border: 6px solid var(--line); border-top-color: var(--indigo); border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ---------- results / analytics ---------- */
-.results { padding: 18px 22px 50px; max-width: 860px; margin: 0 auto; }
-.results-title { text-align: center; font-size: 1.4rem; }
-.score-card { text-align: center; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; border-top: 8px solid var(--indigo); }
-.score-card.level-1, .score-card.level-2 { border-top-color: var(--red); }
-.score-card.level-3 { border-top-color: var(--amber); }
-.score-card.level-4, .score-card.level-5 { border-top-color: var(--green); }
-.score-big { font-size: 4rem; font-weight: 900; line-height: 1; color: var(--indigo); }
-.score-scale { color: var(--muted); font-size: .9rem; }
-.meter { height: 14px; background: var(--line); border-radius: 999px; margin: 16px auto; max-width: 480px; overflow: hidden; }
-.meter-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e); }
-.level-badge { display: inline-block; font-weight: 800; font-size: 1.1rem; padding: 8px 18px; border-radius: 999px; background: #eef2ff; color: var(--indigo); }
-.score-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 16px; color: var(--muted); }
-
-.dom-list { display: flex; flex-direction: column; gap: 10px; }
-.dom-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 14px; align-items: center; background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 12px 16px; }
-.dom-row.strength { border-color: var(--green); }
-.dom-row.needs-work { border-color: var(--red); }
-.dom-name { font-weight: 600; }
-.dom-bar { height: 14px; background: var(--line); border-radius: 999px; overflow: hidden; }
-.dom-fill { height: 100%; background: var(--indigo); }
-.dom-row.strength .dom-fill { background: var(--green); }
-.dom-row.needs-work .dom-fill { background: var(--red); }
-.dom-val { font-weight: 700; white-space: nowrap; }
-.dom-count { color: var(--muted); font-weight: 400; font-size: .85rem; }
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
-.panel { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-top: 16px; }
-.panel ul { margin: 6px 0 0; padding-left: 20px; }
-.panel li { padding: 3px 0; }
-.strength-panel { border-color: var(--green); }
-.focus-panel { border-color: var(--amber); }
-.claude-panel { border-color: var(--indigo); background: #f5f3ff; }
-.claude-panel h4 { margin: 12px 0 2px; }
-
-.save-row { display: flex; gap: 14px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
-
-/* ---------- responsive ---------- */
-@media (max-width: 640px) {
-  body { font-size: 17px; }
-  .cards, .two-col { grid-template-columns: 1fr; }
-  .dom-row { grid-template-columns: 1fr auto; }
-  .dom-bar { grid-column: 1 / -1; order: 3; }
-}
+/* review + report */
+.review{padding:24px;max-width:800px;margin:0 auto}
+.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:18px 0}
+.review-cell{border:2px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;background:#fff;font:inherit}.review-cell.done{border-color:var(--green);background:var(--green-bg)}.review-cell.todo{border-color:var(--amber)}
+.review-actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.report-main{padding:18px 22px 50px;max-width:840px;margin:0 auto}.report-actions{display:flex;justify-content:center;padding:20px}
+.score-card{text-align:center;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border-top:8px solid var(--indigo)}
+.score-card.level-1,.score-card.level-2{border-top-color:var(--red)}.score-card.level-3{border-top-color:var(--amber)}.score-card.level-4,.score-card.level-5{border-top-color:var(--green)}
+.score-big{font-size:3.6rem;font-weight:900;color:var(--indigo);line-height:1}.score-scale{color:var(--muted);font-size:.85rem}
+.meter{height:14px;background:var(--line);border-radius:99px;max-width:480px;margin:14px auto;overflow:hidden}.meter-fill{height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}
+.level-badge{display:inline-block;font-weight:800;background:#eef2ff;color:var(--indigo);padding:8px 16px;border-radius:99px}
+.score-stats{display:flex;gap:18px;justify-content:center;margin-top:12px;color:var(--muted)}
+.path{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.path-step{padding:6px 12px;border-radius:99px;font-weight:700;text-transform:capitalize}.path-arrow{color:var(--muted)}
+.band-easy{background:#dcfce7;color:#15803d}.band-medium{background:#e0e7ff;color:#4338ca}.band-hard{background:#fee2e2;color:#b91c1c}
+.std-list{display:flex;flex-direction:column;gap:8px}.std-row{display:grid;grid-template-columns:1fr 2fr auto;gap:12px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:10px;padding:10px 14px}
+.std-row.strength{border-color:var(--green)}.std-row.needs{border-color:var(--red)}
+.std-bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}.std-bar>span{display:block;height:100%;background:var(--indigo)}.std-val{white-space:nowrap;font-weight:700}
+.item-table{border-collapse:collapse;width:100%;margin-top:8px;font-size:.9rem}.item-table th,.item-table td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+@media(max-width:760px){.test-cards{grid-template-columns:1fr}.tds-body.two-pane{flex-direction:column}.tds-mid{display:none}.divider{display:none}}
   </style>
 </head>
 <body>
   <div id="app"></div>
   <script src="data.js"></script>
   <script>
-/* ===== storage.js ===== */
-// Local persistence using localStorage. Everything stays on the device.
+/* ===== app/content.js ===== */
+// Item bank: shared stimuli + items in the canonical schema (spec C.2).
+// "Form A" reproduces the items observed in the official Grade 3 practice test
+// (passage paraphrased to avoid reprinting copyrighted text). The large legacy
+// question bank (data.js globals) is transformed into the same schema to give
+// the adaptive engine a deep, domain-tagged pool to route through.
 
-const SETTINGS_KEY = 'njsla.settings.v1';
-const RESULTS_KEY = 'njsla.results.v1';
-const PROGRESS_KEY = 'njsla.progress.v1';
+// ---- helpers ----
+const DOMAIN_NAMES = {
+  OA: 'Operations & Algebraic Thinking',
+  NBT: 'Number & Operations in Base Ten',
+  NF: 'Number & Operations—Fractions',
+  MD: 'Measurement & Data',
+  G: 'Geometry',
+  RL: 'Reading: Literature',
+  RI: 'Reading: Informational',
+  L: 'Language & Vocabulary',
+  W: 'Written Expression',
+};
+const SUBJECT_MAP = { math: 'math', reading: 'ela_reading', writing: 'ela_writing' };
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-const DEFAULT_SETTINGS = {
-  studentName: '',
-  provider: 'anthropic', // 'anthropic' | 'openai' | 'gemini'
-  apiKey: '',
-  model: 'claude-sonnet-4-6',
-  useApi: true, // use the AI provider when a key is present
+function diffToB(d) { return ({ 1: -2, 2: -1, 3: 0, 4: 1, 5: 2 })[d] != null ? ({ 1: -2, 2: -1, 3: 0, 4: 1, 5: 2 })[d] : 0; }
+function bToBand(b) { return b <= -1 ? 'easy' : b >= 1 ? 'hard' : 'medium'; }
+
+// ---- shared stimuli (passages / figures) ----
+const STIMULI = {
+  'passage-never': {
+    id: 'passage-never', kind: 'literary',
+    title: 'The Meaning of “Never”', author: 'Practice adaptation',
+    paragraphs: [
+      'Every evening, Jatto sat beside his mother and read to her from his English book. His mother spoke Esan, and she liked to hear the new words even when she did not know them all.',
+      'One night Jatto read a sentence that ended with the word “never.” His mother stopped him. “What is this word?” she asked.',
+      'Jatto thought for a moment. He wanted to explain it well. “It means not ever,” he said. “Something that will not happen at any time.”',
+      'His mother tilted her head. The word sounded heavy and sad to her, like a door closing.',
+      'Jatto tried again. He gave her an example about a bird that would never forget its way home.',
+      'As he spoke, a leaf came loose from the tree by the window. It floated to the ground like a feather, slowly and gently.',
+      'His mother smiled and began a story of her own, a story from when she was a girl. Jatto closed his book and listened.',
+      'After a while his mother said, “You can eat while I talk.” She knew he had been reading a long time and needed a rest.',
+      'When her story ended, she said something Jatto did not expect. “Never can be a happy word, too,” she told him. “We will never stop sharing our stories.”',
+      'Jatto had thought he understood the word perfectly. Now he saw that his mother had taught him a new meaning. “Never” did not have to mean an ending. It could mean forever.',
+    ],
+    credit: 'Original practice passage written for this app; inspired by the theme of the released item.',
+  },
+  'passage-sisters': {
+    id: 'passage-sisters', kind: 'literary',
+    title: 'The Sisters and Their Cat', author: 'Practice adaptation',
+    paragraphs: [
+      'Sofia and Rosa had wanted a pet for a long time. On Saturday, their family brought home a small gray cat from the shelter.',
+      'The cat was shy at first. It hid under the couch and peeked out with wide green eyes.',
+      'Sofia set down a soft blanket. Rosa filled a little bowl with water. They sat quietly and waited for the cat to feel safe.',
+    ],
+    credit: 'Original practice source written for this app.',
+  },
 };
 
-function loadSettings() {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SETTINGS };
-  } catch {
-    return { ...DEFAULT_SETTINGS };
-  }
-}
+// ---- Form A: reproduced observed items ----
+const FORM_A_ITEMS = [
+  // ----- ELA Reading (passage-never) -----
+  mc('rA-1', 'ela_reading', 'RL.3.1', 'RL', 'Key Ideas & Details: inference', 0, 'passage-never',
+    'Why does Jatto have to explain the meaning of “never” to his mother?',
+    ['His mother does not understand all of the English words.', 'His mother has never read the book before.', 'Jatto wants to show how many words he knows.', 'Jatto read the sentence incorrectly.'], 'A',
+    'His mother speaks Esan and asks what the word means.'),
+  mc('rA-2', 'ela_reading', 'RL.3.4', 'RL', 'Craft & Structure: vocabulary in context', -1, 'passage-never',
+    'Read this sentence from the story. “It floated to the ground like a feather, slowly and gently.” (paragraph 6) What does the phrase mean?',
+    ['It fell slowly and gently.', 'It blew far away.', 'It made a loud sound.', 'It floated up into the sky.'], 'A',
+    'A feather drifts down slowly and gently.'),
+  mc('rA-3', 'ela_reading', 'RL.3.5', 'RL', 'Craft & Structure: text structure', 1, 'passage-never',
+    'How do the events change in paragraph 7?',
+    ['Jatto switches from reading his book to listening to his mother’s story.', 'Jatto leaves the room to eat dinner.', 'Jatto starts a brand-new book.', 'Jatto teaches his mother to read.'], 'A',
+    'In paragraph 7 he closes his book and listens to her story.'),
+  mc('rA-4', 'ela_reading', 'RL.3.6', 'RL', 'Craft & Structure: point of view', 0, 'passage-never',
+    'What is Jatto’s view of his explanation of the word “never”?',
+    ['He believes he explained it well.', 'He thinks he made a mistake.', 'He wishes he had not tried.', 'He is bored by it.'], 'A',
+    'The story says he wanted to explain it well and thought he understood it perfectly.'),
+  mc('rA-5', 'ela_reading', 'RL.3.3', 'RL', 'Key Ideas & Details: character', 0, 'passage-never',
+    'Why does the mother say, “You can eat while I talk”?',
+    ['She understands that Jatto needs a break.', 'She is angry that he is hungry.', 'She wants him to stop listening.', 'She is finished telling stories.'], 'A',
+    'She knows he has been reading a long time and needs a rest.'),
+  multi('rA-6', 'ela_reading', 'RL.3.2', 'RL', 'Key Ideas & Details: central message', 1, 'passage-never',
+    'Why is it important to the mother that Jatto read aloud to her? Choose two reasons.',
+    ['It helps Jatto practice his English.', 'It lets them spend meaningful time together.', 'It teaches her to write in English.', 'It helps Jatto fall asleep.', 'It keeps the house quiet.'], ['A', 'B'],
+    'Reading aloud helps Jatto practice English and lets them share time together.'),
+  mc('rA-7', 'ela_reading', 'RL.3.2', 'RL', 'Theme / lesson', 1, 'passage-never',
+    'What lesson does the mother help Jatto learn?',
+    ['“Never” can be a positive word.', 'Books are better than stories.', 'English is too hard to learn.', 'It is best to read silently.'], 'A',
+    'She shows him “never” can mean they will never stop sharing stories — a happy meaning.'),
 
-function saveSettings(settings) {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
+  // ----- ELA Writing (passage-sisters) -----
+  {
+    id: 'wA-1', subject: 'ela_writing', grade: 3, standard: 'W.3.3', domain: DOMAIN_NAMES.W,
+    skill: 'narrative writing', type: 'extended_writing', difficulty: 0, stage_band: 'medium',
+    stimulus_ref: 'passage-sisters',
+    stem: 'Use your imagination to write a new story about what happens when Sofia and Rosa get their new cat. Include details about how they feel about the new cat and what they teach it.',
+    plan: ['plan your story', 'write your story', 'revise your story', 'edit your story'],
+    checklist: ['a plot with a beginning, middle, and end', 'character development', 'a descriptive setting'],
+    format: 'Your response should be in the form of a multiparagraph story. Write your story in the space provided.',
+    media: [], interaction: { editor: 'rich' },
+    answer_key: null, scoring: { points: 8, rule: 'rubric' },
+    rationale: 'Holistic two-dimension rubric: Composition and Conventions.', calculator: false,
+  },
 
-function loadResults() {
-  try {
-    const raw = localStorage.getItem(RESULTS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveResult(result) {
-  const all = loadResults();
-  all.unshift(result); // newest first
-  localStorage.setItem(RESULTS_KEY, JSON.stringify(all));
-  return all;
-}
-
-function deleteResult(id) {
-  const all = loadResults().filter((r) => r.id !== id);
-  localStorage.setItem(RESULTS_KEY, JSON.stringify(all));
-  return all;
-}
-
-function clearResults() {
-  localStorage.removeItem(RESULTS_KEY);
-}
-
-// ---- in-progress test (save & resume) ----
-function saveProgress(progress) {
-  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch {}
-}
-
-function loadProgress() {
-  try {
-    const raw = localStorage.getItem(PROGRESS_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function clearProgress() {
-  localStorage.removeItem(PROGRESS_KEY);
-}
-
-/* ===== scoring.js ===== */
-// NJSLA-style scoring.
-//
-// The real NJSLA reports a scale score from 650 to 850 and places students in
-// one of five performance levels. We approximate that here from a difficulty-
-// weighted performance index so that reaching (and answering) harder questions
-// raises the score the way an adaptive form would.
-//
-// Level cut scores below match the published NJSLA performance-level ranges.
-
-const LEVELS = [
-  { level: 1, min: 650, max: 699, label: 'Did Not Yet Meet Expectations', short: 'Level 1' },
-  { level: 2, min: 700, max: 724, label: 'Partially Met Expectations', short: 'Level 2' },
-  { level: 3, min: 725, max: 749, label: 'Approached Expectations', short: 'Level 3' },
-  { level: 4, min: 750, max: 809, label: 'Met Expectations', short: 'Level 4' },
-  { level: 5, min: 810, max: 850, label: 'Exceeded Expectations', short: 'Level 5' },
+  // ----- Mathematics Form A (11 observed items) -----
+  numeric('mA-1', '3.OA.A.2', 'OA', 'division word problem', -1,
+    'There are 18 DVDs placed equally on 3 shelves. How many DVDs are on each shelf?', '6', null,
+    '18 ÷ 3 = 6.'),
+  {
+    id: 'mA-2', subject: 'math', grade: 3, standard: '3.NF.A.2', domain: DOMAIN_NAMES.NF,
+    skill: 'fraction on a number line', type: 'fraction_entry', difficulty: 0, stage_band: 'medium',
+    stimulus_ref: null,
+    stem: 'The point on the number line shows a fraction. Create a fraction that represents the point.',
+    figure: { type: 'numberline', min: 0, max: 1, ticks: 4, point: 0.75, label: '' },
+    media: [], interaction: { mode: 'fraction' },
+    answer_key: { value: '3/4', equivalent: true }, scoring: { points: 1, rule: 'equivalent' },
+    rationale: 'The point sits at the 3rd of 4 equal parts, so 3/4.', calculator: false,
+  },
+  mcFig('mA-3', '3.MD.C.6', 'MD', 'area as unit squares', 0,
+    'A shaded figure covers 14 square units on the grid. What does one shaded square represent?',
+    { type: 'areagrid', rows: 2, cols: 7, shaded: 14 },
+    ['One square unit', 'Fourteen square units', 'One half of a square', 'Seven square units'], 'A',
+    'Each small shaded square is one square unit.'),
+  numeric('mA-4', '3.OA.D.8', 'OA', 'multi-step word problem', 1,
+    'Maya rides her bike 3 days each week. She rides 10 minutes each day. How many minutes does she ride in 2 weeks?', '60', null,
+    '3 × 10 = 30 minutes per week, then 30 × 2 = 60 minutes.'),
+  {
+    id: 'mA-5', subject: 'math', grade: 3, standard: '3.NBT.A.1', domain: DOMAIN_NAMES.NBT,
+    skill: 'rounding to nearest ten (open-ended)', type: 'numeric_entry', difficulty: 1, stage_band: 'hard',
+    stimulus_ref: null,
+    stem: 'Enter one number that is greater than 275 AND rounds to the same nearest ten as 275. (275 rounds to 280.)',
+    media: [], interaction: { mode: 'integer' },
+    answer_key: { any_of: ['276', '277', '278', '279', '280', '281', '282', '283', '284'] },
+    scoring: { points: 1, rule: 'any_of' },
+    rationale: '275 rounds to 280; numbers from 276 to 284 are greater than 275 and also round to 280.', calculator: false,
+  },
+  {
+    id: 'mA-6', subject: 'math', grade: 3, standard: '3.MD.B.3', domain: DOMAIN_NAMES.MD,
+    skill: 'scaled bar graph (build)', type: 'bar_graph_build', difficulty: 0, stage_band: 'medium',
+    stimulus_ref: null,
+    stem: 'Nadia counted how many of her friends own 0, 1, or 2 pets. Use the table to build the bar graph. Click between the lines to set each bar.',
+    table: { headers: ['Number of pets', 'Friends'], rows: [['0', '15'], ['1', '18'], ['2', '6']] },
+    media: [], interaction: { categories: ['0', '1', '2'], yMax: 20, yStep: 1 },
+    answer_key: { '0': 15, '1': 18, '2': 6 }, scoring: { points: 1, rule: 'exact' },
+    rationale: 'Each bar height matches the table: 15, 18, and 6.', calculator: false,
+  },
+  {
+    id: 'mA-7', subject: 'math', grade: 3, standard: '3.NF.A.3', domain: DOMAIN_NAMES.NF,
+    skill: 'compare unit fractions', type: 'numeric_entry', difficulty: 1, stage_band: 'hard',
+    stimulus_ref: null,
+    stem: 'A comparison is shown:  \\(\\frac{1}{?} > \\frac{1}{4}\\).  What whole number could be the missing denominator?',
+    media: [], interaction: { mode: 'integer' },
+    answer_key: { any_of: ['1', '2', '3'] }, scoring: { points: 1, rule: 'any_of' },
+    rationale: 'A unit fraction is larger when its denominator is smaller, so any whole number less than 4 works.', calculator: false,
+  },
+  numeric('mA-8', '3.OA.B.5', 'OA', 'missing factor / properties', 1,
+    'Find the missing value:  12 × 6 × 5 × 3 = 60 × ▢', '18', null,
+    '12 × 6 × 5 × 3 = 1080, and 1080 ÷ 60 = 18.'),
+  mcFig('mA-9', '3.NF.A.2', 'NF', 'fraction on a number line', 0,
+    'The point on the number line shows the fraction 3 over a missing number. What is the missing number (the denominator)?',
+    { type: 'numberline', min: 0, max: 1, ticks: 4, point: 0.75, label: '3/?' },
+    ['3', '4', '6', '8'], 'B',
+    'The line is split into 4 equal parts and the point is at the 3rd, so the denominator is 4.'),
+  numeric('mA-10', '3.MD.D.8', 'MD', 'perimeter of a rectangle', 0,
+    'A rectangle is 8 inches tall and 10 inches wide. What is its perimeter in inches?', '36',
+    { type: 'rectangle', w: 10, h: 8, unit: 'in' },
+    'Perimeter = 8 + 10 + 8 + 10 = 36 inches.'),
+  {
+    id: 'mA-11', subject: 'math', grade: 3, standard: '3.NBT.A.2', domain: DOMAIN_NAMES.NBT,
+    skill: 'place-value patterns (multi-part)', type: 'multi_part_entry', difficulty: 0, stage_band: 'medium',
+    stimulus_ref: null,
+    stem: 'Enter a number to complete each equation.',
+    media: [], interaction: { blanks: [
+      { id: 'b1', label: '9 − ▢ = 6' },
+      { id: 'b2', label: '90 − ▢ = 60' },
+      { id: 'b3', label: '900 − ▢ = 600' },
+    ], mode: 'integer' },
+    answer_key: { b1: '3', b2: '30', b3: '300' }, scoring: { points: 3, rule: 'partial' },
+    rationale: 'Each uses the same pattern: 3, 30, 300.', calculator: false,
+  },
 ];
 
-function levelForScore(score) {
-  return LEVELS.find((l) => score >= l.min && score <= l.max) || LEVELS[0];
-}
-
-// answers: [{ question, correct (bool), partial (0..1), difficulty }]
-// Returns { scaleScore, level, perfIndex, points, maxPoints, accuracy }
-function scoreTest(answers) {
-  if (!answers.length) {
-    return { scaleScore: 650, level: LEVELS[0], perfIndex: 0, points: 0, maxPoints: 0, accuracy: 0 };
-  }
-
-  // Difficulty-weighted points. A correct item earns points equal to its
-  // difficulty (1..5); partial credit (writing) earns a fraction of that.
-  let points = 0;
-  let maxPoints = 0;
-  let correctCount = 0;
-  for (const a of answers) {
-    const d = a.difficulty || 3;
-    maxPoints += d;
-    const credit = a.correct ? 1 : (a.partial || 0);
-    points += credit * d;
-    if (a.correct) correctCount += 1;
-  }
-
-  const perfIndex = maxPoints > 0 ? points / maxPoints : 0; // 0..1
-  const accuracy = correctCount / answers.length;
-
-  // Map performance index to the 650..850 scale.
-  let scaleScore = Math.round(650 + perfIndex * 200);
-  scaleScore = Math.max(650, Math.min(850, scaleScore));
-
+// ---- compact item constructors ----
+function mc(id, subject, standard, dom, skill, b, stim, stem, opts, correct, rationale) {
   return {
-    scaleScore,
-    level: levelForScore(scaleScore),
-    perfIndex,
-    points: Math.round(points * 10) / 10,
-    maxPoints,
-    accuracy,
+    id, subject, grade: 3, standard, domain: DOMAIN_NAMES[dom], skill,
+    type: 'multiple_choice', difficulty: b, stage_band: bToBand(b), stimulus_ref: stim,
+    stem, media: [], interaction: { options: opts.map((t, i) => ({ id: LETTERS[i], text: t })), shuffle: false },
+    answer_key: { correct }, scoring: { points: 1, rule: 'exact' }, rationale, calculator: false,
   };
 }
-
-// Score the ELA-Writing assessment from its extended-response task(s).
-// NJSLA-Adaptive writing uses a holistic rubric with two dimensions:
-// Composition (ideas/organization, weighted higher) and Conventions.
-function scoreWriting(answers) {
-  const essays = answers.filter((a) => a.writingScores);
-  if (!essays.length) {
-    return { scaleScore: 650, level: LEVELS[0], accuracy: 0, perfIndex: 0, dimensions: { composition: 0, conventions: 0 } };
-  }
-  const avg = (k) => essays.reduce((s, a) => s + (a.writingScores[k] || 0), 0) / essays.length;
-  const composition = avg('composition');
-  const conventions = avg('conventions');
-  const overall = 0.65 * composition + 0.35 * conventions; // 0..1
-
-  let scaleScore = Math.round(650 + overall * 200);
-  scaleScore = Math.max(650, Math.min(850, scaleScore));
-
+function mcFig(id, standard, dom, skill, b, stem, figure, opts, correct, rationale) {
+  const it = mc(id, 'math', standard, dom, skill, b, null, stem, opts, correct, rationale);
+  it.type = 'mc_with_figure'; it.figure = figure; return it;
+}
+function multi(id, subject, standard, dom, skill, b, stim, stem, opts, correct, rationale) {
   return {
-    scaleScore,
-    level: levelForScore(scaleScore),
-    accuracy: overall,
-    perfIndex: overall,
-    dimensions: {
-      composition: Math.round(composition * 100),
-      conventions: Math.round(conventions * 100),
-    },
+    id, subject, grade: 3, standard, domain: DOMAIN_NAMES[dom], skill,
+    type: 'multi_select', difficulty: b, stage_band: bToBand(b), stimulus_ref: stim,
+    stem, media: [], interaction: { options: opts.map((t, i) => ({ id: LETTERS[i], text: t })), selectCount: correct.length },
+    answer_key: { correct }, scoring: { points: 1, rule: 'all_or_nothing' }, rationale, calculator: false,
   };
 }
+function numeric(id, standard, dom, skill, b, stem, value, figure, rationale) {
+  const it = {
+    id, subject: 'math', grade: 3, standard, domain: DOMAIN_NAMES[dom], skill,
+    type: 'numeric_entry', difficulty: b, stage_band: bToBand(b), stimulus_ref: null,
+    stem, media: [], interaction: { mode: 'integer' },
+    answer_key: { value: String(value) }, scoring: { points: 1, rule: 'exact' }, rationale, calculator: false,
+  };
+  if (figure) it.figure = figure;
+  return it;
+}
 
-// Break performance down by domain for the analytics screen.
-// Returns [{ domain, name, total, correct, accuracy, status }]
-function scoreByDomain(answers, domainNames) {
-  const map = {};
-  for (const a of answers) {
-    const dom = a.question.domain;
-    if (!map[dom]) map[dom] = { domain: dom, name: domainNames[dom] || dom, total: 0, correct: 0, partialSum: 0 };
-    map[dom].total += 1;
-    if (a.correct) map[dom].correct += 1;
-    map[dom].partialSum += a.correct ? 1 : (a.partial || 0);
+// ---- transform the legacy bank (data.js globals) into pool items ----
+function transformLegacy() {
+  if (typeof QUESTIONS === 'undefined') return [];
+  return QUESTIONS.map((q) => {
+    const subject = SUBJECT_MAP[q.subject] || 'math';
+    const b = diffToB(q.difficulty || 3);
+    const base = {
+      id: 'legacy-' + q.id, subject, grade: 3, standard: q.standard || '', domain: DOMAIN_NAMES[q.domain] || q.domain,
+      skill: q.standard || q.domain, difficulty: b, stage_band: bToBand(b),
+      stimulus_ref: q.passage ? 'legacy-' + q.passage : null,
+      stem: q.stem, media: [], rationale: q.explanation || '', calculator: false,
+    };
+    if (q.type === 'mc') {
+      base.type = q.passage ? 'multiple_choice' : 'multiple_choice';
+      base.interaction = { options: q.choices.map((t, i) => ({ id: LETTERS[i], text: t })), shuffle: false };
+      base.answer_key = { correct: LETTERS[q.answer] };
+      base.scoring = { points: 1, rule: 'exact' };
+    } else if (q.type === 'ms') {
+      base.type = 'multi_select';
+      base.interaction = { options: q.choices.map((t, i) => ({ id: LETTERS[i], text: t })), selectCount: q.answer.length };
+      base.answer_key = { correct: q.answer.map((i) => LETTERS[i]) };
+      base.scoring = { points: 1, rule: 'all_or_nothing' };
+    } else if (q.type === 'num') {
+      base.type = 'numeric_entry';
+      base.interaction = { mode: 'integer' };
+      base.answer_key = { value: String(q.answer) };
+      base.scoring = { points: 1, rule: 'exact' };
+    } else if (q.type === 'essay') {
+      base.type = 'extended_writing';
+      base.interaction = { editor: 'rich' };
+      base.plan = ['plan', 'write', 'revise', 'edit'];
+      base.checklist = ['clear ideas', 'details and organization', 'correct conventions'];
+      base.format = q.stem;
+      base.answer_key = null;
+      base.scoring = { points: 8, rule: 'rubric' };
+      base.mode = q.mode || 'Narrative';
+    }
+    return base;
+  });
+}
+
+// legacy passages -> stimuli
+function transformLegacyStimuli() {
+  if (typeof PASSAGES === 'undefined') return;
+  for (const [pid, p] of Object.entries(PASSAGES)) {
+    STIMULI['legacy-' + pid] = {
+      id: 'legacy-' + pid, kind: 'literary', title: p.title, author: '',
+      paragraphs: String(p.text).split(/(?<=[.!?])\s+(?=[A-Z“"])/).filter(Boolean),
+      credit: '',
+    };
   }
-  return Object.values(map).map((d) => {
-    const accuracy = d.partialSum / d.total;
-    let status = 'developing';
-    if (accuracy >= 0.75) status = 'strength';
-    else if (accuracy < 0.5) status = 'needs-work';
-    return { ...d, accuracy, status };
-  }).sort((a, b) => b.accuracy - a.accuracy);
 }
+transformLegacyStimuli();
 
-/* ===== analytics.js ===== */
-// Pure rendering helpers for results & analytics. Return HTML strings.
+const ITEMS = [...FORM_A_ITEMS, ...transformLegacy()];
 
+// quick index
+const ITEMS_BY_ID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+function getStimulus(id) { return STIMULI[id]; }
 
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function scoreCard(result) {
-  // position of score along the 650-850 scale for the meter
-  const pct = Math.max(0, Math.min(100, ((result.scaleScore - 650) / 200) * 100));
-  let stats;
-  if (result.isWriting && result.writing) {
-    stats = `
-      <span>Composition: <strong>${result.writing.composition}%</strong></span>
-      <span>Conventions: <strong>${result.writing.conventions}%</strong></span>`;
-  } else {
-    stats = `
-      <span><strong>${result.correctCount}/${result.totalQuestions}</strong> correct</span>
-      <span><strong>${result.accuracy}%</strong> accuracy</span>
-      <span>hardest level reached: <strong>${result.highestDifficultyReached}/5</strong></span>`;
-  }
-  return `
-    <div class="score-card level-${result.level}">
-      <div class="score-big">${result.scaleScore}</div>
-      <div class="score-scale">scale score (650–850)</div>
-      <div class="meter"><div class="meter-fill" style="width:${pct}%"></div></div>
-      <div class="level-badge">Level ${result.level} — ${esc(result.levelLabel)}</div>
-      <div class="score-stats">${stats}</div>
-    </div>`;
-}
-
-const STATUS_LABEL = {
-  strength: '💪 Strength',
-  developing: '🌱 Developing',
-  'needs-work': '🎯 Needs practice',
+// ---- blueprint + forms ----
+// Domains to sample per subject (content balancing — adaptivity changes
+// difficulty, never which standards are covered).
+const BLUEPRINT = {
+  ela_reading: { domains: ['RL', 'RI', 'L'], sessions: 2, itemsPerSession: 7, setSize: 3 },
+  math: { domains: ['OA', 'NBT', 'NF', 'MD', 'G'], sessions: 2, itemsPerSession: 8, setSize: 4 },
+  ela_writing: { domains: ['W'], sessions: 1, itemsPerSession: 1, setSize: 1 },
 };
 
-function domainBars(result) {
-  const rows = result.byDomain
-    .map((d) => `
-      <div class="dom-row ${d.status}">
-        <div class="dom-name">${esc(d.name)}</div>
-        <div class="dom-bar"><div class="dom-fill" style="width:${d.accuracy}%"></div></div>
-        <div class="dom-val">${d.accuracy}% <span class="dom-count">(${d.correct}/${d.total})</span></div>
-      </div>`)
-    .join('');
-  return `<div class="dom-list">${rows}</div>`;
-}
-
-function strengthsImprovements(result) {
-  const strengths = result.byDomain.filter((d) => d.status === 'strength');
-  const focus = result.byDomain.filter((d) => d.status === 'needs-work');
-  const developing = result.byDomain.filter((d) => d.status === 'developing');
-
-  const list = (arr, empty) =>
-    arr.length
-      ? '<ul>' + arr.map((d) => `<li>${esc(d.name)} <span class="muted">(${d.accuracy}%)</span></li>`).join('') + '</ul>'
-      : `<p class="muted">${empty}</p>`;
-
-  return `
-    <div class="two-col">
-      <div class="panel strength-panel">
-        <h3>💪 Areas of Strength</h3>
-        ${list(strengths, 'Keep practicing to build clear strengths.')}
-      </div>
-      <div class="panel focus-panel">
-        <h3>🎯 Areas to Improve</h3>
-        ${list(focus, 'No major weak spots — nice!')}
-      </div>
-    </div>
-    ${developing.length ? `<div class="panel"><h3>🌱 Developing</h3>${list(developing, '')}</div>` : ''}`;
-}
-
-function claudeAnalysis(a) {
-  if (!a) return '';
-  const ul = (arr) => (arr && arr.length ? '<ul>' + arr.map((x) => `<li>${esc(x)}</li>`).join('') + '</ul>' : '');
-  return `
-    <div class="panel claude-panel">
-      <h3>🧠 Coach's Analysis (Claude)</h3>
-      <p>${esc(a.summary || '')}</p>
-      ${a.strengths && a.strengths.length ? `<h4>What went well</h4>${ul(a.strengths)}` : ''}
-      ${a.focus && a.focus.length ? `<h4>What to work on</h4>${ul(a.focus)}` : ''}
-      ${a.nextSteps && a.nextSteps.length ? `<h4>Try this at home</h4>${ul(a.nextSteps)}` : ''}
-    </div>`;
-}
-
-/* ===== claude.js ===== */
-// AI client that runs directly from the browser, supporting multiple providers:
-// Anthropic (Claude), OpenAI (ChatGPT), and Google Gemini.
-//
-// NOTE: Calling these APIs from the browser exposes the API key to anyone using
-// this device, so this is intended for personal/at-home use with a key you
-// control. The key is stored only in this device's localStorage.
-
-
-const ANTHROPIC_VERSION = '2023-06-01';
-
-const PROVIDERS = {
-  anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-6', keyHint: 'sk-ant-...' },
-  openai: { label: 'OpenAI (ChatGPT)', defaultModel: 'gpt-4o', keyHint: 'sk-...' },
-  gemini: { label: 'Google Gemini', defaultModel: 'gemini-2.5-flash', keyHint: 'AIza...' },
+// Fixed "Form A" sequences (reproduce the observed practice tests exactly).
+const FORMS = {
+  reading_formA: { subject: 'ela_reading', title: 'NJSLA-A Grade 3 Reading Practice Test (Form A)', items: ['rA-1', 'rA-2', 'rA-3', 'rA-4', 'rA-5', 'rA-6', 'rA-7'] },
+  writing_formA: { subject: 'ela_writing', title: 'NJSLA-A Grade 3 Writing Practice Test (Form A)', items: ['wA-1'] },
+  math_formA: { subject: 'math', title: 'NJSLA-A Grade 3 Mathematics Practice Test (Form A)', items: ['mA-1', 'mA-2', 'mA-3', 'mA-4', 'mA-5', 'mA-6', 'mA-7', 'mA-8', 'mA-9', 'mA-10', 'mA-11'] },
 };
 
-function defaultModelFor(provider) {
-  return (PROVIDERS[provider] || PROVIDERS.anthropic).defaultModel;
+const DOMAIN_LABEL = DOMAIN_NAMES;
+
+/* ===== app/scoring.js ===== */
+// Auto-scorers for every item type + θ→scale→performance-level conversion.
+
+const LEVELS = [
+  { level: 1, min: 650, max: 699, label: 'Did Not Yet Meet Expectations' },
+  { level: 2, min: 700, max: 724, label: 'Partially Met Expectations' },
+  { level: 3, min: 725, max: 749, label: 'Approached Expectations' },
+  { level: 4, min: 750, max: 809, label: 'Met Expectations' },
+  { level: 5, min: 810, max: 850, label: 'Exceeded Expectations' },
+];
+function levelForScore(s) { return LEVELS.find((l) => s >= l.min && s <= l.max) || LEVELS[0]; }
+
+// Final ability estimate -> NJSLA-style scale score (PRACTICE ESTIMATE; the
+// real cut scores are not public). theta ~ [-3,+3] maps across 650..850.
+function scaleFromTheta(theta) {
+  return Math.max(650, Math.min(850, Math.round(740 + theta * 35)));
 }
 
-// ---- provider-specific calls; each returns the assistant's text ----
-
-async function callAnthropic({ apiKey, model, system, messages, maxTokens }) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': ANTHROPIC_VERSION,
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
-  });
-  if (!res.ok) throw new Error(`Anthropic error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
-  const data = await res.json();
-  const block = (data.content || []).find((b) => b.type === 'text');
-  return block ? block.text : '';
+function normNum(s) {
+  return String(s == null ? '' : s).trim().replace(/\s+/g, '').replace(/^\+/, '');
 }
-
-async function callOpenAI({ apiKey, model, system, messages, maxTokens }) {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      messages: [{ role: 'system', content: system }, ...messages],
-    }),
-  });
-  if (!res.ok) throw new Error(`OpenAI error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || '';
+function parseFrac(s) {
+  const t = normNum(s);
+  const m = t.match(/^(-?\d+)\/(\d+)$/);
+  if (m) return Number(m[1]) / Number(m[2]);
+  if (/^-?\d+(\.\d+)?$/.test(t)) return Number(t);
+  return NaN;
 }
-
-async function callGemini({ apiKey, model, system, messages, maxTokens }) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const contents = messages.map((m) => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents,
-      generationConfig: { maxOutputTokens: maxTokens },
-    }),
-  });
-  if (!res.ok) throw new Error(`Gemini error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
-  const data = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  return parts.map((p) => p.text || '').join('');
-}
-
-// Unified entry point. Reads provider/model/key from settings.
-async function callLLM({ settings, system, messages, maxTokens = 1024 }) {
-  const provider = settings.provider || 'anthropic';
-  const apiKey = settings.apiKey;
-  const model = settings.model || defaultModelFor(provider);
-  const args = { apiKey, model, system, messages, maxTokens };
-  if (provider === 'openai') return callOpenAI(args);
-  if (provider === 'gemini') return callGemini(args);
-  return callAnthropic(args);
-}
-
-// Pull the first JSON object/array out of a model response.
-function extractJson(text) {
-  if (!text) throw new Error('Empty response');
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const candidate = fenced ? fenced[1] : text;
-  const start = candidate.search(/[[{]/);
-  if (start === -1) throw new Error('No JSON found in response');
-  const sub = candidate.slice(start);
-  return JSON.parse(sub.trim().replace(/,\s*([}\]])/g, '$1'));
-}
-
-// Generate a fresh extended-response writing prompt for the ELA-Writing test.
-async function generateWritingPrompt({ settings, history = [] }) {
-  const modes = ['Opinion', 'Narrative', 'Informative'];
-  const mode = modes[Math.floor(Math.random() * modes.length)];
-  const system =
-    'You write NJSLA-aligned Grade 3 extended-response writing prompts. Respond with ONLY ' +
-    'a JSON object: {"mode":"' + mode + '","stem":"the full prompt a child reads","rubric":"what a strong response includes"}.';
-  const user =
-    `Create ONE Grade 3 ${mode} writing prompt suitable for a single extended-response task (a few paragraphs). ` +
-    `Make it concrete and age-appropriate.` +
-    (history.length ? ` Avoid these recent prompts: ${history.slice(-4).join(' | ')}` : '');
-  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 500 });
-  const out = extractJson(text);
-  return {
-    id: 'gen_w_' + Math.random().toString(36).slice(2, 9),
-    subject: 'writing', domain: 'W', standard: 'AI-generated', difficulty: 3,
-    type: 'essay', mode: out.mode || mode, stem: out.stem,
-    rubric: out.rubric || 'Composition: clear ideas, organization, and details. Conventions: grammar, spelling, and punctuation.',
-    generated: true,
-  };
-}
-
-// Generate a single fresh question at the requested subject/domain/difficulty.
-async function generateQuestion({ settings, subject, domain, difficulty, history = [] }) {
-  if (subject === 'writing') return generateWritingPrompt({ settings, history });
-  const domainName = DOMAINS[subject][domain] || domain;
-  const subjectName = subject === 'math' ? 'Mathematics' : 'ELA Reading';
-  const needPassage = subject === 'reading' && (domain === 'RL' || domain === 'RI');
-
-  const system =
-    'You are an assessment item writer creating NJSLA-aligned practice questions for a ' +
-    'Grade 3 student in New Jersey. Questions must be grade-3 appropriate, factually correct, ' +
-    'and have exactly one unambiguous correct answer (unless multi-select). Respond with ONLY ' +
-    'a JSON object, no extra text.';
-
-  const schema = needPassage
-    ? `{
-  "passage": "a short 60-110 word grade-3 reading passage (omit if not needed)",
-  "type": "mc" | "ms",
-  "stem": "the question",
-  "choices": ["A","B","C","D"],
-  "answer": <index 0-3 for mc, or array of indices for ms>,
-  "explanation": "1-2 sentence kid-friendly explanation"
-}`
-    : `{
-  "type": "mc" | "ms" | "num",
-  "stem": "the question",
-  "choices": ["A","B","C","D"]   // omit for num,
-  "answer": <index for mc, array for ms, or a number for num>,
-  "explanation": "1-2 sentence kid-friendly explanation"
-}`;
-
-  const user =
-    `Create ONE Grade 3 ${subjectName} question.\n` +
-    `Domain: ${domainName} (${domain}).\n` +
-    `Difficulty: ${difficulty} on a 1 (easiest) to 5 (hardest) scale. ` +
-    `Make it genuinely ${difficulty >= 4 ? 'challenging but still grade-3 level' : 'appropriate for difficulty ' + difficulty}.\n` +
-    (history.length ? `Do NOT repeat these recent questions: ${history.slice(-6).join(' | ')}\n` : '') +
-    `Return JSON exactly in this shape:\n${schema}`;
-
-  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 700 });
-  const q = extractJson(text);
-
-  const question = {
-    id: 'gen_' + Math.random().toString(36).slice(2, 9),
-    subject,
-    domain,
-    standard: 'AI-generated',
-    difficulty,
-    type: q.type === 'ms' ? 'ms' : q.type === 'num' ? 'num' : 'mc',
-    stem: q.stem,
-    choices: q.choices,
-    answer: q.answer,
-    explanation: q.explanation || '',
-    generated: true,
-  };
-  if (q.passage) {
-    const pid = 'gen_p_' + question.id;
-    question.passage = pid;
-    question._passageText = q.passage;
-  }
-  return question;
-}
-
-// Grade an extended-response writing task on the two-dimension rubric.
-async function gradeWriting({ settings, question, response }) {
-  const passage = question.passage ? (PASSAGES[question.passage]?.text || question._passageText || '') : '';
-  const system =
-    'You are a kind but fair Grade 3 writing rater using the NJSLA-Adaptive holistic rubric, which has ' +
-    'TWO dimensions: Composition (ideas, organization, development, details) and Conventions (grammar, ' +
-    'spelling, capitalization, punctuation, complete sentences). Respond with ONLY JSON: ' +
-    '{"composition": <0 to 1>, "conventions": <0 to 1>, "feedback": "2-3 sentences of warm, specific feedback for a child"}.';
-  const user =
-    (passage ? `Passage:\n${passage}\n\n` : '') +
-    `Prompt: ${question.stem}\n\n` +
-    `What a strong response includes: ${question.rubric || 'clear ideas, details, and correct conventions.'}\n\n` +
-    `Student's response:\n"${response}"\n\n` +
-    `Score each dimension from 0 (off task/blank) to 1 (fully proficient for Grade 3). Partial values like 0.5 are fine.`;
-
-  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 400 });
-  const out = extractJson(text);
-  const clamp = (v) => { const n = Number(v); return Number.isNaN(n) ? 0 : Math.max(0, Math.min(1, n)); };
-  const composition = clamp(out.composition);
-  const conventions = clamp(out.conventions);
-  const overall = Math.round((0.65 * composition + 0.35 * conventions) * 100) / 100;
-  return { composition, conventions, overall, feedback: out.feedback || '' };
-}
-
-// Produce a narrative analysis of an overall performance summary.
-async function analyzePerformance({ settings, summary }) {
-  const system =
-    'You are an encouraging Grade 3 learning coach writing for a parent. Be warm, concrete, and ' +
-    'specific. Respond with ONLY JSON: {"summary": "2-3 sentences", "strengths": ["..."], ' +
-    '"focus": ["..."], "nextSteps": ["3 specific practice activities a parent can do at home"]}.';
-  const user =
-    `Here is a Grade 3 NJSLA practice-test result. Analyze it for the parent.\n\n` +
-    JSON.stringify(summary, null, 2);
-  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 800 });
-  return extractJson(text);
-}
-
-// Lightweight connectivity check used by the Settings screen.
-async function testConnection(settings) {
-  const text = await callLLM({
-    settings,
-    system: 'Reply with the single word: OK',
-    messages: [{ role: 'user', content: 'ping' }],
-    maxTokens: 10,
-  });
-  return /ok/i.test(text);
-}
-
-/* ===== engine.js ===== */
-// Adaptive test engine — modeled on the 2026 NJSLA-Adaptive (CAT) format.
-//
-// Each TestSession runs one assessment (Mathematics, ELA-Reading, or
-// ELA-Writing), organized into timed sessions. Difficulty starts at medium and
-// adapts after each *set* of items (not after every single item), mirroring the
-// real NJSLA-Adaptive "grouping" behavior. Questions come from Claude when an
-// API key is set, otherwise from the built-in bank. ELA-Writing is a single
-// extended-response task scored on two dimensions (Composition & Conventions).
-
-
-const TEST_CONFIG = {
-  math: {
-    name: SUBJECTS.math,
-    domains: ['OA', 'NBT', 'NF', 'MD', 'G'],
-    calculator: false,
-    full: { sessions: 2, minutesPerSession: 75, itemsPerSession: 18, setSize: 6 },
-    practice: { sessions: 1, minutesPerSession: 25, itemsPerSession: 12, setSize: 6 },
-  },
-  reading: {
-    name: SUBJECTS.reading,
-    domains: ['RL', 'RI', 'L'],
-    full: { sessions: 2, minutesPerSession: 75, itemsPerSession: 18, setSize: 6 },
-    practice: { sessions: 1, minutesPerSession: 25, itemsPerSession: 12, setSize: 6 },
-  },
-  writing: {
-    name: SUBJECTS.writing,
-    domains: ['W'],
-    isWriting: true,
-    full: { sessions: 1, minutesPerSession: 90, itemsPerSession: 1, setSize: 1 },
-    practice: { sessions: 1, minutesPerSession: 15, itemsPerSession: 1, setSize: 1 },
-  },
-};
-
-// Difficulty adapts after each set based on the set's accuracy.
-const SET_UP = 0.67;   // >= 2/3 correct in the set -> harder
-const SET_DOWN = 0.34; // <= 1/3 correct in the set -> easier
-
-function arraysEqualAsSets(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b)) return false;
-  if (a.length !== b.length) return false;
-  const sa = [...a].sort();
-  const sb = [...b].sort();
+function setsEqual(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+  const sa = [...a].sort(); const sb = [...b].sort();
   return sa.every((v, i) => v === sb[i]);
 }
 
-class TestSession {
-  constructor(subject, mode, settings) {
-    this.subject = subject;            // 'math' | 'reading' | 'writing'
-    this.mode = mode;                  // 'full' | 'practice'
-    this.settings = settings;
-    const cfg = TEST_CONFIG[subject];
-    this.cfg = cfg;
-    this.params = cfg[mode];
-    this.domains = cfg.domains;
-    this.isWriting = !!cfg.isWriting;
-
-    this.totalQuestions = this.params.sessions * this.params.itemsPerSession;
-    this.sessionIndex = 0;             // current session (0-based)
-    this.qInSession = 0;               // items answered in current session
-    this.globalIndex = 0;              // items answered overall
-
-    this.difficulty = 3;               // adaptive level, 1..5 (starts medium)
-    this.setCount = 0;                 // items answered in the current set
-    this.setCorrect = 0;               // weighted correct in the current set
-
-    this.usedIds = new Set();
-    this.usedStems = [];
-    this.answers = [];
-    this.passages = { ...PASSAGES };
-    this.currentQuestion = null;
-
-    this.domainPlan = this._buildDomainPlan();
-  }
-
-  _buildDomainPlan() {
-    const plan = [];
-    const n = this.params.itemsPerSession;
-    for (let i = 0; i < n; i++) plan.push(this.domains[i % this.domains.length]);
-    return plan;
-  }
-
-  // ----- progress helpers (NJSLA "session" terminology) -----
-  get sessionNumber() { return this.sessionIndex + 1; }
-  get sessions() { return this.params.sessions; }
-  get sessionMinutes() { return this.params.minutesPerSession; }
-  get itemsPerSession() { return this.params.itemsPerSession; }
-  get questionNumberInSession() { return this.qInSession + 1; }
-
-  isSessionComplete() { return this.qInSession >= this.params.itemsPerSession; }
-  isTestComplete() { return this.globalIndex >= this.totalQuestions; }
-
-  advanceSession() {
-    this.sessionIndex += 1;
-    this.qInSession = 0;
-    this.difficulty = 3;     // re-establish a medium starting point each session
-    this.setCount = 0;
-    this.setCorrect = 0;
-  }
-
-  getPassage(id) { return this.passages[id]; }
-
-  // ----- save / resume support -----
-  serialize() {
-    return {
-      subject: this.subject,
-      mode: this.mode,
-      sessionIndex: this.sessionIndex,
-      qInSession: this.qInSession,
-      globalIndex: this.globalIndex,
-      difficulty: this.difficulty,
-      setCount: this.setCount,
-      setCorrect: this.setCorrect,
-      usedIds: [...this.usedIds],
-      usedStems: this.usedStems,
-      answers: this.answers,
-      passages: this.passages,
-      domainPlan: this.domainPlan,
-      currentQuestion: this.currentQuestion,
-    };
-  }
-
-  static fromJSON(o, settings) {
-    const s = new TestSession(o.subject, o.mode, settings);
-    s.sessionIndex = o.sessionIndex || 0;
-    s.qInSession = o.qInSession || 0;
-    s.globalIndex = o.globalIndex || 0;
-    s.difficulty = o.difficulty || 3;
-    s.setCount = o.setCount || 0;
-    s.setCorrect = o.setCorrect || 0;
-    s.usedIds = new Set(o.usedIds || []);
-    s.usedStems = o.usedStems || [];
-    s.answers = o.answers || [];
-    s.passages = o.passages || { ...PASSAGES };
-    s.domainPlan = o.domainPlan || s.domainPlan;
-    s.currentQuestion = o.currentQuestion || null;
-    return s;
-  }
-
-  async nextQuestion() {
-    const targetDomain = this.domainPlan[this.qInSession] || this.domains[0];
-    const target = this.difficulty;
-
-    let question = null;
-    const apiReady = this.settings.useApi && this.settings.apiKey;
-
-    if (this.isWriting) {
-      question = await this._pickWriting(apiReady);
-    } else {
-      if (apiReady) {
-        try {
-          question = await generateQuestion({
-            settings: this.settings,
-            subject: this.subject,
-            domain: targetDomain,
-            difficulty: target,
-            history: this.usedStems,
-          });
-          if (question._passageText) {
-            this.passages[question.passage] = { title: 'Reading Passage', text: question._passageText };
-          }
-        } catch (err) {
-          console.warn('Claude generation failed, falling back to bank:', err.message);
-          question = null;
-        }
+// Returns { correct: bool|null, partial: 0..1, points, max }
+function scoreItem(item, response) {
+  const max = (item.scoring && item.scoring.points) || 1;
+  const ak = item.answer_key || {};
+  switch (item.type) {
+    case 'multiple_choice':
+    case 'mc_with_figure': {
+      const correct = response != null && response === ak.correct;
+      return { correct, partial: correct ? 1 : 0, points: correct ? max : 0, max };
+    }
+    case 'multi_select': {
+      const correct = setsEqual(response, ak.correct);
+      // optional partial credit: fraction of correct picks minus wrong picks
+      let partial = correct ? 1 : 0;
+      if (!correct && Array.isArray(response)) {
+        const good = response.filter((r) => ak.correct.includes(r)).length;
+        const bad = response.filter((r) => !ak.correct.includes(r)).length;
+        partial = Math.max(0, (good - bad) / ak.correct.length);
       }
-      if (!question) question = this._pickFromBank(targetDomain, target);
+      return { correct, partial, points: correct ? max : 0, max };
     }
-
-    this.currentQuestion = question;
-    if (question) {
-      this.usedIds.add(question.id);
-      this.usedStems.push(question.stem);
+    case 'numeric_entry':
+    case 'fraction_entry': {
+      let correct = false;
+      if (ak.any_of) correct = ak.any_of.map(normNum).includes(normNum(response));
+      else if (item.scoring && item.scoring.rule === 'equivalent') {
+        const a = parseFrac(response); const b = parseFrac(ak.value);
+        correct = !Number.isNaN(a) && !Number.isNaN(b) && Math.abs(a - b) < 1e-9;
+      } else correct = normNum(response) === normNum(ak.value);
+      return { correct, partial: correct ? 1 : 0, points: correct ? max : 0, max };
     }
-    return question;
-  }
-
-  async _pickWriting(apiReady) {
-    if (apiReady) {
-      try {
-        const q = await generateQuestion({
-          settings: this.settings, subject: 'writing', domain: 'W', difficulty: 3, history: this.usedStems,
-        });
-        return q;
-      } catch (err) {
-        console.warn('Claude writing-prompt generation failed, using bank:', err.message);
-      }
+    case 'multi_part_entry': {
+      const blanks = (item.interaction.blanks || []).map((b) => b.id);
+      let got = 0;
+      for (const id of blanks) if (response && normNum(response[id]) === normNum(ak[id])) got += 1;
+      const correct = got === blanks.length && blanks.length > 0;
+      return { correct, partial: blanks.length ? got / blanks.length : 0, points: Math.round((got / Math.max(1, blanks.length)) * max), max };
     }
-    const pool = QUESTIONS.filter((q) => q.subject === 'writing' && !this.usedIds.has(q.id));
-    const list = pool.length ? pool : QUESTIONS.filter((q) => q.subject === 'writing');
-    return list[Math.floor(Math.random() * list.length)];
-  }
-
-  _pickFromBank(domain, target) {
-    const pool = QUESTIONS.filter((q) => q.subject === this.subject && !this.usedIds.has(q.id));
-    if (!pool.length) {
-      this.usedIds.clear();
-      return this._pickFromBank(domain, target);
+    case 'bar_graph_build': {
+      const cats = item.interaction.categories || Object.keys(ak);
+      let got = 0;
+      for (const c of cats) if (response && Number(response[c]) === Number(ak[c])) got += 1;
+      const correct = got === cats.length;
+      return { correct, partial: cats.length ? got / cats.length : 0, points: correct ? max : 0, max };
     }
-    const score = (q) => (q.domain === domain ? 0 : 10) + Math.abs((q.difficulty || 3) - target);
-    pool.sort((a, b) => score(a) - score(b) || Math.random() - 0.5);
-    return pool[0];
-  }
-
-  // Grade the current question, update the running set, and adapt at set ends.
-  async submitAnswer(response) {
-    const q = this.currentQuestion;
-    let correct = false;
-    let partial = 0;
-    let feedback = '';
-    let writingScores = null;
-
-    if (q.type === 'mc') {
-      correct = Number(response) === Number(q.answer);
-    } else if (q.type === 'ms') {
-      correct = arraysEqualAsSets(response, q.answer);
-    } else if (q.type === 'num') {
-      const r = parseFloat(String(response).replace(/[^0-9.\-]/g, ''));
-      correct = !Number.isNaN(r) && r === Number(q.answer);
-    } else if (q.type === 'essay' || q.type === 'writing') {
-      const text = String(response || '').trim();
-      if (this.settings.useApi && this.settings.apiKey && text.length > 0) {
-        try {
-          const g = await gradeWriting({ settings: this.settings, question: q, response: text });
-          writingScores = { composition: g.composition, conventions: g.conventions };
-          partial = g.overall;
-          feedback = g.feedback;
-          correct = partial >= 0.85;
-        } catch (err) {
-          const est = this._estimateWriting(text);
-          writingScores = est.scores; partial = est.overall; feedback = est.feedback;
-        }
-      } else {
-        const est = this._estimateWriting(text);
-        writingScores = est.scores; partial = est.overall; feedback = est.feedback;
-      }
+    case 'extended_writing': {
+      // Not auto-scored for correctness; handled by rubric/LLM elsewhere.
+      return { correct: null, partial: 0, points: 0, max };
     }
-
-    const credit = correct ? 1 : partial;
-    this.answers.push({
-      question: q,
-      response,
-      correct,
-      partial: credit,
-      difficulty: q.difficulty || 3,
-      feedback,
-      writingScores,
-    });
-
-    // Set-based adaptation (skip for the single-task writing test).
-    if (!this.isWriting) {
-      this.setCount += 1;
-      this.setCorrect += credit;
-      if (this.setCount >= this.params.setSize) {
-        const setAcc = this.setCorrect / this.setCount;
-        if (setAcc >= SET_UP) this.difficulty = Math.min(5, this.difficulty + 1);
-        else if (setAcc <= SET_DOWN) this.difficulty = Math.max(1, this.difficulty - 1);
-        this.setCount = 0;
-        this.setCorrect = 0;
-      }
-    }
-
-    this.qInSession += 1;
-    this.globalIndex += 1;
-
-    return { correct, partial: credit, answer: q.answer, explanation: q.explanation, feedback, writingScores };
-  }
-
-  _estimateWriting(text) {
-    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
-    // Rough offline heuristic so the app is usable without the API.
-    const composition = words >= 80 ? 0.7 : words >= 40 ? 0.5 : words >= 15 ? 0.35 : 0.15;
-    const sentences = (text.match(/[.!?]/g) || []).length;
-    const conventions = sentences >= 4 ? 0.7 : sentences >= 2 ? 0.5 : 0.3;
-    const overall = Math.round((0.65 * composition + 0.35 * conventions) * 100) / 100;
-    return {
-      scores: { composition, conventions },
-      overall,
-      feedback: 'Saved your writing. Turn on the Claude API in Settings for a detailed, rubric-based score and feedback.',
-    };
-  }
-
-  getResultSummary() {
-    let scoreInfo;
-    if (this.isWriting) {
-      scoreInfo = scoreWriting(this.answers);
-    } else {
-      scoreInfo = scoreTest(this.answers);
-    }
-    const byDomain = scoreByDomain(this.answers, DOMAINS[this.subject]);
-    const avgDifficulty =
-      this.answers.reduce((s, a) => s + a.difficulty, 0) / (this.answers.length || 1);
-    const highestReached = this.answers.reduce((m, a) => Math.max(m, a.difficulty), 0);
-
-    return {
-      id: 'r_' + Date.now(),
-      date: new Date().toISOString(),
-      studentName: this.settings.studentName || 'Student',
-      subject: this.subject,
-      subjectName: this.cfg.name,
-      isWriting: this.isWriting,
-      mode: this.mode,
-      totalQuestions: this.answers.length,
-      correctCount: this.answers.filter((a) => a.correct).length,
-      scaleScore: scoreInfo.scaleScore,
-      level: scoreInfo.level.level,
-      levelLabel: scoreInfo.level.label,
-      accuracy: Math.round((scoreInfo.accuracy || 0) * 100),
-      perfIndex: Math.round((scoreInfo.perfIndex || 0) * 100) / 100,
-      avgDifficulty: Math.round(avgDifficulty * 10) / 10,
-      highestDifficultyReached: highestReached,
-      usedClaude: !!(this.settings.useApi && this.settings.apiKey),
-      writing: this.isWriting ? scoreInfo.dimensions : null,
-      byDomain: byDomain.map((d) => ({
-        domain: d.domain, name: d.name, total: d.total, correct: d.correct,
-        accuracy: Math.round(d.accuracy * 100), status: d.status,
-      })),
-      answers: this.answers.map((a) => ({
-        domain: a.question.domain,
-        difficulty: a.difficulty,
-        stem: a.question.stem,
-        correct: a.correct,
-        partial: a.partial,
-        writingScores: a.writingScores || null,
-      })),
-    };
+    default:
+      return { correct: false, partial: 0, points: 0, max };
   }
 }
 
-/* ===== app.js ===== */
-// Main application controller: routing, screens, timer, and test flow.
-// Modeled on the 2026 NJSLA-Adaptive format (separate Math, Reading, Writing
-// assessments; timed sessions; set-based adaptivity).
+// Rasch (1-PL) ability update for one response.
+function updateTheta(theta, b, score, K = 0.5) {
+  const p = 1 / (1 + Math.exp(-(theta - b)));
+  return theta + K * (score - p);
+}
 
+/* ===== app/a11y.js ===== */
+// Accessibility helpers: text-to-speech (Web Speech API), and the default
+// attribute/a11y state used across the app.
 
-const app = document.getElementById('app');
-let settings = loadSettings();
-let session = null;
-let timer = null;
-let battery = null; // { queue:[subjects], index, mode, results:[] } when running the full battery
+function speak(text) {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'en-US'; u.rate = 0.95;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  } catch { /* not available */ }
+}
 
-const BATTERY_QUEUE = ['reading', 'writing', 'math'];
+const DEFAULT_ATTRIBUTES = { forced: true, tts: false, contrast: 'bw', masking: false };
+const DEFAULT_A11Y = { contrast: 'bw', zoom: 1, lineReader: false, masking: false };
 
-const ICONS = { math: '➗', reading: '📖', writing: '✍️' };
+/* ===== app/mathui.js ===== */
+// Math rendering (LaTeX-lite), figures (number line / area grid / rectangle),
+// the on-screen keypad + equation editor, and the interactive bar-graph builder.
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function clearTimer() {
-  if (timer && timer.intervalId) clearInterval(timer.intervalId);
-  timer = null;
+// Render \( ... \) inline math: supports \frac{a}{b} and plain text.
+function mathRender(text) {
+  let t = esc(text);
+  t = t.replace(/\\\((.+?)\\\)/g, (_, inner) => '<span class="math">' + renderMath(inner) + '</span>');
+  return t;
+}
+function renderMath(inner) {
+  let s = inner;
+  s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span class="num">$1</span><span class="den">$2</span></span>');
+  s = s.replace(/\\times/g, '×').replace(/\\div/g, '÷').replace(/\\gt/g, '&gt;').replace(/\\lt/g, '&lt;');
+  return s;
 }
 
-// ---------------------------------------------------------------- Home
-function renderHome() {
-  clearTimer();
-  session = null;
-  battery = null;
-  const results = loadResults();
-  const apiOn = settings.useApi && settings.apiKey;
-  const providerLabel = (PROVIDERS[settings.provider] || PROVIDERS.anthropic).label;
-  const name = settings.studentName ? esc(settings.studentName) : null;
-  const prog = loadProgress();
+// ---- figures ----
+function figureHTML(fig) {
+  if (!fig) return '';
+  if (fig.type === 'numberline') return numberLine(fig);
+  if (fig.type === 'areagrid') return areaGrid(fig);
+  if (fig.type === 'rectangle') return rectangle(fig);
+  return '';
+}
 
-  app.innerHTML = `
-    <header class="app-header">
-      <div class="brand">🎓 <span>NJSLA-Adaptive · Grade 3</span></div>
-      <button class="btn ghost" id="go-settings">⚙️ Settings</button>
-    </header>
-    <main class="home">
-      ${prog ? renderResumeBanner(prog) : ''}
-      <div class="hero">
-        <h1>${name ? `Hi ${name}! ` : ''}Ready to practice? 🌟</h1>
-        <p class="sub">Adaptive Grade 3 practice tests modeled on the 2026 NJSLA-Adaptive (computer-adaptive) format.</p>
-        <div class="api-pill ${apiOn ? 'on' : 'off'}">${apiOn ? '🧠 ' + esc(providerLabel) + ' live questions: ON' : '📚 Offline question bank'}</div>
-      </div>
+function numberLine(f) {
+  const W = 420, pad = 30, y = 40, ticks = f.ticks || 4;
+  const x = (frac) => pad + frac * (W - 2 * pad);
+  let parts = `<line x1="${pad}" y1="${y}" x2="${W - pad}" y2="${y}" stroke="currentColor" stroke-width="2"/>`;
+  for (let i = 0; i <= ticks; i++) {
+    const fx = x(i / ticks);
+    parts += `<line x1="${fx}" y1="${y - 8}" x2="${fx}" y2="${y + 8}" stroke="currentColor" stroke-width="2"/>`;
+    const lbl = i === 0 ? '0' : i === ticks ? '1' : '';
+    if (lbl) parts += `<text x="${fx}" y="${y + 26}" text-anchor="middle" font-size="14">${lbl}</text>`;
+  }
+  const px = x((f.point - f.min) / (f.max - f.min));
+  parts += `<circle cx="${px}" cy="${y}" r="7" fill="var(--indigo,#4f46e5)"/>`;
+  if (f.label) parts += `<text x="${px}" y="${y - 16}" text-anchor="middle" font-size="16" font-weight="700">${esc(f.label)}</text>`;
+  return `<svg class="figure" viewBox="0 0 ${W} 70" role="img" aria-label="number line with a plotted point">${parts}</svg>`;
+}
 
-      <div class="cards three">
-        ${subjectCard('math')}
-        ${subjectCard('reading')}
-        ${subjectCard('writing')}
-      </div>
+function areaGrid(f) {
+  const cell = 28, cols = f.cols, rows = f.rows, total = rows * cols;
+  let cells = '';
+  for (let i = 0; i < total; i++) {
+    const r = Math.floor(i / cols), c = i % cols;
+    const shaded = i < (f.shaded || 0);
+    cells += `<rect x="${c * cell}" y="${r * cell}" width="${cell}" height="${cell}" fill="${shaded ? 'var(--indigo,#4f46e5)' : '#fff'}" stroke="#94a3b8"/>`;
+  }
+  return `<svg class="figure" viewBox="0 0 ${cols * cell} ${rows * cell}" role="img" aria-label="area grid">${cells}</svg>`;
+}
 
-      <button class="battery-card" data-battery>
-        <span class="battery-icon">🏆</span>
-        <span class="battery-text">
-          <strong>Full Battery</strong>
-          <span class="muted">All three tests in a row — Reading → Writing → Math</span>
-        </span>
-        <span class="card-go">Start ▶</span>
-      </button>
+function rectangle(f) {
+  const W = 240, H = 150, x = 40, y = 25, w = 150, h = 90;
+  const unit = f.unit || '';
+  return `<svg class="figure" viewBox="0 0 ${W} ${H}" role="img" aria-label="rectangle figure">
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#eef2ff" stroke="currentColor" stroke-width="2"/>
+    <text x="${x + w / 2}" y="${y - 8}" text-anchor="middle" font-size="14">${esc(String(f.w))} ${esc(unit)}</text>
+    <text x="${x - 10}" y="${y + h / 2}" text-anchor="end" font-size="14">${esc(String(f.h))} ${esc(unit)}</text>
+  </svg>`;
+}
 
-      <div class="mode-row">
-        <label class="mode-label">Test length:</label>
-        <label class="radio"><input type="radio" name="mode" value="full" checked> Official length</label>
-        <label class="radio"><input type="radio" name="mode" value="practice"> Short practice</label>
-      </div>
-
-      <section class="history-block">
-        <h2>📊 Saved Results <span class="muted">(${results.length})</span>${results.length ? ' <button class="btn ghost danger" id="clear-all">🗑 Clear all</button>' : ''}</h2>
-        ${results.length ? renderHistoryList(results) : '<p class="muted">No saved tests yet. Finish a test and tap <strong>Save Results</strong> to track progress here.</p>'}
-      </section>
-    </main>
-    <footer class="app-footer">Practice tool · not affiliated with NJ DOE or Cambium · models the 2026 NJSLA-Adaptive format</footer>
-  `;
-
-  document.getElementById('go-settings').onclick = renderSettings;
-  app.querySelectorAll('[data-subject]').forEach((el) => {
-    el.onclick = () => {
-      const mode = app.querySelector('input[name="mode"]:checked').value;
-      startTest(el.dataset.subject, mode);
+// ---- on-screen keypad / equation editor ----
+let ACTIVE_INPUT = null;
+function setActiveInput(el) { ACTIVE_INPUT = el; }
+function keypadHTML(opts = {}) {
+  const frac = opts.fraction ? `<button type="button" class="kp" data-k="/" aria-label="fraction bar"><span class="frac"><span class="num">▢</span><span class="den">▢</span></span></button>` : `<button type="button" class="kp" data-k="." aria-label="decimal point">.</button>`;
+  const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0'];
+  let grid = keys.map((k) => `<button type="button" class="kp" data-k="${k}">${k}</button>`).join('');
+  return `<div class="keypad" role="group" aria-label="math keypad">
+    ${grid}
+    ${frac}
+    <button type="button" class="kp kp-back" data-k="back" aria-label="backspace">⌫</button>
+  </div>`;
+}
+function wireKeypad(root) {
+  root.querySelectorAll('.kp').forEach((btn) => {
+    btn.onclick = () => {
+      if (!ACTIVE_INPUT) return;
+      const k = btn.dataset.k;
+      if (k === 'back') ACTIVE_INPUT.value = ACTIVE_INPUT.value.slice(0, -1);
+      else ACTIVE_INPUT.value += k;
+      ACTIVE_INPUT.dispatchEvent(new Event('input', { bubbles: true }));
+      ACTIVE_INPUT.focus();
     };
   });
-  const batteryBtn = app.querySelector('[data-battery]');
-  if (batteryBtn) batteryBtn.onclick = () => {
-    const mode = app.querySelector('input[name="mode"]:checked').value;
-    startBattery(mode);
-  };
-  const resumeBtn = document.getElementById('resume-test');
-  if (resumeBtn) resumeBtn.onclick = resumeTest;
-  const discardBtn = document.getElementById('discard-progress');
-  if (discardBtn) discardBtn.onclick = () => { if (confirm('Discard the in-progress test?')) { clearProgress(); renderHome(); } };
-  const clearAllBtn = document.getElementById('clear-all');
-  if (clearAllBtn) clearAllBtn.onclick = () => { if (confirm('Delete ALL saved results? This cannot be undone.')) { clearResults(); renderHome(); } };
-  app.querySelectorAll('[data-result]').forEach((el) => {
-    el.onclick = () => renderAnalytics(loadResults().find((r) => r.id === el.dataset.result));
+}
+
+// ---- interactive bar-graph builder ----
+// Renders clickable columns; clicking at a height sets that bar. Returns markup;
+// wireBarGraph attaches behavior and reports state via onChange(state).
+function barGraphHTML(item) {
+  const cats = item.interaction.categories, yMax = item.interaction.yMax, step = item.interaction.yStep || 1;
+  const cw = 70, gap = 24, padL = 40, padB = 30, padT = 16, h = 220;
+  const W = padL + cats.length * (cw + gap), H = h + padB + padT;
+  const yPix = (v) => padT + (1 - v / yMax) * h;
+  let grid = '';
+  for (let v = 0; v <= yMax; v += step) {
+    const yy = yPix(v);
+    grid += `<line x1="${padL}" y1="${yy}" x2="${W}" y2="${yy}" stroke="#e2e8f0"/>`;
+    grid += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="11">${v}</text>`;
+  }
+  let cols = '';
+  cats.forEach((c, i) => {
+    const x = padL + i * (cw + gap) + gap / 2;
+    cols += `<g class="bg-col" data-cat="${esc(c)}" data-x="${x}" data-cw="${cw}">
+      <rect class="bg-hit" x="${x}" y="${padT}" width="${cw}" height="${h}" fill="transparent" style="cursor:pointer"/>
+      <rect class="bg-bar" x="${x}" y="${padT + h}" width="${cw}" height="0" fill="var(--indigo,#4f46e5)"/>
+      <text x="${x + cw / 2}" y="${H - 8}" text-anchor="middle" font-size="13">${esc(c)}</text>
+    </g>`;
   });
-  app.querySelectorAll('[data-delete]').forEach((el) => {
-    el.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this saved result?')) { deleteResult(el.dataset.delete); renderHome(); } };
+  return `<svg class="figure bargraph" viewBox="0 0 ${W} ${H}" data-ymax="${yMax}" data-h="${h}" data-padt="${padT}" role="group" aria-label="bar graph builder">${grid}${cols}</svg>`;
+}
+function wireBarGraph(svg, onChange) {
+  const yMax = +svg.dataset.ymax, h = +svg.dataset.h, padT = +svg.dataset.padt;
+  const state = {};
+  svg.querySelectorAll('.bg-col').forEach((g) => {
+    const cat = g.dataset.cat;
+    g.querySelector('.bg-hit').addEventListener('click', (e) => {
+      const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+      let val = Math.round((1 - (loc.y - padT) / h) * yMax);
+      val = Math.max(0, Math.min(yMax, val));
+      state[cat] = val;
+      const bar = g.querySelector('.bg-bar');
+      const barH = (val / yMax) * h;
+      bar.setAttribute('y', padT + h - barH);
+      bar.setAttribute('height', barH);
+      onChange({ ...state });
+    });
   });
 }
 
-function renderResumeBanner(prog) {
-  const cfg = TEST_CONFIG[prog.session.subject];
-  const done = prog.session.globalIndex || 0;
-  const where = prog.battery
-    ? `Full Battery · ${esc(cfg.name)}`
-    : `${esc(cfg.name)}`;
-  const detail = prog.session.subject === 'writing'
-    ? 'writing task in progress'
-    : `${done} of ${prog.session.totalQuestions || (TEST_CONFIG[prog.session.subject][prog.session.mode].sessions * TEST_CONFIG[prog.session.subject][prog.session.mode].itemsPerSession)} questions done`;
-  return `
-    <div class="resume-banner">
-      <div class="resume-text"><strong>⏸ Resume your test</strong><span class="muted">${where} — ${detail}</span></div>
-      <div class="resume-actions">
-        <button class="btn primary" id="resume-test">Resume ▶</button>
-        <button class="btn ghost danger" id="discard-progress">Discard</button>
-      </div>
+/* ===== app/items.js ===== */
+// ItemRenderer: a renderer + input wiring per item type (spec C.3).
+// Renders into a two-pane layout (stimulus left, question right) and reports
+// answers back to the engine via run.submit + onChange().
+
+
+// Returns { stimulusHTML, questionHTML, twoPane }
+function renderItem(item) {
+  const stim = item.stimulus_ref ? getStimulus(item.stimulus_ref) : null;
+  const twoPane = !!stim;
+  const stimulusHTML = stim ? stimulusPane(stim) : '';
+  const questionHTML = questionPane(item);
+  return { stimulusHTML, questionHTML, twoPane };
+}
+
+function stimulusPane(stim) {
+  if (stim.kind === 'literary' || stim.kind === 'informational') {
+    const paras = stim.paragraphs.map((p, i) => `<p class="para"><span class="pnum">${i + 1}</span>${esc(p)}</p>`).join('');
+    return `<div class="passage">
+      <h3 class="passage-title">${esc(stim.title)}</h3>
+      ${stim.author ? `<div class="passage-author">${esc(stim.author)}</div>` : ''}
+      ${paras}
+      ${stim.credit ? `<div class="passage-credit">${esc(stim.credit)}</div>` : ''}
     </div>`;
-}
-
-function subjectCard(subject) {
-  const cfg = TEST_CONFIG[subject];
-  const f = cfg.full;
-  let meta;
-  if (subject === 'writing') meta = `1 session · ${f.minutesPerSession} min · one writing task`;
-  else meta = `${f.sessions} sessions · ${f.minutesPerSession} min each · adaptive`;
-  return `
-    <button class="subject-card" data-subject="${subject}">
-      <div class="card-icon">${ICONS[subject]}</div>
-      <div class="card-title">${esc(cfg.name)}</div>
-      <div class="card-meta">${meta}</div>
-      <div class="card-go">Start ▶</div>
-    </button>`;
-}
-
-function renderHistoryList(results) {
-  return `<div class="history-list">${results
-    .map((r) => `
-      <div class="history-item" data-result="${r.id}">
-        <div class="hi-main">
-          <span class="hi-subject">${ICONS[r.subject] || '📝'} ${esc(r.subjectName)}</span>
-          <span class="hi-score level-${r.level}">${r.scaleScore} · L${r.level}</span>
-        </div>
-        <div class="hi-sub">
-          <span>${new Date(r.date).toLocaleDateString()} · ${r.isWriting ? ('Composition ' + (r.writing ? r.writing.composition : 0) + '%') : (r.accuracy + '% · ' + r.correctCount + '/' + r.totalQuestions)}</span>
-          <button class="link-del" data-delete="${r.id}">delete</button>
-        </div>
-      </div>`)
-    .join('')}</div>`;
-}
-
-// ---------------------------------------------------------------- Settings
-function renderSettings() {
-  clearTimer();
-  app.innerHTML = `
-    <header class="app-header">
-      <button class="btn ghost" id="back">← Back</button>
-      <div class="brand"><span>Settings</span></div>
-      <span></span>
-    </header>
-    <main class="settings">
-      <label class="field">
-        <span>Student's name</span>
-        <input id="s-name" type="text" placeholder="e.g. Ava" value="${esc(settings.studentName)}">
-      </label>
-
-      <div class="divider">AI provider (optional)</div>
-      <p class="muted small">Add an API key to generate fresh adaptive questions, grade writing on the two-dimension rubric, and get a written performance analysis. The key is stored only on this device and sent directly to your chosen provider. Leave blank to use the offline question bank.</p>
-
-      <label class="field">
-        <span>Provider</span>
-        <select id="s-provider">
-          ${Object.entries(PROVIDERS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}
-        </select>
-      </label>
-      <label class="field">
-        <span>API key</span>
-        <input id="s-key" type="password" placeholder="${esc((PROVIDERS[settings.provider] || PROVIDERS.anthropic).keyHint)}" value="${esc(settings.apiKey)}">
-      </label>
-      <label class="field">
-        <span>Model</span>
-        <input id="s-model" type="text" placeholder="model name" value="${esc(settings.model)}">
-      </label>
-      <label class="check">
-        <input id="s-useapi" type="checkbox" ${settings.useApi ? 'checked' : ''}>
-        Use the AI provider for live questions &amp; analysis when a key is set
-      </label>
-
-      <div class="btn-row">
-        <button class="btn" id="s-test">Test connection</button>
-        <button class="btn primary" id="s-save">Save</button>
-      </div>
-      <div id="s-status" class="status"></div>
-    </main>
-  `;
-  const providerSel = document.getElementById('s-provider');
-  providerSel.value = settings.provider || 'anthropic';
-  document.getElementById('back').onclick = renderHome;
-
-  // When the provider changes, suggest its default model and key hint.
-  providerSel.onchange = () => {
-    const p = providerSel.value;
-    const modelEl = document.getElementById('s-model');
-    modelEl.value = defaultModelFor(p);
-    document.getElementById('s-key').placeholder = (PROVIDERS[p] || PROVIDERS.anthropic).keyHint;
-  };
-
-  document.getElementById('s-save').onclick = () => {
-    settings = {
-      ...settings,
-      studentName: document.getElementById('s-name').value.trim(),
-      provider: providerSel.value,
-      apiKey: document.getElementById('s-key').value.trim(),
-      model: document.getElementById('s-model').value.trim() || defaultModelFor(providerSel.value),
-      useApi: document.getElementById('s-useapi').checked,
-    };
-    saveSettings(settings);
-    setStatus('s-status', '✅ Saved!', 'ok');
-    setTimeout(renderHome, 700);
-  };
-
-  document.getElementById('s-test').onclick = async () => {
-    const probe = {
-      ...settings,
-      provider: providerSel.value,
-      apiKey: document.getElementById('s-key').value.trim(),
-      model: document.getElementById('s-model').value.trim() || defaultModelFor(providerSel.value),
-    };
-    if (!probe.apiKey) return setStatus('s-status', 'Enter an API key first.', 'err');
-    setStatus('s-status', 'Testing…', '');
-    try {
-      const ok = await testConnection(probe);
-      setStatus('s-status', ok ? '✅ Connected!' : '⚠️ Connected, unexpected reply.', ok ? 'ok' : 'err');
-    } catch (e) {
-      setStatus('s-status', '❌ ' + e.message, 'err');
-    }
-  };
-}
-
-function setStatus(id, msg, cls) {
-  const el = document.getElementById(id);
-  if (el) { el.textContent = msg; el.className = 'status ' + (cls || ''); }
-}
-
-// ---------------------------------------------------------------- Test flow
-async function startTest(subject, mode) {
-  session = new TestSession(subject, mode, settings);
-  await renderSessionIntro();
-}
-
-async function renderSessionIntro() {
-  clearTimer();
-  const cfg = session.cfg;
-  const points = session.isWriting
-    ? `
-      <li>⏱️ You have <strong>${session.sessionMinutes} minutes</strong> to write.</li>
-      <li>✍️ <strong>One writing task</strong> — plan, write, and check your work.</li>
-      <li>📋 You're scored on <strong>Composition</strong> (ideas) and <strong>Conventions</strong> (grammar &amp; spelling).</li>`
-    : `
-      <li>⏱️ You have <strong>${session.sessionMinutes} minutes</strong> for this session.</li>
-      <li>❓ <strong>${session.itemsPerSession} questions</strong> in this session.</li>
-      <li>📈 The test adapts: a set of questions gets harder if you do well, easier if not.</li>
-      ${cfg.calculator === false ? '<li>🚫 No calculator (just like the real Grade 3 math test).</li>' : ''}`;
-  app.innerHTML = `
-    <main class="unit-intro">
-      <div class="intro-card">
-        <div class="card-icon">${ICONS[session.subject]}</div>
-        <h1>${esc(cfg.name)}</h1>
-        <h2>${session.isWriting ? 'Writing Task' : `Session ${session.sessionNumber} of ${session.sessions}`}</h2>
-        <ul class="intro-points">${points}</ul>
-        <button class="btn primary big" id="begin">${session.isWriting ? 'Start Writing ▶' : `Start Session ${session.sessionNumber} ▶`}</button>
-        <button class="btn ghost" id="quit">Quit to Home</button>
-      </div>
-    </main>`;
-  document.getElementById('quit').onclick = () => { if (confirm('Quit this test? Progress will be lost.')) { clearProgress(); renderHome(); } };
-  document.getElementById('begin').onclick = async () => {
-    startSessionTimer();
-    await nextQuestion();
-  };
-}
-
-function startSessionTimer(remaining) {
-  clearTimer();
-  timer = { remaining: remaining != null ? remaining : session.sessionMinutes * 60, intervalId: null };
-  timer.intervalId = setInterval(() => {
-    timer.remaining -= 1;
-    updateTimerDisplay();
-    if (timer.remaining <= 0) {
-      clearTimer();
-      finishSession(true);
-    }
-  }, 1000);
-}
-
-// Persist a resumable snapshot of the current test (and battery) state.
-function persistProgress(phase) {
-  if (!session) return;
-  saveProgress({
-    phase,
-    remaining: timer ? timer.remaining : null,
-    session: session.serialize(),
-    battery,
-  });
-}
-
-function resumeTest() {
-  const p = loadProgress();
-  if (!p) return renderHome();
-  session = TestSession.fromJSON(p.session, settings);
-  battery = p.battery || null;
-  if (p.phase === 'interstitial') return renderBatteryInterstitial();
-  if (p.phase === 'break') return renderSessionBreak(false);
-  // 'question' phase: re-show the exact question the student was on.
-  startSessionTimer(p.remaining);
-  if (session.currentQuestion) renderQuestion(session.currentQuestion);
-  else nextQuestion();
-}
-
-function updateTimerDisplay() {
-  const el = document.getElementById('timer');
-  if (!el || !timer) return;
-  const m = Math.floor(timer.remaining / 60);
-  const s = timer.remaining % 60;
-  el.textContent = `${m}:${String(s).padStart(2, '0')}`;
-  el.classList.toggle('low', timer.remaining <= 60);
-}
-
-function progressLabel() {
-  if (session.isWriting) return 'Writing Task';
-  return `Session ${session.sessionNumber}/${session.sessions} · Q ${session.questionNumberInSession}/${session.itemsPerSession}`;
-}
-
-async function nextQuestion() {
-  app.innerHTML = `
-    <header class="test-header">
-      <div class="th-left">${progressLabel()}</div>
-      <div class="th-right">⏱️ <span id="timer">--:--</span></div>
-    </header>
-    <main class="loading"><div class="spinner"></div><p>${session.isWriting ? 'Preparing your writing task…' : 'Preparing your next question…'}</p></main>`;
-  updateTimerDisplay();
-  const q = await session.nextQuestion();
-  renderQuestion(q);
-}
-
-function renderQuestion(q) {
-  const progress = (session.qInSession / session.itemsPerSession) * 100;
-  const passage = q.passage ? session.getPassage(q.passage) : null;
-  const isEssay = q.type === 'essay' || q.type === 'writing';
-  app.innerHTML = `
-    <header class="test-header">
-      <div class="th-left">${progressLabel()}</div>
-      <div class="th-mid">${isEssay ? `<span class="diff-pill">${esc(q.mode || 'Writing')} task</span>` : `<span class="diff-pill">Level ${q.difficulty}/5</span>`}</div>
-      <div class="th-right"><button class="btn ghost tiny" id="exit-test">⏸ Save &amp; Exit</button> ⏱️ <span id="timer">--:--</span></div>
-    </header>
-    <div class="progress"><div class="progress-fill" style="width:${progress}%"></div></div>
-    <main class="question-screen">
-      ${passage ? `<div class="passage"><h3>${esc(passage.title)}</h3><p>${esc(passage.text)}</p></div>` : ''}
-      <div class="stem">${esc(q.stem)}</div>
-      <form id="answer-form" class="answer-area">${renderInput(q)}</form>
-      <div id="feedback" class="feedback hidden"></div>
-      <div class="action-row">
-        <button class="btn primary big" id="submit">${isEssay ? 'Submit Writing' : 'Submit Answer'}</button>
-        <button class="btn primary big hidden" id="next">${session.isWriting ? 'See Results ▶' : 'Next ▶'}</button>
-      </div>
-    </main>`;
-  updateTimerDisplay();
-  wireQuestion(q);
-  // Checkpoint: this exact (unanswered) question is the resume point.
-  persistProgress('question');
-}
-
-function renderInput(q) {
-  if (q.type === 'mc' || q.type === 'ms') {
-    const inputType = q.type === 'ms' ? 'checkbox' : 'radio';
-    const hint = q.type === 'ms' ? '<div class="hint">Select all that apply.</div>' : '';
-    return hint + q.choices.map((c, i) => `
-      <label class="choice">
-        <input type="${inputType}" name="choice" value="${i}">
-        <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
-        <span class="choice-text">${esc(c)}</span>
-      </label>`).join('');
-  }
-  if (q.type === 'num') {
-    return `<input class="num-input" id="num" type="text" inputmode="numeric" placeholder="Type your answer" autocomplete="off">`;
-  }
-  if (q.type === 'essay' || q.type === 'writing') {
-    return `<textarea class="writing-input" id="writing" rows="12" placeholder="Plan your ideas, then write your answer in complete paragraphs…"></textarea>`;
   }
   return '';
 }
 
-function wireQuestion(q) {
-  const form = document.getElementById('answer-form');
-  const submitBtn = document.getElementById('submit');
-  const nextBtn = document.getElementById('next');
-  const exitBtn = document.getElementById('exit-test');
-  // The auto-saved checkpoint (this unanswered question) is the resume point.
-  if (exitBtn) exitBtn.onclick = () => { alert('Progress saved. You can resume from the home screen.'); renderHome(); };
+function questionPane(item) {
+  let html = '';
+  if (item.figure && (item.type === 'extended_writing')) { /* none */ }
+  html += `<div class="stem">${mathRender(item.stem)}</div>`;
+  if (item.figure) html += `<div class="figure-wrap">${figureHTML(item.figure)}</div>`;
+  if (item.table) html += tableHTML(item.table);
+  html += `<div class="answer-area">${interactionHTML(item)}</div>`;
+  return html;
+}
 
-  form.querySelectorAll('.choice input').forEach((inp) => {
-    inp.onchange = () => {
-      form.querySelectorAll('.choice').forEach((c) => {
-        const i = c.querySelector('input');
-        c.classList.toggle('selected', i.checked);
+function tableHTML(t) {
+  const head = `<tr>${t.headers.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>`;
+  const rows = t.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('');
+  return `<table class="data-table">${head}${rows}</table>`;
+}
+
+function interactionHTML(item) {
+  switch (item.type) {
+    case 'multiple_choice':
+    case 'mc_with_figure':
+      return choiceHTML(item, 'radio');
+    case 'multi_select':
+      return `<div class="hint">Choose ${item.interaction.selectCount}.</div>` + choiceHTML(item, 'checkbox');
+    case 'numeric_entry':
+      return `<input class="num-input keypad-target" id="ans" inputmode="numeric" autocomplete="off" placeholder="Type your answer" />` + keypadHTML();
+    case 'fraction_entry':
+      return `<input class="num-input keypad-target" id="ans" autocomplete="off" placeholder="e.g. 3/4" />` + keypadHTML({ fraction: true });
+    case 'multi_part_entry':
+      return item.interaction.blanks.map((b) => blankRow(b)).join('') + keypadHTML();
+    case 'bar_graph_build':
+      return barGraphHTML(item);
+    case 'extended_writing':
+      return writingHTML(item);
+    default:
+      return `<div class="muted">Unsupported item type: ${esc(item.type)}</div>`;
+  }
+}
+
+function choiceHTML(item, kind) {
+  return `<div class="choices" role="${kind === 'radio' ? 'radiogroup' : 'group'}">` + item.interaction.options.map((o) => `
+    <label class="choice">
+      <input type="${kind}" name="choice" value="${o.id}" aria-label="Option ${o.id}" />
+      <span class="choice-letter">${o.id}</span>
+      <span class="choice-text">${mathRender(o.text)}</span>
+    </label>`).join('') + `</div>`;
+}
+
+function blankRow(b) {
+  const parts = String(b.label).split('▢');
+  const filled = parts[0] !== undefined ? `${mathRender(parts[0] || '')}<input class="num-input small keypad-target" data-blank="${b.id}" inputmode="numeric" autocomplete="off" />${mathRender(parts[1] || '')}` : '';
+  return `<div class="blank-row">${filled}</div>`;
+}
+
+function writingHTML(item) {
+  const tools = [
+    ['bold', 'B', 'Bold'], ['italic', 'I', 'Italic'], ['underline', 'U', 'Underline'],
+    ['insertUnorderedList', '•', 'Bullet list'], ['insertOrderedList', '1.', 'Numbered list'],
+    ['undo', '↶', 'Undo'], ['redo', '↷', 'Redo'],
+  ];
+  const toolbar = tools.map(([cmd, lbl, title]) => `<button type="button" class="wtool" data-cmd="${cmd}" title="${title}" aria-label="${title}">${lbl}</button>`).join('');
+  const plan = item.plan ? `<div class="wplan"><strong>Manage your time so you can:</strong> ${item.plan.map(esc).join(' · ')}</div>` : '';
+  const checklist = item.checklist ? `<div class="wcheck"><strong>Be sure to include:</strong><ul>${item.checklist.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div>` : '';
+  const fmt = item.format ? `<div class="wfmt">${esc(item.format)}</div>` : '';
+  return `${plan}${checklist}${fmt}
+    <div class="weditor-toolbar" role="toolbar">${toolbar}</div>
+    <div id="weditor" class="weditor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Write your story"></div>
+    <div class="wcount"><span id="wcount">0</span> words</div>`;
+}
+
+// ---- wiring: restore prior answer + report changes ----
+function wireItem(item, run, qEl, onChange) {
+  const prev = (run.responses[item.id] || {}).response;
+  const report = (val) => { run.submit(item.id, val); onChange && onChange(); };
+
+  if (item.type === 'multiple_choice' || item.type === 'mc_with_figure') {
+    qEl.querySelectorAll('input[name="choice"]').forEach((inp) => {
+      if (prev === inp.value) inp.checked = true;
+      inp.onchange = () => { paintChoices(qEl); report(inp.value); };
+    });
+    paintChoices(qEl);
+  } else if (item.type === 'multi_select') {
+    const boxes = [...qEl.querySelectorAll('input[name="choice"]')];
+    if (Array.isArray(prev)) boxes.forEach((b) => { if (prev.includes(b.value)) b.checked = true; });
+    boxes.forEach((b) => { b.onchange = () => { paintChoices(qEl); report(boxes.filter((x) => x.checked).map((x) => x.value)); }; });
+    paintChoices(qEl);
+  } else if (item.type === 'numeric_entry' || item.type === 'fraction_entry') {
+    const inp = qEl.querySelector('#ans');
+    if (prev != null) inp.value = prev;
+    inp.addEventListener('focus', () => setActiveInput(inp));
+    setActiveInput(inp);
+    inp.addEventListener('input', () => report(inp.value.trim()));
+    wireKeypad(qEl);
+  } else if (item.type === 'multi_part_entry') {
+    const inputs = [...qEl.querySelectorAll('input[data-blank]')];
+    const collect = () => Object.fromEntries(inputs.map((i) => [i.dataset.blank, i.value.trim()]));
+    inputs.forEach((i) => {
+      if (prev && prev[i.dataset.blank] != null) i.value = prev[i.dataset.blank];
+      i.addEventListener('focus', () => setActiveInput(i));
+      i.addEventListener('input', () => report(collect()));
+    });
+    if (inputs[0]) setActiveInput(inputs[0]);
+    wireKeypad(qEl);
+  } else if (item.type === 'bar_graph_build') {
+    const svg = qEl.querySelector('.bargraph');
+    // restore
+    if (prev && typeof prev === 'object') {
+      svg.querySelectorAll('.bg-col').forEach((g) => {
+        const v = prev[g.dataset.cat]; if (v == null) return;
+        const h = +svg.dataset.h, padT = +svg.dataset.padt, yMax = +svg.dataset.ymax;
+        const bar = g.querySelector('.bg-bar'); const barH = (v / yMax) * h;
+        bar.setAttribute('y', padT + h - barH); bar.setAttribute('height', barH);
       });
-    };
-  });
-
-  submitBtn.onclick = async () => {
-    const response = collectResponse(q);
-    if (response == null || (Array.isArray(response) && response.length === 0) || response === '') {
-      flash(submitBtn, q.type === 'essay' || q.type === 'writing' ? 'Write something first' : 'Pick or type an answer first');
-      return;
     }
-    submitBtn.disabled = true;
-    submitBtn.textContent = (q.type === 'essay' || q.type === 'writing') ? 'Scoring…' : 'Submitting…';
-    const result = await session.submitAnswer(response);
-    showFeedback(q, result);
-    submitBtn.classList.add('hidden');
-    nextBtn.classList.remove('hidden');
-    nextBtn.focus();
-  };
-
-  nextBtn.onclick = async () => {
-    if (session.isTestComplete()) finishSession(false);
-    else if (session.isSessionComplete()) finishSession(false);
-    else await nextQuestion();
-  };
+    wireBarGraph(svg, (state) => report(state));
+  } else if (item.type === 'extended_writing') {
+    const ed = qEl.querySelector('#weditor');
+    if (prev) ed.innerHTML = prev;
+    const count = () => { const w = ed.innerText.trim().split(/\s+/).filter(Boolean).length; qEl.querySelector('#wcount').textContent = w; };
+    count();
+    ed.addEventListener('input', () => { count(); report(ed.innerHTML); });
+    qEl.querySelectorAll('.wtool').forEach((b) => { b.onclick = () => { document.execCommand(b.dataset.cmd, false, null); ed.focus(); count(); report(ed.innerHTML); }; });
+  }
 }
 
-function collectResponse(q) {
-  const form = document.getElementById('answer-form');
-  if (q.type === 'mc') {
-    const sel = form.querySelector('input[name="choice"]:checked');
-    return sel ? Number(sel.value) : null;
-  }
-  if (q.type === 'ms') {
-    return [...form.querySelectorAll('input[name="choice"]:checked')].map((i) => Number(i.value));
-  }
-  if (q.type === 'num') return document.getElementById('num').value.trim();
-  if (q.type === 'essay' || q.type === 'writing') return document.getElementById('writing').value.trim();
-  return null;
+function paintChoices(qEl) {
+  qEl.querySelectorAll('.choice').forEach((c) => {
+    const inp = c.querySelector('input');
+    c.classList.toggle('selected', inp.checked);
+  });
 }
 
-function showFeedback(q, result) {
-  const form = document.getElementById('answer-form');
-  form.querySelectorAll('input, textarea').forEach((i) => (i.disabled = true));
-  const isEssay = q.type === 'essay' || q.type === 'writing';
-  if (q.type === 'mc' || q.type === 'ms') {
-    const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
-    form.querySelectorAll('.choice').forEach((c, i) => {
-      if (correctSet.includes(i)) c.classList.add('correct');
+// Read-only "show correct" pass for the review/report screens.
+function paintCorrectness(item, run, qEl) {
+  const r = run.responses[item.id]; if (!r || !r.score) return;
+  if (item.type === 'multiple_choice' || item.type === 'mc_with_figure' || item.type === 'multi_select') {
+    const correct = [].concat(item.answer_key.correct);
+    qEl.querySelectorAll('.choice').forEach((c) => {
       const inp = c.querySelector('input');
-      if (inp.checked && !correctSet.includes(i)) c.classList.add('wrong');
+      if (correct.includes(inp.value)) c.classList.add('correct');
+      if (inp.checked && !correct.includes(inp.value)) c.classList.add('wrong');
+      inp.disabled = true;
     });
   }
-  const fb = document.getElementById('feedback');
-  fb.classList.remove('hidden');
-  let head;
-  if (isEssay) {
-    const ws = result.writingScores || { composition: 0, conventions: 0 };
-    head = `<div class="fb-head writing">📝 Composition ${Math.round(ws.composition * 100)}% · Conventions ${Math.round(ws.conventions * 100)}%</div>`;
-  } else {
-    head = result.correct
-      ? `<div class="fb-head ok">✅ Correct!</div>`
-      : `<div class="fb-head no">❌ Not quite.</div>`;
-  }
-  fb.innerHTML = `
-    ${head}
-    ${result.explanation ? `<div class="fb-exp"><strong>Why:</strong> ${esc(result.explanation)}</div>` : ''}
-    ${result.feedback ? `<div class="fb-exp">${esc(result.feedback)}</div>` : ''}`;
-  fb.className = 'feedback ' + (isEssay ? 'writing' : result.correct ? 'ok' : 'no');
 }
 
-function flash(btn, msg) {
-  const old = btn.textContent;
-  btn.textContent = msg;
-  btn.classList.add('shake');
-  setTimeout(() => { btn.textContent = old; btn.classList.remove('shake'); }, 1200);
+/* ===== app/engine.js ===== */
+// Group/multistage adaptive engine (spec C.5).
+// - starts at the medium band, routes by SET (not per item),
+// - forced response, no re-adapt (routing frozen at set boundaries),
+// - blueprint balancing across domains (content fixed, only difficulty varies),
+// - 2 sessions for Reading/Math, 1 for Writing.
+// Also supports a fixed "Form A" mode that replays the observed items in order.
+
+
+const SET_UP = 2 / 3, SET_DOWN = 1 / 3;
+const BANDS = ['easy', 'medium', 'hard'];
+function stepBand(band, dir) {
+  const i = Math.max(0, Math.min(2, BANDS.indexOf(band) + dir));
+  return BANDS[i];
 }
 
-function finishSession(timedOut) {
-  clearTimer();
-  if (!session.isTestComplete() && session.sessionNumber < session.sessions) {
-    session.advanceSession();
-    return renderSessionBreak(timedOut);
-  }
-  finishTest();
-}
+class TestRun {
+  constructor({ subject, mode = 'adaptive', settings = {} }) {
+    this.subject = subject;
+    this.mode = mode;                 // 'adaptive' | 'formA'
+    this.settings = settings;
+    this.bp = BLUEPRINT[subject];
+    this.domains = this.bp.domains;
+    this.setSize = this.bp.setSize;
+    this.sessions = this.bp.sessions;
 
-function renderSessionBreak(timedOut) {
-  app.innerHTML = `
-    <main class="unit-intro">
-      <div class="intro-card">
-        <div class="card-icon">🎉</div>
-        <h1>${timedOut ? "Time's up for that session!" : 'Session complete!'}</h1>
-        <h2>Take a short break</h2>
-        <p>Great work. Remember: answers from the last session are locked now. When you're ready, start Session ${session.sessionNumber}.</p>
-        <button class="btn primary big" id="cont">Start Session ${session.sessionNumber} ▶</button>
-      </div>
-    </main>`;
-  document.getElementById('cont').onclick = async () => {
-    startSessionTimer();
-    await nextQuestion();
-  };
-  persistProgress('break');
-}
+    this.theta = 0;
+    this.band = 'medium';
+    this.routedAt = new Set();        // set-boundary indices already routed (freeze)
+    this.usedIds = new Set();
+    this.delivered = [];              // [{ id, session }]
+    this.responses = {};              // id -> { response, score, flagged, notepad, time, answeredAt }
+    this.sessionIndex = 0;
 
-// ---------------------------------------------------------------- Battery
-function startBattery(mode) {
-  battery = { queue: BATTERY_QUEUE.slice(), index: 0, mode, results: [] };
-  startTest(battery.queue[0], mode);
-}
-
-function renderBatteryInterstitial() {
-  const done = battery.queue[battery.index - 1];
-  const next = battery.queue[battery.index];
-  app.innerHTML = `
-    <main class="unit-intro">
-      <div class="intro-card">
-        <div class="card-icon">✅</div>
-        <h1>${esc(TEST_CONFIG[done].name)} done!</h1>
-        <h2>Test ${battery.index} of ${battery.queue.length} complete</h2>
-        <p>Take a breath. Next up: <strong>${esc(TEST_CONFIG[next].name)}</strong> ${ICONS[next]}</p>
-        <button class="btn primary big" id="cont">Start ${esc(TEST_CONFIG[next].name)} ▶</button>
-        <button class="btn ghost" id="quit">Save progress &amp; quit</button>
-      </div>
-    </main>`;
-  document.getElementById('cont').onclick = () => startTest(next, battery.mode);
-  document.getElementById('quit').onclick = () => {
-    if (confirm('Quit the battery? Tests you already finished can still be saved from the results screen.')) renderBatteryResults();
-  };
-  persistProgress('interstitial');
-}
-
-function renderBatteryResults() {
-  clearTimer();
-  clearProgress();
-  const results = battery.results;
-  const avg = results.length ? Math.round(results.reduce((s, r) => s + r.scaleScore, 0) / results.length) : 0;
-  const cards = results.map((r) => `
-    <div class="battery-result">
-      <h2>${ICONS[r.subject]} ${esc(r.subjectName)}</h2>
-      ${scoreCard(r)}
-      ${r.isWriting ? '' : domainBars(r)}
-    </div>`).join('');
-  app.innerHTML = `
-    <header class="app-header">
-      <div class="brand"><span>Full Battery Complete! 🏆</span></div>
-      <button class="btn ghost" id="home">🏠 Home</button>
-    </header>
-    <main class="results">
-      <h1 class="results-title">${esc(results[0] ? results[0].studentName : 'Student')}</h1>
-      <div class="score-card">
-        <div class="score-big">${avg}</div>
-        <div class="score-scale">average scale score across ${results.length} test${results.length === 1 ? '' : 's'}</div>
-      </div>
-      ${cards}
-      <div class="save-row">
-        <button class="btn primary big" id="save-all">💾 Save All Results</button>
-        <button class="btn ghost" id="discard">Discard</button>
-      </div>
-    </main>`;
-  document.getElementById('home').onclick = renderHome;
-  document.getElementById('save-all').onclick = (e) => {
-    results.forEach((r) => saveResult(r));
-    e.target.textContent = '✅ Saved!';
-    e.target.disabled = true;
-  };
-  document.getElementById('discard').onclick = () => { if (confirm('Discard all battery results?')) renderHome(); };
-}
-
-// ---------------------------------------------------------------- Results
-let pendingResult = null;
-
-function finishTest() {
-  clearTimer();
-  const summary = session.getResultSummary();
-  if (battery) {
-    battery.results.push(summary);
-    battery.index += 1;
-    if (battery.index < battery.queue.length) return renderBatteryInterstitial();
-    return renderBatteryResults();
-  }
-  clearProgress(); // single test finished — nothing to resume
-  pendingResult = summary;
-  renderResults(pendingResult, false);
-}
-
-function renderResults(result, saved) {
-  const writingPanel = result.isWriting && result.writing
-    ? `<div class="panel claude-panel"><h3>✍️ Writing Dimensions</h3>
-        <div class="dom-list">
-          <div class="dom-row strength"><div class="dom-name">Composition (ideas)</div><div class="dom-bar"><div class="dom-fill" style="width:${result.writing.composition}%"></div></div><div class="dom-val">${result.writing.composition}%</div></div>
-          <div class="dom-row"><div class="dom-name">Conventions (grammar)</div><div class="dom-bar"><div class="dom-fill" style="width:${result.writing.conventions}%"></div></div><div class="dom-val">${result.writing.conventions}%</div></div>
-        </div></div>`
-    : '';
-  app.innerHTML = `
-    <header class="app-header">
-      <div class="brand"><span>${saved ? 'Saved Result' : 'Test Complete! 🎉'}</span></div>
-      <button class="btn ghost" id="home">🏠 Home</button>
-    </header>
-    <main class="results">
-      <h1 class="results-title">${esc(result.studentName)} · ${esc(result.subjectName)}</h1>
-      ${scoreCard(result)}
-      ${writingPanel}
-      ${result.isWriting ? '' : '<h2>By Topic</h2>' + domainBars(result) + strengthsImprovements(result)}
-      ${!saved ? `
-        <div class="save-row">
-          <button class="btn primary big" id="save">💾 Save Results</button>
-          <button class="btn ghost" id="discard">Discard</button>
-        </div>` : `
-        <div class="save-row" id="analysis-slot">
-          <button class="btn primary" id="analyze">🧠 Analyze with AI</button>
-        </div>`}
-    </main>`;
-
-  document.getElementById('home').onclick = renderHome;
-
-  if (!saved) {
-    document.getElementById('save').onclick = () => {
-      saveResult(result);
-      renderResults(result, true);
-    };
-    document.getElementById('discard').onclick = () => { if (confirm('Discard this result without saving?')) renderHome(); };
-  } else {
-    wireAnalyze(result);
-  }
-}
-
-function renderAnalytics(result) {
-  if (!result) return renderHome();
-  renderResults(result, true);
-}
-
-function wireAnalyze(result) {
-  const btn = document.getElementById('analyze');
-  if (!btn) return;
-  if (!(settings.useApi && settings.apiKey)) {
-    btn.disabled = true;
-    btn.title = 'Add an API key in Settings to enable this.';
-    btn.textContent = '🧠 Analyze with AI (add API key in Settings)';
-    return;
-  }
-  btn.onclick = async () => {
-    btn.disabled = true;
-    btn.textContent = '🧠 Analyzing…';
-    try {
-      const summary = {
-        student: result.studentName,
-        subject: result.subjectName,
-        scaleScore: result.scaleScore,
-        level: result.levelLabel,
-        accuracy: result.accuracy,
-        writing: result.writing || undefined,
-        byDomain: result.byDomain.map((d) => ({ topic: d.name, accuracy: d.accuracy, correct: d.correct, total: d.total })),
-      };
-      const analysis = await analyzePerformance({ settings, summary });
-      const slot = document.getElementById('analysis-slot');
-      slot.insertAdjacentHTML('beforebegin', claudeAnalysis(analysis));
-      btn.remove();
-    } catch (e) {
-      btn.disabled = false;
-      btn.textContent = '🧠 Analyze with AI';
-      alert('Analysis failed: ' + e.message);
+    if (mode === 'formA') {
+      const form = Object.values(FORMS).find((f) => f.subject === subject);
+      this.formItems = form ? form.items.slice() : [];
+      this.itemsPerSession = Math.ceil(this.formItems.length / this.sessions);
+      this.totalItems = this.formItems.length;
+    } else {
+      this.itemsPerSession = this.bp.itemsPerSession;
+      this.totalItems = this.sessions * this.itemsPerSession;
     }
+  }
+
+  // ---- progress ----
+  get sessionNumber() { return this.sessionIndex + 1; }
+  sessionDelivered() { return this.delivered.filter((d) => d.session === this.sessionIndex); }
+  deliveredCountInSession() { return this.sessionDelivered().length; }
+  isSessionComplete() { return this.deliveredCountInSession() >= this.itemsPerSession; }
+  isTestComplete() { return this.delivered.length >= this.totalItems; }
+
+  advanceSession() {
+    this.sessionIndex += 1;
+    if (this.mode === 'adaptive') { this.band = 'medium'; } // re-establish medium each session
+  }
+
+  // ---- delivery ----
+  // Returns the next item to add to the current session, or null if the session
+  // is already full / test complete.
+  deliverNext() {
+    if (this.isTestComplete() || this.isSessionComplete()) return null;
+    const idxInSession = this.deliveredCountInSession();
+
+    // Route at set boundaries (adaptive only), based on the just-finished set.
+    if (this.mode === 'adaptive' && idxInSession > 0 && idxInSession % this.setSize === 0) {
+      this._routeBand(idxInSession);
+    }
+
+    let item;
+    if (this.mode === 'formA') {
+      const id = this.formItems[this.delivered.length];
+      item = ITEMS_BY_ID[id];
+    } else {
+      const domain = this.domains[idxInSession % this.domains.length];
+      item = this._pick(domain, this.band);
+    }
+    if (!item) return null;
+    this.usedIds.add(item.id);
+    this.delivered.push({ id: item.id, session: this.sessionIndex });
+    return item;
+  }
+
+  _routeBand(idxInSession) {
+    const key = this.sessionIndex + ':' + idxInSession;
+    if (this.routedAt.has(key)) return;        // freeze: route a boundary only once
+    this.routedAt.add(key);
+    const setItems = this.sessionDelivered().slice(idxInSession - this.setSize, idxInSession);
+    let correct = 0;
+    for (const d of setItems) { const r = this.responses[d.id]; if (r && r.score && r.score.correct) correct += 1; }
+    const acc = setItems.length ? correct / setItems.length : 0.5;
+    if (acc >= SET_UP) this.band = stepBand(this.band, +1);
+    else if (acc <= SET_DOWN) this.band = stepBand(this.band, -1);
+  }
+
+  _pick(domain, band) {
+    const pool = ITEMS.filter((it) => it.subject === this.subject && !this.usedIds.has(it.id));
+    if (!pool.length) { this.usedIds.clear(); return this._pick(domain, band); }
+    const domCode = domain;
+    const score = (it) => {
+      const dCode = (it.standard.match(/[A-Z]{1,3}/) || [it.domain])[0];
+      const domMiss = it.domain && this._domainCode(it) === domCode ? 0 : 5;
+      const bandMiss = it.stage_band === band ? 0 : 3;
+      return domMiss + bandMiss;
+    };
+    pool.sort((a, b) => score(a) - score(b) || Math.random() - 0.5);
+    return pool[0];
+  }
+
+  _domainCode(it) {
+    // derive the short domain code (OA/NBT/.../RL/RI/L/W) from the standard
+    const s = it.standard || '';
+    if (s.startsWith('3.')) return s.split('.')[1];     // 3.OA.A.1 -> OA
+    const m = s.match(/^(RL|RI|RF|L|W|SL)/);             // RL.3.1 -> RL
+    return m ? m[1] : '';
+  }
+
+  // ---- responses ----
+  submit(itemId, response) {
+    const item = ITEMS_BY_ID[itemId];
+    const score = scoreItem(item, response);
+    const prev = this.responses[itemId] || {};
+    this.responses[itemId] = {
+      ...prev, response, score,
+      answeredAt: Date.now(),
+      time: (prev.time || 0),
+    };
+    return score;
+  }
+  addTime(itemId, ms) { const r = this.responses[itemId] || (this.responses[itemId] = {}); r.time = (r.time || 0) + ms; }
+  toggleFlag(itemId) { const r = this.responses[itemId] || (this.responses[itemId] = {}); r.flagged = !r.flagged; return r.flagged; }
+  setNotepad(itemId, text) { const r = this.responses[itemId] || (this.responses[itemId] = {}); r.notepad = text; }
+  isAnswered(itemId) {
+    const r = this.responses[itemId];
+    if (!r) return false;
+    const v = r.response;
+    if (v == null) return false;
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === 'object') return Object.values(v).some((x) => String(x).trim() !== '');
+    return String(v).trim() !== '';
+  }
+
+  // ---- scoring / report ----
+  finalTheta() {
+    let theta = 0;
+    for (const d of this.delivered) {
+      const it = ITEMS_BY_ID[d.id];
+      const r = this.responses[d.id];
+      if (!r || !r.score || r.score.correct == null) continue; // skip writing
+      const s = r.score.correct ? 1 : (r.score.partial || 0);
+      theta = updateTheta(theta, it.difficulty || 0, s);
+    }
+    return theta;
+  }
+
+  report() {
+    const theta = this.finalTheta();
+    const scale = scaleFromTheta(theta);
+    const level = levelForScore(scale);
+    const perItem = this.delivered.map((d, i) => {
+      const it = ITEMS_BY_ID[d.id];
+      const r = this.responses[d.id] || {};
+      return {
+        n: i + 1, id: it.id, domain: it.domain, standard: it.standard, band: it.stage_band,
+        correct: r.score ? r.score.correct : null, partial: r.score ? r.score.partial : 0,
+        timeMs: r.time || 0, flagged: !!r.flagged,
+      };
+    });
+    const byStandard = {};
+    for (const p of perItem) {
+      if (p.correct == null) continue;
+      const k = p.standard || p.domain;
+      byStandard[k] = byStandard[k] || { standard: k, domain: p.domain, total: 0, correct: 0 };
+      byStandard[k].total += 1; if (p.correct) byStandard[k].correct += 1;
+    }
+    // difficulty path: band per set
+    const path = [];
+    const sd = this.delivered;
+    for (let i = 0; i < sd.length; i += this.setSize) {
+      const setIt = sd.slice(i, i + this.setSize).map((d) => ITEMS_BY_ID[d.id]);
+      path.push(setIt[0] ? setIt[0].stage_band : 'medium');
+    }
+    const scored = perItem.filter((p) => p.correct != null);
+    const correctCount = scored.filter((p) => p.correct).length;
+    return {
+      subject: this.subject, mode: this.mode, theta: Math.round(theta * 100) / 100,
+      scaleScore: scale, level: level.level, levelLabel: level.label,
+      total: this.delivered.length, scoredCount: scored.length, correctCount,
+      accuracy: scored.length ? Math.round((correctCount / scored.length) * 100) : 0,
+      path, byStandard: Object.values(byStandard), perItem,
+      flagged: perItem.filter((p) => p.flagged).map((p) => p.n),
+    };
+  }
+}
+
+/* ===== app/player.js ===== */
+// Cambium-style test player: top bar (Items map, progress %, title, Pause),
+// tools (Line Reader, Zoom), two-pane stimulus/question, per-item context menu
+// (Mark for Review / Notepad / Highlight), Back / Next / Save, forced response,
+// end-of-session review, and the final parent report.
+
+
+function startPlayer(opts) {
+  const app = document.getElementById('app');
+  const run = new TestRun({ subject: opts.subject, mode: opts.mode || 'adaptive' });
+  const SUBJ = { ela_reading: 'Reading', ela_writing: 'Writing', math: 'Mathematics' };
+  const title = `NJSLA-A Grade 3 ${SUBJ[opts.subject] || ''} Practice Test` + (run.mode === 'formA' ? ' (Form A)' : '');
+  const forced = opts.attributes ? opts.attributes.forced !== false : true;
+  let cur = 0;            // index within the current session's delivered list
+  let itemStart = Date.now();
+
+  // ensure at least one item exists in this session
+  if (run.sessionDelivered().length === 0) run.deliverNext();
+
+  function sessionList() { return run.delivered.filter((d) => d.session === run.sessionIndex); }
+  function curEntry() { return sessionList()[cur]; }
+  function curItem() { const e = curEntry(); return e ? ITEMS_BY_ID[e.id] : null; }
+
+  function recordTime() { const it = curItem(); if (it) run.addTime(it.id, Date.now() - itemStart); itemStart = Date.now(); }
+
+  function render() {
+    const list = sessionList();
+    const item = curItem();
+    const answeredCount = run.delivered.filter((d) => run.isAnswered(d.id)).length;
+    const pct = Math.round((answeredCount / run.totalItems) * 100);
+    const r = run.responses[item.id] || {};
+    const { stimulusHTML, questionHTML, twoPane } = renderItem(item);
+
+    app.innerHTML = `
+      <div class="tds ${opts.a11y && opts.a11y.contrast ? 'contrast-' + opts.a11y.contrast : ''}" style="--zoom:${(opts.a11y && opts.a11y.zoom) || 1}">
+        <header class="tds-top">
+          <div class="tds-left">
+            <div class="items-menu">
+              <button class="tds-btn" id="items-btn">▾ Items</button>
+              <div class="items-pop hidden" id="items-pop">
+                <div class="items-legend"><span class="warn">⚠</span> = unanswered</div>
+                <div class="items-chips">${list.map((d, i) => chip(d, i)).join('')}</div>
+              </div>
+            </div>
+            <div class="tds-progress"><div class="tds-progress-fill" style="width:${pct}%"></div></div>
+            <span class="tds-pct">${pct}%</span>
+          </div>
+          <div class="tds-mid">${esc(title)}</div>
+          <div class="tds-right">
+            <span class="tds-stu">${esc(opts.student || 'Guest')} · GUEST SESSION</span>
+            <button class="tds-btn" id="pause-btn" title="Pause">⏸ Pause</button>
+          </div>
+        </header>
+
+        <div class="tds-toolbar">
+          <button class="tds-tool" id="line-reader" title="Line Reader">▭ Line Reader</button>
+          <button class="tds-tool" id="zoom-out" title="Zoom out">A−</button>
+          <button class="tds-tool" id="zoom-in" title="Zoom in">A+</button>
+          ${opts.attributes && opts.attributes.tts ? '<button class="tds-tool" id="tts" title="Read aloud">🔊 Read</button>' : ''}
+        </div>
+
+        <main class="tds-body ${twoPane ? 'two-pane' : ''}">
+          ${twoPane ? `<section class="pane stimulus-pane">${stimulusHTML}</section><div class="divider"></div>` : ''}
+          <section class="pane question-pane">
+            <div class="q-head">
+              <span class="q-num">${cur + 1}</span>
+              <div class="q-menu">
+                <button class="tds-btn" id="ctx-btn" aria-label="item options">☰</button>
+                <div class="ctx-pop hidden" id="ctx-pop">
+                  <button data-act="flag">${r.flagged ? '✓ ' : ''}Mark for Review</button>
+                  <button data-act="note">Notepad</button>
+                  <button data-act="hl">Highlight Selection</button>
+                </div>
+              </div>
+            </div>
+            ${r.flagged ? '<div class="flag-banner">⚑ Marked for review</div>' : ''}
+            <div id="qcontent">${questionHTML}</div>
+            <div id="notepad-wrap" class="notepad ${r.notepad ? '' : 'hidden'}">
+              <textarea id="notepad" placeholder="Your notes for this question…">${esc(r.notepad || '')}</textarea>
+            </div>
+          </section>
+        </main>
+
+        <footer class="tds-bottom">
+          <button class="tds-btn" id="back-btn" ${cur === 0 && run.sessionIndex === 0 ? 'disabled' : ''}>◀ Back</button>
+          <button class="tds-btn" id="save-btn">Save</button>
+          <span id="save-msg" class="save-msg"></span>
+          <button class="tds-btn primary" id="next-btn">${nextLabel()} ▶</button>
+        </footer>
+      </div>`;
+
+    wireItem(item, run, document.getElementById('qcontent'), () => updateChrome());
+    wireChrome();
+    if (opts.a11y && opts.a11y.lineReader) document.getElementById('line-reader').classList.add('active');
+  }
+
+  function nextLabel() {
+    const list = sessionList();
+    if (cur < list.length - 1) return 'Next';
+    if (run.isSessionComplete()) return run.sessionNumber < run.sessions ? 'Review & End Session' : 'Review & Finish';
+    return 'Next';
+  }
+
+  function chip(d, i) {
+    const answered = run.isAnswered(d.id);
+    const flagged = (run.responses[d.id] || {}).flagged;
+    return `<button class="chip ${i === cur ? 'cur' : ''} ${answered ? 'done' : 'todo'}" data-i="${i}">${i + 1}${flagged ? ' ⚑' : ''}${answered ? '' : ' <span class="warn">⚠</span>'}</button>`;
+  }
+
+  function updateChrome() {
+    // refresh Next enabled state + item map without full re-render
+    const item = curItem();
+    const nextBtn = document.getElementById('next-btn');
+    if (nextBtn) nextBtn.disabled = forced && !run.isAnswered(item.id);
+    const pop = document.getElementById('items-pop');
+    if (pop) pop.querySelector('.items-chips').innerHTML = sessionList().map((d, i) => chip(d, i)).join('');
+    wirePop();
+  }
+
+  function wirePop() {
+    document.querySelectorAll('.items-chips .chip').forEach((c) => {
+      c.onclick = () => { recordTime(); cur = +c.dataset.i; render(); };
+    });
+  }
+
+  function wireChrome() {
+    const item = curItem();
+    document.getElementById('items-btn').onclick = () => document.getElementById('items-pop').classList.toggle('hidden');
+    document.getElementById('ctx-btn').onclick = () => document.getElementById('ctx-pop').classList.toggle('hidden');
+    document.getElementById('pause-btn').onclick = () => { if (confirm('Are you sure you want to pause the test?')) { recordTime(); opts.onExit && opts.onExit(); } };
+    document.getElementById('zoom-in').onclick = () => { opts.a11y.zoom = Math.min(2, (opts.a11y.zoom || 1) + 0.15); render(); };
+    document.getElementById('zoom-out').onclick = () => { opts.a11y.zoom = Math.max(1, (opts.a11y.zoom || 1) - 0.15); render(); };
+    document.getElementById('line-reader').onclick = (e) => { opts.a11y.lineReader = !opts.a11y.lineReader; e.currentTarget.classList.toggle('active'); document.querySelector('.tds-body').classList.toggle('line-reader', opts.a11y.lineReader); };
+    const ttsBtn = document.getElementById('tts');
+    if (ttsBtn) ttsBtn.onclick = () => speak(stripForTTS(item));
+
+    document.querySelectorAll('#ctx-pop button').forEach((b) => {
+      b.onclick = () => {
+        const act = b.dataset.act;
+        document.getElementById('ctx-pop').classList.add('hidden');
+        if (act === 'flag') { run.toggleFlag(item.id); render(); }
+        else if (act === 'note') { document.getElementById('notepad-wrap').classList.toggle('hidden'); }
+        else if (act === 'hl') { highlightSelection(); }
+      };
+    });
+    const np = document.getElementById('notepad');
+    if (np) np.oninput = () => run.setNotepad(item.id, np.value);
+
+    document.getElementById('back-btn').onclick = goBack;
+    document.getElementById('next-btn').onclick = goNext;
+    document.getElementById('save-btn').onclick = () => { const m = document.getElementById('save-msg'); m.textContent = '✓ Saved'; setTimeout(() => (m.textContent = ''), 1200); };
+
+    wirePop();
+    updateChrome();
+  }
+
+  function goBack() {
+    recordTime();
+    if (cur > 0) { cur -= 1; render(); }
+    else if (run.sessionIndex > 0) { /* cannot change prior session; stay */ }
+  }
+
+  function goNext() {
+    const item = curItem();
+    if (forced && !run.isAnswered(item.id)) { flashNext(); return; }
+    recordTime();
+    const list = sessionList();
+    if (cur < list.length - 1) { cur += 1; render(); return; }
+    if (!run.isSessionComplete()) {
+      const it = run.deliverNext();
+      if (it) { cur += 1; render(); return; }
+    }
+    // session full -> review
+    reviewScreen();
+  }
+
+  function flashNext() {
+    const b = document.getElementById('next-btn');
+    b.classList.add('shake'); b.textContent = 'Answer first';
+    setTimeout(() => { b.classList.remove('shake'); b.textContent = nextLabel() + ' ▶'; }, 1200);
+  }
+
+  // ---- review screen (end of a session) ----
+  function reviewScreen() {
+    const list = sessionList();
+    app.innerHTML = `
+      <div class="tds review">
+        <h1>Review — Session ${run.sessionNumber} of ${run.sessions}</h1>
+        <p class="muted">You can change answers in this session. After you end the session, answers are locked.</p>
+        <div class="review-grid">
+          ${list.map((d, i) => {
+            const answered = run.isAnswered(d.id);
+            const flagged = (run.responses[d.id] || {}).flagged;
+            return `<button class="review-cell ${answered ? 'done' : 'todo'}" data-i="${i}">Q${i + 1} ${flagged ? '⚑' : ''} ${answered ? '✓' : '<span class="warn">⚠ unanswered</span>'}</button>`;
+          }).join('')}
+        </div>
+        <div class="review-actions">
+          <button class="tds-btn" id="rev-back">◀ Back to questions</button>
+          <button class="tds-btn primary" id="rev-end">${run.sessionNumber < run.sessions ? 'End Session & Start Session ' + (run.sessionNumber + 1) : 'Finish Test'} ▶</button>
+        </div>
+      </div>`;
+    document.querySelectorAll('.review-cell').forEach((c) => { c.onclick = () => { cur = +c.dataset.i; render(); }; });
+    document.getElementById('rev-back').onclick = () => { cur = 0; render(); };
+    document.getElementById('rev-end').onclick = () => {
+      if (run.sessionNumber < run.sessions) {
+        run.advanceSession(); cur = 0; run.deliverNext(); itemStart = Date.now(); render();
+      } else { finish(); }
+    };
+  }
+
+  function finish() {
+    const report = run.report();
+    if (opts.onSaveAttempt) opts.onSaveAttempt({ ...report, student: opts.student, date: new Date().toISOString(), title });
+    reportScreen(report);
+  }
+
+  function reportScreen(rep) {
+    app.innerHTML = renderReport(rep, title, opts.student) + `<div class="report-actions"><button class="tds-btn primary" id="rep-home">🏠 Done</button></div>`;
+    document.getElementById('rep-home').onclick = () => opts.onExit && opts.onExit();
+  }
+
+  // ---- helpers ----
+  function highlightSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    try {
+      const range = sel.getRangeAt(0);
+      const span = document.createElement('mark'); span.className = 'user-hl';
+      range.surroundContents(span);
+      sel.removeAllRanges();
+    } catch { /* cross-node selection — ignore */ }
+  }
+
+  render();
+}
+
+function stripForTTS(item) {
+  let t = item.stem.replace(/\\\(|\\\)|\\frac|[{}]/g, ' ');
+  if (item.interaction && item.interaction.options) t += '. ' + item.interaction.options.map((o) => 'Option ' + o.id + ', ' + o.text).join('. ');
+  return t;
+}
+
+// ---- parent report (also reused by the dashboard) ----
+function renderReport(rep, title, student) {
+  const pct = Math.max(0, Math.min(100, ((rep.scaleScore - 650) / 200) * 100));
+  const pathHTML = rep.path.map((b) => `<span class="path-step band-${b}">${b}</span>`).join('<span class="path-arrow">→</span>');
+  const stdRows = rep.byStandard.sort((a, b) => (b.correct / b.total) - (a.correct / a.total)).map((s) => {
+    const acc = Math.round((s.correct / s.total) * 100);
+    const cls = acc >= 75 ? 'strength' : acc < 50 ? 'needs' : 'developing';
+    return `<div class="std-row ${cls}"><span class="std-name">${esc(s.standard)} <span class="muted">${esc(s.domain)}</span></span><span class="std-bar"><span style="width:${acc}%"></span></span><span class="std-val">${acc}% <span class="muted">(${s.correct}/${s.total})</span></span></div>`;
+  }).join('');
+  const itemRows = rep.perItem.map((p) => `<tr>
+      <td>${p.n}</td><td>${esc(p.standard || p.domain)}</td><td>${p.band}</td>
+      <td>${p.correct == null ? '—' : p.correct ? '✓' : '✗'}</td>
+      <td>${(p.timeMs / 1000).toFixed(0)}s</td><td>${p.flagged ? '⚑' : ''}</td></tr>`).join('');
+  return `<div class="report">
+    <header class="app-header"><div class="brand"><span>Practice Report</span></div></header>
+    <main class="report-main">
+      <h1>${esc(student || 'Student')} · ${esc(title)}</h1>
+      <div class="score-card level-${rep.level}">
+        <div class="score-big">${rep.scaleScore}</div>
+        <div class="score-scale">practice scale estimate (650–850)</div>
+        <div class="meter"><div class="meter-fill" style="width:${pct}%"></div></div>
+        <div class="level-badge">Level ${rep.level} — ${esc(rep.levelLabel)}</div>
+        <div class="muted small">Practice estimate — not an official NJSLA score.</div>
+        <div class="score-stats"><span><strong>${rep.correctCount}/${rep.scoredCount}</strong> correct</span><span><strong>${rep.accuracy}%</strong> accuracy</span></div>
+      </div>
+      <h2>📈 Difficulty path (how the test adapted)</h2>
+      <div class="path">${pathHTML}</div>
+      <h2>🎯 By standard</h2>
+      <div class="std-list">${stdRows || '<p class="muted">—</p>'}</div>
+      <h2>🧾 Item details</h2>
+      <table class="item-table"><tr><th>#</th><th>Standard</th><th>Band</th><th>Correct</th><th>Time</th><th>Flag</th></tr>${itemRows}</table>
+      ${rep.flagged.length ? `<p class="muted">Marked for review: ${rep.flagged.map((n) => 'Q' + n).join(', ')}</p>` : ''}
+    </main>
+  </div>`;
+}
+
+/* ===== app/main.js ===== */
+// App shell + pre-test flow (spec A.2/A.3) and a simple parent dashboard.
+// Sign-in/Guest → Your Tests → Choose Testing Attributes → (Reading) A/V Check
+// → Instructions → Test player → Report. Attempts persist in localStorage.
+
+
+const app = document.getElementById('app');
+const ATTEMPTS_KEY = 'njslaA.attempts.v1';
+
+const TESTS = [
+  { subject: 'ela_reading', label: 'Reading', icon: '📖', avCheck: true },
+  { subject: 'ela_writing', label: 'Writing', icon: '✍️', avCheck: false },
+  { subject: 'math', label: 'Mathematics', icon: '➗', avCheck: false },
+];
+
+const INSTRUCTIONS = {
+  ela_reading: 'Today, you will take the Reading component of the grade 3 English Language Arts practice student learning assessment. Read each passage and question. Then, follow the directions to answer each question. You must select an answer for each question before moving to the next question; however, if you finish early, you may review your answers and any questions you may have marked for review during this session.',
+  ela_writing: 'Today, you will take the Writing unit of the grade 3 English Language Arts practice student learning assessment. Read the writing prompt and sources. Then, write your answer in the space provided. Check over your essay when you are finished.',
+  math: 'Today, you will take the Grade 3 Mathematics practice student learning assessment. You must select an answer for each question before moving to the next question; however, if you finish early, you may review your answers and any questions you may have marked for review.',
+};
+
+const state = {
+  student: '',
+  attributes: { ...DEFAULT_ATTRIBUTES },
+  a11y: { ...DEFAULT_A11Y },
+  mode: 'adaptive',
+};
+
+function loadAttempts() { try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '[]'); } catch { return []; } }
+function saveAttempt(a) { const all = loadAttempts(); a.id = 'a_' + Date.now(); all.unshift(a); localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(all)); }
+function deleteAttempt(id) { localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(loadAttempts().filter((a) => a.id !== id))); }
+
+// ---------------- Sign-in ----------------
+function signIn() {
+  app.innerHTML = `
+    <div class="flow">
+      <div class="flow-card">
+        <div class="seal">🏛️</div>
+        <h1>State of New Jersey — Practice Tests</h1>
+        <h2>NJSLA-Adaptive · Grade 3</h2>
+        <p class="muted">Please sign in, or continue as a guest.</p>
+        <label class="field"><span>First Name</span><input id="fn" placeholder="e.g. Aria" value="${esc(state.student)}"></label>
+        <div class="btn-row">
+          <button class="btn primary" id="signin">Sign In</button>
+          <button class="btn" id="guest">Continue as Guest</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('signin').onclick = () => { state.student = document.getElementById('fn').value.trim() || 'Student'; catalog(); };
+  document.getElementById('guest').onclick = () => { state.student = document.getElementById('fn').value.trim() || 'Guest'; catalog(); };
+}
+
+// ---------------- Your Tests ----------------
+function catalog() {
+  const attempts = loadAttempts();
+  app.innerHTML = `
+    <div class="flow wide">
+      <header class="app-header"><div class="brand">🏛️ <span>New Jersey Practice Tests</span></div><span class="muted">${esc(state.student)}</span></header>
+      <main class="catalog">
+        <div class="catalog-top">
+          <label class="inline">Grade Level <select id="grade"><option>3</option><option disabled>4</option><option disabled>5</option></select></label>
+          <label class="inline">Mode
+            <select id="mode">
+              <option value="adaptive" ${state.mode === 'adaptive' ? 'selected' : ''}>Adaptive (computer-adaptive)</option>
+              <option value="formA" ${state.mode === 'formA' ? 'selected' : ''}>Form A (observed items)</option>
+            </select>
+          </label>
+        </div>
+        <h2>NJSLA-Adaptive — choose a test</h2>
+        <div class="test-cards">
+          ${TESTS.map((t) => `
+            <button class="test-card" data-subject="${t.subject}">
+              <div class="tc-icon">${t.icon}</div>
+              <div class="tc-title">NJSLA-A Grade 3 ${t.label} Practice Test</div>
+              <div class="tc-meta">This is opportunity 1 of 99</div>
+            </button>`).join('')}
+        </div>
+
+        <section class="dashboard">
+          <h2>👪 Parent Dashboard <span class="muted">(${attempts.length} attempt${attempts.length === 1 ? '' : 's'})</span>${attempts.length ? ' <button class="btn ghost danger" id="clear">Clear all</button>' : ''}</h2>
+          ${attempts.length ? attempts.map(attemptRow).join('') : '<p class="muted">No attempts yet. Finish a test to see a detailed report here.</p>'}
+        </section>
+      </main>
+    </div>`;
+  document.getElementById('mode').onchange = (e) => (state.mode = e.target.value);
+  document.querySelectorAll('.test-card').forEach((c) => { c.onclick = () => { const t = TESTS.find((x) => x.subject === c.dataset.subject); attributesScreen(t); }; });
+  document.querySelectorAll('[data-report]').forEach((el) => { el.onclick = () => { const a = loadAttempts().find((x) => x.id === el.dataset.report); showReport(a); }; });
+  document.querySelectorAll('[data-del]').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); deleteAttempt(el.dataset.del); catalog(); }; });
+  const clr = document.getElementById('clear'); if (clr) clr.onclick = () => { if (confirm('Delete all saved attempts?')) { localStorage.removeItem(ATTEMPTS_KEY); catalog(); } };
+}
+
+function attemptRow(a) {
+  return `<div class="attempt" data-report="${a.id}">
+    <div class="att-main"><span>${esc(a.title)}</span><span class="att-score level-${a.level}">${a.scaleScore} · L${a.level}</span></div>
+    <div class="att-sub"><span>${new Date(a.date).toLocaleDateString()} · ${a.accuracy}% · ${a.correctCount}/${a.scoredCount}</span><button class="link-del" data-del="${a.id}">delete</button></div>
+  </div>`;
+}
+
+// ---------------- Choose Testing Attributes ----------------
+function attributesScreen(t) {
+  app.innerHTML = `
+    <div class="flow">
+      <div class="flow-card">
+        <h1>Choose Testing Attributes</h1>
+        <p class="muted">Set accessibility supports before you begin.</p>
+        <label class="field"><span>Color Contrast <span class="help" title="Changes the page colors">?</span></span>
+          <select id="contrast">
+            <option value="bw">Black on White</option>
+            <option value="wb">White on Black</option>
+            <option value="yb">Yellow on Black</option>
+          </select></label>
+        <label class="check"><input type="checkbox" id="tts"> Text-to-Speech (read items aloud)</label>
+        <label class="check"><input type="checkbox" id="masking"> Masking</label>
+        <label class="field"><span>Zoom</span>
+          <select id="zoom"><option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select></label>
+        <label class="check"><input type="checkbox" id="forced" checked> Require an answer before moving on (like the real test)</label>
+        <div class="btn-row">
+          <button class="btn" id="back">Go Back</button>
+          <button class="btn primary" id="select">Select</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('back').onclick = catalog;
+  document.getElementById('select').onclick = () => {
+    state.attributes = { forced: document.getElementById('forced').checked, tts: document.getElementById('tts').checked };
+    state.a11y = { contrast: document.getElementById('contrast').value, zoom: parseFloat(document.getElementById('zoom').value), lineReader: false, masking: document.getElementById('masking').checked };
+    if (t.avCheck) avCheck(t); else instructions(t);
   };
 }
 
-// ---------------------------------------------------------------- boot
-renderHome();
+// ---------------- (Reading) Sound & Video Check ----------------
+function avCheck(t) {
+  app.innerHTML = `
+    <div class="flow">
+      <div class="flow-card">
+        <h1>Sound and Video Playback Check</h1>
+        <p>Press play on the sample below. If you can see and hear it, continue.</p>
+        <div class="av-sample" id="av"><div class="av-play">▶</div><div class="av-note">Sample media (click to play)</div></div>
+        <div class="btn-row">
+          <button class="btn" id="back">Go Back</button>
+          <button class="btn primary" id="ok" disabled>I could play the video and sound</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('back').onclick = () => attributesScreen(t);
+  document.getElementById('av').onclick = (e) => {
+    e.currentTarget.classList.add('played');
+    e.currentTarget.querySelector('.av-note').textContent = '✓ Played';
+    document.getElementById('ok').disabled = false;
+  };
+  document.getElementById('ok').onclick = () => instructions(t);
+}
+
+// ---------------- Instructions ----------------
+function instructions(t) {
+  app.innerHTML = `
+    <div class="flow">
+      <div class="flow-card">
+        <h1>Instructions</h1>
+        <p class="instructions">${esc(INSTRUCTIONS[t.subject])}</p>
+        <details class="attr-view"><summary>View Testing Attributes</summary>
+          <ul>
+            <li>Color contrast: ${esc(state.a11y.contrast)}</li>
+            <li>Text-to-Speech: ${state.attributes.tts ? 'On' : 'Off'}</li>
+            <li>Zoom: ${state.a11y.zoom}×</li>
+            <li>Require answer before moving on: ${state.attributes.forced ? 'Yes' : 'No'}</li>
+          </ul>
+        </details>
+        <div class="btn-row">
+          <button class="btn" id="back">Go Back</button>
+          <button class="btn primary" id="begin">Begin Test Now ▶</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('back').onclick = catalog;
+  document.getElementById('begin').onclick = () => beginTest(t);
+}
+
+function beginTest(t) {
+  startPlayer({
+    subject: t.subject,
+    mode: state.mode,
+    student: state.student,
+    attributes: state.attributes,
+    a11y: { ...state.a11y },
+    onSaveAttempt: (rep) => saveAttempt(rep),
+    onExit: catalog,
+  });
+}
+
+function showReport(a) {
+  app.innerHTML = renderReport(a, a.title, a.student) + `<div class="report-actions"><button class="tds-btn primary" id="back">◀ Back to dashboard</button></div>`;
+  document.getElementById('back').onclick = catalog;
+}
+
+// boot
+signIn();
 
   </script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
-    }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {})); }
   </script>
 </body>
 </html>

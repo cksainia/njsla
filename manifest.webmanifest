@@ -1,11 +1,1 @@
-{
-  "name": "NJSLA-Adaptive Grade 3 Practice",
-  "short_name": "NJSLA G3",
-  "description": "Adaptive Grade 3 NJSLA practice (Math, Reading, Writing) with multi-provider AI question generation and analytics.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#f1f5f9",
-  "theme_color": "#4f46e5",
-  "icons": [ { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" } ]
-}
+{ "name": "NJSLA-Adaptive Grade 3 Practice Test", "short_name": "NJSLA-A G3", "description": "Faithful Cambium-style Grade 3 NJSLA-Adaptive practice tests (Reading, Writing, Math) with a group-adaptive engine and parent report.", "start_url": "./index.html", "display": "standalone", "background_color": "#f1f5f9", "theme_color": "#1e293b", "icons": [ { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" } ] }
