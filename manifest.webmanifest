@@ -1,0 +1,11 @@
+{
+  "name": "NJSLA-Adaptive Grade 3 Practice",
+  "short_name": "NJSLA G3",
+  "description": "Adaptive Grade 3 NJSLA practice (Math, Reading, Writing) with multi-provider AI question generation and analytics.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f1f5f9",
+  "theme_color": "#4f46e5",
+  "icons": [ { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" } ]
+}

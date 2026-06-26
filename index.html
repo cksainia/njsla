@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NJSLA G3" />
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="icon" href="icon.svg" />
+  <title>NJSLA-Adaptive Grade 3 Practice</title>
+  <style>
+/* NJSLA Grade 3 Mock Test — iPad-first, kid-friendly UI */
+:root {
+  --indigo: #4f46e5;
+  --indigo-dark: #4338ca;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --amber: #d97706;
+  --amber-bg: #fef3c7;
+  --ink: #1e293b;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --radius: 18px;
+  --shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+#app { min-height: 100vh; max-width: 1100px; margin: 0 auto; padding: env(safe-area-inset-top) 0 0; }
+
+h1 { font-size: 2rem; margin: 0 0 .3em; }
+h2 { font-size: 1.4rem; margin: 1.2em 0 .4em; }
+h3 { font-size: 1.15rem; margin: 0 0 .4em; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.hidden { display: none !important; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font: inherit; font-weight: 600;
+  border: 2px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 14px; padding: 12px 20px; cursor: pointer;
+  transition: transform .08s ease, background .15s, box-shadow .15s;
+  min-height: 52px;
+}
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--indigo); color: #fff; border-color: var(--indigo); box-shadow: var(--shadow); }
+.btn.primary:hover { background: var(--indigo-dark); }
+.btn.primary:disabled { opacity: .6; cursor: default; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--indigo); }
+.btn.big { font-size: 1.2rem; padding: 18px 32px; width: 100%; max-width: 380px; }
+.btn-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.btn.danger { color: var(--red); }
+.btn.tiny { min-height: 0; padding: 6px 12px; font-size: .8rem; border-radius: 10px; }
+.btn.shake { animation: shake .4s; border-color: var(--red); color: var(--red); }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+/* ---------- header / footer ---------- */
+.app-header, .test-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px; gap: 12px;
+}
+.brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+.brand span { color: var(--indigo); }
+.app-footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 30px 20px; }
+
+/* ---------- home ---------- */
+.home { padding: 10px 22px 40px; }
+.hero { text-align: center; padding: 14px 0 8px; }
+.hero .sub { color: var(--muted); margin: 0 0 14px; }
+.api-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; font-size: .9rem; font-weight: 600; }
+.api-pill.on { background: var(--green-bg); color: var(--green); }
+.api-pill.off { background: #e0e7ff; color: var(--indigo); }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
+.subject-card {
+  text-align: left; border: 2px solid var(--line); background: var(--card);
+  border-radius: var(--radius); padding: 26px; cursor: pointer; font: inherit;
+  box-shadow: var(--shadow); transition: transform .1s, border-color .15s;
+}
+.subject-card:hover { border-color: var(--indigo); transform: translateY(-3px); }
+.subject-card:active { transform: scale(.98); }
+.card-icon { font-size: 2.6rem; }
+.card-title { font-size: 1.4rem; font-weight: 700; margin-top: 6px; }
+.card-meta { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+.card-go { color: var(--indigo); font-weight: 700; margin-top: 14px; }
+
+.resume-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  background: var(--amber-bg); border: 2px solid var(--amber); border-radius: var(--radius);
+  padding: 16px 20px; margin: 10px 0 18px;
+}
+.resume-text { display: flex; flex-direction: column; }
+.resume-text strong { font-size: 1.1rem; }
+.resume-actions { display: flex; gap: 10px; }
+
+.battery-card {
+  display: flex; align-items: center; gap: 16px; width: 100%; text-align: left;
+  font: inherit; cursor: pointer; margin: 0 0 22px;
+  border: 2px solid var(--indigo); border-radius: var(--radius); padding: 18px 22px;
+  background: linear-gradient(100deg, #eef2ff, #faf5ff); box-shadow: var(--shadow);
+  transition: transform .1s;
+}
+.battery-card:hover { transform: translateY(-2px); }
+.battery-card:active { transform: scale(.99); }
+.battery-icon { font-size: 2.2rem; }
+.battery-text { display: flex; flex-direction: column; flex: 1; }
+.battery-text strong { font-size: 1.2rem; }
+.battery-card .card-go { margin: 0; }
+.battery-result { margin-top: 22px; padding-top: 6px; border-top: 2px dashed var(--line); }
+.battery-result h2 { margin-top: 8px; }
+
+.mode-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+.mode-label { font-weight: 700; }
+.radio, .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.radio input, .check input { width: 20px; height: 20px; }
+
+.history-block { margin-top: 30px; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item {
+  background: var(--card); border: 2px solid var(--line); border-radius: 14px;
+  padding: 14px 18px; cursor: pointer; transition: border-color .15s;
+}
+.history-item:hover { border-color: var(--indigo); }
+.hi-main { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.hi-score { font-weight: 800; }
+.hi-sub { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .85rem; margin-top: 4px; }
+.link-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: .85rem; }
+
+/* ---------- settings ---------- */
+.settings { padding: 10px 22px 50px; max-width: 640px; margin: 0 auto; }
+.field { display: block; margin: 16px 0; }
+.field span { display: block; font-weight: 600; margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%; font: inherit; padding: 14px; border: 2px solid var(--line);
+  border-radius: 12px; background: #fff;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--indigo); }
+.divider { margin: 26px 0 6px; font-weight: 800; color: var(--indigo); border-top: 2px solid var(--line); padding-top: 18px; }
+.status { margin-top: 14px; font-weight: 600; min-height: 24px; }
+.status.ok { color: var(--green); }
+.status.err { color: var(--red); }
+
+/* ---------- unit intro / break ---------- */
+.unit-intro { display: flex; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; }
+.intro-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px; text-align: center; max-width: 560px; width: 100%; }
+.intro-card .card-icon { font-size: 3.4rem; }
+.intro-points { text-align: left; max-width: 420px; margin: 18px auto 26px; padding-left: 0; list-style: none; }
+.intro-points li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+
+/* ---------- test / question ---------- */
+.test-header { background: var(--card); border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; font-weight: 700; }
+.th-mid { flex: 1; text-align: center; }
+.diff-pill { background: #e0e7ff; color: var(--indigo); padding: 6px 14px; border-radius: 999px; font-size: .85rem; }
+#timer { font-variant-numeric: tabular-nums; }
+#timer.low { color: var(--red); }
+.progress { height: 8px; background: var(--line); }
+.progress-fill { height: 100%; background: var(--indigo); transition: width .3s; }
+
+.question-screen { padding: 22px; max-width: 800px; margin: 0 auto; }
+.passage { background: #fff; border: 2px solid var(--line); border-left: 6px solid var(--indigo); border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; }
+.passage h3 { color: var(--indigo); }
+.stem { font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; }
+
+.answer-area { display: flex; flex-direction: column; gap: 12px; }
+.hint { color: var(--muted); font-size: .9rem; font-style: italic; }
+.choice {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px;
+  border: 2px solid var(--line); border-radius: 14px; background: #fff; cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.choice:hover { border-color: var(--indigo); }
+.choice.selected { border-color: var(--indigo); background: #eef2ff; }
+.choice input { width: 22px; height: 22px; flex-shrink: 0; }
+.choice-letter { font-weight: 800; color: var(--indigo); width: 26px; }
+.choice.correct { border-color: var(--green); background: var(--green-bg); }
+.choice.wrong { border-color: var(--red); background: var(--red-bg); }
+.num-input, .writing-input {
+  width: 100%; font: inherit; padding: 16px; border: 2px solid var(--line); border-radius: 12px;
+}
+.num-input { font-size: 1.4rem; max-width: 280px; }
+.num-input:focus, .writing-input:focus { outline: none; border-color: var(--indigo); }
+
+.feedback { margin-top: 20px; padding: 18px; border-radius: 14px; border: 2px solid var(--line); }
+.feedback.ok { background: var(--green-bg); border-color: var(--green); }
+.feedback.no { background: var(--red-bg); border-color: var(--red); }
+.feedback.writing { background: var(--amber-bg); border-color: var(--amber); }
+.fb-head { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+.fb-head.ok { color: var(--green); }
+.fb-head.no { color: var(--red); }
+.fb-exp { margin-top: 6px; }
+.action-row { margin-top: 24px; display: flex; justify-content: center; }
+
+/* ---------- loading ---------- */
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 18px; color: var(--muted); }
+.spinner { width: 54px; height: 54px; border: 6px solid var(--line); border-top-color: var(--indigo); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- results / analytics ---------- */
+.results { padding: 18px 22px 50px; max-width: 860px; margin: 0 auto; }
+.results-title { text-align: center; font-size: 1.4rem; }
+.score-card { text-align: center; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; border-top: 8px solid var(--indigo); }
+.score-card.level-1, .score-card.level-2 { border-top-color: var(--red); }
+.score-card.level-3 { border-top-color: var(--amber); }
+.score-card.level-4, .score-card.level-5 { border-top-color: var(--green); }
+.score-big { font-size: 4rem; font-weight: 900; line-height: 1; color: var(--indigo); }
+.score-scale { color: var(--muted); font-size: .9rem; }
+.meter { height: 14px; background: var(--line); border-radius: 999px; margin: 16px auto; max-width: 480px; overflow: hidden; }
+.meter-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e); }
+.level-badge { display: inline-block; font-weight: 800; font-size: 1.1rem; padding: 8px 18px; border-radius: 999px; background: #eef2ff; color: var(--indigo); }
+.score-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 16px; color: var(--muted); }
+
+.dom-list { display: flex; flex-direction: column; gap: 10px; }
+.dom-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 14px; align-items: center; background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.dom-row.strength { border-color: var(--green); }
+.dom-row.needs-work { border-color: var(--red); }
+.dom-name { font-weight: 600; }
+.dom-bar { height: 14px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.dom-fill { height: 100%; background: var(--indigo); }
+.dom-row.strength .dom-fill { background: var(--green); }
+.dom-row.needs-work .dom-fill { background: var(--red); }
+.dom-val { font-weight: 700; white-space: nowrap; }
+.dom-count { color: var(--muted); font-weight: 400; font-size: .85rem; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+.panel { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-top: 16px; }
+.panel ul { margin: 6px 0 0; padding-left: 20px; }
+.panel li { padding: 3px 0; }
+.strength-panel { border-color: var(--green); }
+.focus-panel { border-color: var(--amber); }
+.claude-panel { border-color: var(--indigo); background: #f5f3ff; }
+.claude-panel h4 { margin: 12px 0 2px; }
+
+.save-row { display: flex; gap: 14px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .cards, .two-col { grid-template-columns: 1fr; }
+  .dom-row { grid-template-columns: 1fr auto; }
+  .dom-bar { grid-column: 1 / -1; order: 3; }
+}
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="data.js"></script>
+  <script>
+/* ===== storage.js ===== */
+// Local persistence using localStorage. Everything stays on the device.
+
+const SETTINGS_KEY = 'njsla.settings.v1';
+const RESULTS_KEY = 'njsla.results.v1';
+const PROGRESS_KEY = 'njsla.progress.v1';
+
+const DEFAULT_SETTINGS = {
+  studentName: '',
+  provider: 'anthropic', // 'anthropic' | 'openai' | 'gemini'
+  apiKey: '',
+  model: 'claude-sonnet-4-6',
+  useApi: true, // use the AI provider when a key is present
+};
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SETTINGS };
+  } catch {
+    return { ...DEFAULT_SETTINGS };
+  }
+}
+
+function saveSettings(settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function loadResults() {
+  try {
+    const raw = localStorage.getItem(RESULTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveResult(result) {
+  const all = loadResults();
+  all.unshift(result); // newest first
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(all));
+  return all;
+}
+
+function deleteResult(id) {
+  const all = loadResults().filter((r) => r.id !== id);
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(all));
+  return all;
+}
+
+function clearResults() {
+  localStorage.removeItem(RESULTS_KEY);
+}
+
+// ---- in-progress test (save & resume) ----
+function saveProgress(progress) {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch {}
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearProgress() {
+  localStorage.removeItem(PROGRESS_KEY);
+}
+
+/* ===== scoring.js ===== */
+// NJSLA-style scoring.
+//
+// The real NJSLA reports a scale score from 650 to 850 and places students in
+// one of five performance levels. We approximate that here from a difficulty-
+// weighted performance index so that reaching (and answering) harder questions
+// raises the score the way an adaptive form would.
+//
+// Level cut scores below match the published NJSLA performance-level ranges.
+
+const LEVELS = [
+  { level: 1, min: 650, max: 699, label: 'Did Not Yet Meet Expectations', short: 'Level 1' },
+  { level: 2, min: 700, max: 724, label: 'Partially Met Expectations', short: 'Level 2' },
+  { level: 3, min: 725, max: 749, label: 'Approached Expectations', short: 'Level 3' },
+  { level: 4, min: 750, max: 809, label: 'Met Expectations', short: 'Level 4' },
+  { level: 5, min: 810, max: 850, label: 'Exceeded Expectations', short: 'Level 5' },
+];
+
+function levelForScore(score) {
+  return LEVELS.find((l) => score >= l.min && score <= l.max) || LEVELS[0];
+}
+
+// answers: [{ question, correct (bool), partial (0..1), difficulty }]
+// Returns { scaleScore, level, perfIndex, points, maxPoints, accuracy }
+function scoreTest(answers) {
+  if (!answers.length) {
+    return { scaleScore: 650, level: LEVELS[0], perfIndex: 0, points: 0, maxPoints: 0, accuracy: 0 };
+  }
+
+  // Difficulty-weighted points. A correct item earns points equal to its
+  // difficulty (1..5); partial credit (writing) earns a fraction of that.
+  let points = 0;
+  let maxPoints = 0;
+  let correctCount = 0;
+  for (const a of answers) {
+    const d = a.difficulty || 3;
+    maxPoints += d;
+    const credit = a.correct ? 1 : (a.partial || 0);
+    points += credit * d;
+    if (a.correct) correctCount += 1;
+  }
+
+  const perfIndex = maxPoints > 0 ? points / maxPoints : 0; // 0..1
+  const accuracy = correctCount / answers.length;
+
+  // Map performance index to the 650..850 scale.
+  let scaleScore = Math.round(650 + perfIndex * 200);
+  scaleScore = Math.max(650, Math.min(850, scaleScore));
+
+  return {
+    scaleScore,
+    level: levelForScore(scaleScore),
+    perfIndex,
+    points: Math.round(points * 10) / 10,
+    maxPoints,
+    accuracy,
+  };
+}
+
+// Score the ELA-Writing assessment from its extended-response task(s).
+// NJSLA-Adaptive writing uses a holistic rubric with two dimensions:
+// Composition (ideas/organization, weighted higher) and Conventions.
+function scoreWriting(answers) {
+  const essays = answers.filter((a) => a.writingScores);
+  if (!essays.length) {
+    return { scaleScore: 650, level: LEVELS[0], accuracy: 0, perfIndex: 0, dimensions: { composition: 0, conventions: 0 } };
+  }
+  const avg = (k) => essays.reduce((s, a) => s + (a.writingScores[k] || 0), 0) / essays.length;
+  const composition = avg('composition');
+  const conventions = avg('conventions');
+  const overall = 0.65 * composition + 0.35 * conventions; // 0..1
+
+  let scaleScore = Math.round(650 + overall * 200);
+  scaleScore = Math.max(650, Math.min(850, scaleScore));
+
+  return {
+    scaleScore,
+    level: levelForScore(scaleScore),
+    accuracy: overall,
+    perfIndex: overall,
+    dimensions: {
+      composition: Math.round(composition * 100),
+      conventions: Math.round(conventions * 100),
+    },
+  };
+}
+
+// Break performance down by domain for the analytics screen.
+// Returns [{ domain, name, total, correct, accuracy, status }]
+function scoreByDomain(answers, domainNames) {
+  const map = {};
+  for (const a of answers) {
+    const dom = a.question.domain;
+    if (!map[dom]) map[dom] = { domain: dom, name: domainNames[dom] || dom, total: 0, correct: 0, partialSum: 0 };
+    map[dom].total += 1;
+    if (a.correct) map[dom].correct += 1;
+    map[dom].partialSum += a.correct ? 1 : (a.partial || 0);
+  }
+  return Object.values(map).map((d) => {
+    const accuracy = d.partialSum / d.total;
+    let status = 'developing';
+    if (accuracy >= 0.75) status = 'strength';
+    else if (accuracy < 0.5) status = 'needs-work';
+    return { ...d, accuracy, status };
+  }).sort((a, b) => b.accuracy - a.accuracy);
+}
+
+/* ===== analytics.js ===== */
+// Pure rendering helpers for results & analytics. Return HTML strings.
+
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function scoreCard(result) {
+  // position of score along the 650-850 scale for the meter
+  const pct = Math.max(0, Math.min(100, ((result.scaleScore - 650) / 200) * 100));
+  let stats;
+  if (result.isWriting && result.writing) {
+    stats = `
+      <span>Composition: <strong>${result.writing.composition}%</strong></span>
+      <span>Conventions: <strong>${result.writing.conventions}%</strong></span>`;
+  } else {
+    stats = `
+      <span><strong>${result.correctCount}/${result.totalQuestions}</strong> correct</span>
+      <span><strong>${result.accuracy}%</strong> accuracy</span>
+      <span>hardest level reached: <strong>${result.highestDifficultyReached}/5</strong></span>`;
+  }
+  return `
+    <div class="score-card level-${result.level}">
+      <div class="score-big">${result.scaleScore}</div>
+      <div class="score-scale">scale score (650–850)</div>
+      <div class="meter"><div class="meter-fill" style="width:${pct}%"></div></div>
+      <div class="level-badge">Level ${result.level} — ${esc(result.levelLabel)}</div>
+      <div class="score-stats">${stats}</div>
+    </div>`;
+}
+
+const STATUS_LABEL = {
+  strength: '💪 Strength',
+  developing: '🌱 Developing',
+  'needs-work': '🎯 Needs practice',
+};
+
+function domainBars(result) {
+  const rows = result.byDomain
+    .map((d) => `
+      <div class="dom-row ${d.status}">
+        <div class="dom-name">${esc(d.name)}</div>
+        <div class="dom-bar"><div class="dom-fill" style="width:${d.accuracy}%"></div></div>
+        <div class="dom-val">${d.accuracy}% <span class="dom-count">(${d.correct}/${d.total})</span></div>
+      </div>`)
+    .join('');
+  return `<div class="dom-list">${rows}</div>`;
+}
+
+function strengthsImprovements(result) {
+  const strengths = result.byDomain.filter((d) => d.status === 'strength');
+  const focus = result.byDomain.filter((d) => d.status === 'needs-work');
+  const developing = result.byDomain.filter((d) => d.status === 'developing');
+
+  const list = (arr, empty) =>
+    arr.length
+      ? '<ul>' + arr.map((d) => `<li>${esc(d.name)} <span class="muted">(${d.accuracy}%)</span></li>`).join('') + '</ul>'
+      : `<p class="muted">${empty}</p>`;
+
+  return `
+    <div class="two-col">
+      <div class="panel strength-panel">
+        <h3>💪 Areas of Strength</h3>
+        ${list(strengths, 'Keep practicing to build clear strengths.')}
+      </div>
+      <div class="panel focus-panel">
+        <h3>🎯 Areas to Improve</h3>
+        ${list(focus, 'No major weak spots — nice!')}
+      </div>
+    </div>
+    ${developing.length ? `<div class="panel"><h3>🌱 Developing</h3>${list(developing, '')}</div>` : ''}`;
+}
+
+function claudeAnalysis(a) {
+  if (!a) return '';
+  const ul = (arr) => (arr && arr.length ? '<ul>' + arr.map((x) => `<li>${esc(x)}</li>`).join('') + '</ul>' : '');
+  return `
+    <div class="panel claude-panel">
+      <h3>🧠 Coach's Analysis (Claude)</h3>
+      <p>${esc(a.summary || '')}</p>
+      ${a.strengths && a.strengths.length ? `<h4>What went well</h4>${ul(a.strengths)}` : ''}
+      ${a.focus && a.focus.length ? `<h4>What to work on</h4>${ul(a.focus)}` : ''}
+      ${a.nextSteps && a.nextSteps.length ? `<h4>Try this at home</h4>${ul(a.nextSteps)}` : ''}
+    </div>`;
+}
+
+/* ===== claude.js ===== */
+// AI client that runs directly from the browser, supporting multiple providers:
+// Anthropic (Claude), OpenAI (ChatGPT), and Google Gemini.
+//
+// NOTE: Calling these APIs from the browser exposes the API key to anyone using
+// this device, so this is intended for personal/at-home use with a key you
+// control. The key is stored only in this device's localStorage.
+
+
+const ANTHROPIC_VERSION = '2023-06-01';
+
+const PROVIDERS = {
+  anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-6', keyHint: 'sk-ant-...' },
+  openai: { label: 'OpenAI (ChatGPT)', defaultModel: 'gpt-4o', keyHint: 'sk-...' },
+  gemini: { label: 'Google Gemini', defaultModel: 'gemini-2.5-flash', keyHint: 'AIza...' },
+};
+
+function defaultModelFor(provider) {
+  return (PROVIDERS[provider] || PROVIDERS.anthropic).defaultModel;
+}
+
+// ---- provider-specific calls; each returns the assistant's text ----
+
+async function callAnthropic({ apiKey, model, system, messages, maxTokens }) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': ANTHROPIC_VERSION,
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
+  });
+  if (!res.ok) throw new Error(`Anthropic error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
+  const data = await res.json();
+  const block = (data.content || []).find((b) => b.type === 'text');
+  return block ? block.text : '';
+}
+
+async function callOpenAI({ apiKey, model, system, messages, maxTokens }) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      messages: [{ role: 'system', content: system }, ...messages],
+    }),
+  });
+  if (!res.ok) throw new Error(`OpenAI error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+async function callGemini({ apiKey, model, system, messages, maxTokens }) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const contents = messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents,
+      generationConfig: { maxOutputTokens: maxTokens },
+    }),
+  });
+  if (!res.ok) throw new Error(`Gemini error ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
+  const data = await res.json();
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  return parts.map((p) => p.text || '').join('');
+}
+
+// Unified entry point. Reads provider/model/key from settings.
+async function callLLM({ settings, system, messages, maxTokens = 1024 }) {
+  const provider = settings.provider || 'anthropic';
+  const apiKey = settings.apiKey;
+  const model = settings.model || defaultModelFor(provider);
+  const args = { apiKey, model, system, messages, maxTokens };
+  if (provider === 'openai') return callOpenAI(args);
+  if (provider === 'gemini') return callGemini(args);
+  return callAnthropic(args);
+}
+
+// Pull the first JSON object/array out of a model response.
+function extractJson(text) {
+  if (!text) throw new Error('Empty response');
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidate = fenced ? fenced[1] : text;
+  const start = candidate.search(/[[{]/);
+  if (start === -1) throw new Error('No JSON found in response');
+  const sub = candidate.slice(start);
+  return JSON.parse(sub.trim().replace(/,\s*([}\]])/g, '$1'));
+}
+
+// Generate a fresh extended-response writing prompt for the ELA-Writing test.
+async function generateWritingPrompt({ settings, history = [] }) {
+  const modes = ['Opinion', 'Narrative', 'Informative'];
+  const mode = modes[Math.floor(Math.random() * modes.length)];
+  const system =
+    'You write NJSLA-aligned Grade 3 extended-response writing prompts. Respond with ONLY ' +
+    'a JSON object: {"mode":"' + mode + '","stem":"the full prompt a child reads","rubric":"what a strong response includes"}.';
+  const user =
+    `Create ONE Grade 3 ${mode} writing prompt suitable for a single extended-response task (a few paragraphs). ` +
+    `Make it concrete and age-appropriate.` +
+    (history.length ? ` Avoid these recent prompts: ${history.slice(-4).join(' | ')}` : '');
+  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 500 });
+  const out = extractJson(text);
+  return {
+    id: 'gen_w_' + Math.random().toString(36).slice(2, 9),
+    subject: 'writing', domain: 'W', standard: 'AI-generated', difficulty: 3,
+    type: 'essay', mode: out.mode || mode, stem: out.stem,
+    rubric: out.rubric || 'Composition: clear ideas, organization, and details. Conventions: grammar, spelling, and punctuation.',
+    generated: true,
+  };
+}
+
+// Generate a single fresh question at the requested subject/domain/difficulty.
+async function generateQuestion({ settings, subject, domain, difficulty, history = [] }) {
+  if (subject === 'writing') return generateWritingPrompt({ settings, history });
+  const domainName = DOMAINS[subject][domain] || domain;
+  const subjectName = subject === 'math' ? 'Mathematics' : 'ELA Reading';
+  const needPassage = subject === 'reading' && (domain === 'RL' || domain === 'RI');
+
+  const system =
+    'You are an assessment item writer creating NJSLA-aligned practice questions for a ' +
+    'Grade 3 student in New Jersey. Questions must be grade-3 appropriate, factually correct, ' +
+    'and have exactly one unambiguous correct answer (unless multi-select). Respond with ONLY ' +
+    'a JSON object, no extra text.';
+
+  const schema = needPassage
+    ? `{
+  "passage": "a short 60-110 word grade-3 reading passage (omit if not needed)",
+  "type": "mc" | "ms",
+  "stem": "the question",
+  "choices": ["A","B","C","D"],
+  "answer": <index 0-3 for mc, or array of indices for ms>,
+  "explanation": "1-2 sentence kid-friendly explanation"
+}`
+    : `{
+  "type": "mc" | "ms" | "num",
+  "stem": "the question",
+  "choices": ["A","B","C","D"]   // omit for num,
+  "answer": <index for mc, array for ms, or a number for num>,
+  "explanation": "1-2 sentence kid-friendly explanation"
+}`;
+
+  const user =
+    `Create ONE Grade 3 ${subjectName} question.\n` +
+    `Domain: ${domainName} (${domain}).\n` +
+    `Difficulty: ${difficulty} on a 1 (easiest) to 5 (hardest) scale. ` +
+    `Make it genuinely ${difficulty >= 4 ? 'challenging but still grade-3 level' : 'appropriate for difficulty ' + difficulty}.\n` +
+    (history.length ? `Do NOT repeat these recent questions: ${history.slice(-6).join(' | ')}\n` : '') +
+    `Return JSON exactly in this shape:\n${schema}`;
+
+  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 700 });
+  const q = extractJson(text);
+
+  const question = {
+    id: 'gen_' + Math.random().toString(36).slice(2, 9),
+    subject,
+    domain,
+    standard: 'AI-generated',
+    difficulty,
+    type: q.type === 'ms' ? 'ms' : q.type === 'num' ? 'num' : 'mc',
+    stem: q.stem,
+    choices: q.choices,
+    answer: q.answer,
+    explanation: q.explanation || '',
+    generated: true,
+  };
+  if (q.passage) {
+    const pid = 'gen_p_' + question.id;
+    question.passage = pid;
+    question._passageText = q.passage;
+  }
+  return question;
+}
+
+// Grade an extended-response writing task on the two-dimension rubric.
+async function gradeWriting({ settings, question, response }) {
+  const passage = question.passage ? (PASSAGES[question.passage]?.text || question._passageText || '') : '';
+  const system =
+    'You are a kind but fair Grade 3 writing rater using the NJSLA-Adaptive holistic rubric, which has ' +
+    'TWO dimensions: Composition (ideas, organization, development, details) and Conventions (grammar, ' +
+    'spelling, capitalization, punctuation, complete sentences). Respond with ONLY JSON: ' +
+    '{"composition": <0 to 1>, "conventions": <0 to 1>, "feedback": "2-3 sentences of warm, specific feedback for a child"}.';
+  const user =
+    (passage ? `Passage:\n${passage}\n\n` : '') +
+    `Prompt: ${question.stem}\n\n` +
+    `What a strong response includes: ${question.rubric || 'clear ideas, details, and correct conventions.'}\n\n` +
+    `Student's response:\n"${response}"\n\n` +
+    `Score each dimension from 0 (off task/blank) to 1 (fully proficient for Grade 3). Partial values like 0.5 are fine.`;
+
+  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 400 });
+  const out = extractJson(text);
+  const clamp = (v) => { const n = Number(v); return Number.isNaN(n) ? 0 : Math.max(0, Math.min(1, n)); };
+  const composition = clamp(out.composition);
+  const conventions = clamp(out.conventions);
+  const overall = Math.round((0.65 * composition + 0.35 * conventions) * 100) / 100;
+  return { composition, conventions, overall, feedback: out.feedback || '' };
+}
+
+// Produce a narrative analysis of an overall performance summary.
+async function analyzePerformance({ settings, summary }) {
+  const system =
+    'You are an encouraging Grade 3 learning coach writing for a parent. Be warm, concrete, and ' +
+    'specific. Respond with ONLY JSON: {"summary": "2-3 sentences", "strengths": ["..."], ' +
+    '"focus": ["..."], "nextSteps": ["3 specific practice activities a parent can do at home"]}.';
+  const user =
+    `Here is a Grade 3 NJSLA practice-test result. Analyze it for the parent.\n\n` +
+    JSON.stringify(summary, null, 2);
+  const text = await callLLM({ settings, system, messages: [{ role: 'user', content: user }], maxTokens: 800 });
+  return extractJson(text);
+}
+
+// Lightweight connectivity check used by the Settings screen.
+async function testConnection(settings) {
+  const text = await callLLM({
+    settings,
+    system: 'Reply with the single word: OK',
+    messages: [{ role: 'user', content: 'ping' }],
+    maxTokens: 10,
+  });
+  return /ok/i.test(text);
+}
+
+/* ===== engine.js ===== */
+// Adaptive test engine — modeled on the 2026 NJSLA-Adaptive (CAT) format.
+//
+// Each TestSession runs one assessment (Mathematics, ELA-Reading, or
+// ELA-Writing), organized into timed sessions. Difficulty starts at medium and
+// adapts after each *set* of items (not after every single item), mirroring the
+// real NJSLA-Adaptive "grouping" behavior. Questions come from Claude when an
+// API key is set, otherwise from the built-in bank. ELA-Writing is a single
+// extended-response task scored on two dimensions (Composition & Conventions).
+
+
+const TEST_CONFIG = {
+  math: {
+    name: SUBJECTS.math,
+    domains: ['OA', 'NBT', 'NF', 'MD', 'G'],
+    calculator: false,
+    full: { sessions: 2, minutesPerSession: 75, itemsPerSession: 18, setSize: 6 },
+    practice: { sessions: 1, minutesPerSession: 25, itemsPerSession: 12, setSize: 6 },
+  },
+  reading: {
+    name: SUBJECTS.reading,
+    domains: ['RL', 'RI', 'L'],
+    full: { sessions: 2, minutesPerSession: 75, itemsPerSession: 18, setSize: 6 },
+    practice: { sessions: 1, minutesPerSession: 25, itemsPerSession: 12, setSize: 6 },
+  },
+  writing: {
+    name: SUBJECTS.writing,
+    domains: ['W'],
+    isWriting: true,
+    full: { sessions: 1, minutesPerSession: 90, itemsPerSession: 1, setSize: 1 },
+    practice: { sessions: 1, minutesPerSession: 15, itemsPerSession: 1, setSize: 1 },
+  },
+};
+
+// Difficulty adapts after each set based on the set's accuracy.
+const SET_UP = 0.67;   // >= 2/3 correct in the set -> harder
+const SET_DOWN = 0.34; // <= 1/3 correct in the set -> easier
+
+function arraysEqualAsSets(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  const sa = [...a].sort();
+  const sb = [...b].sort();
+  return sa.every((v, i) => v === sb[i]);
+}
+
+class TestSession {
+  constructor(subject, mode, settings) {
+    this.subject = subject;            // 'math' | 'reading' | 'writing'
+    this.mode = mode;                  // 'full' | 'practice'
+    this.settings = settings;
+    const cfg = TEST_CONFIG[subject];
+    this.cfg = cfg;
+    this.params = cfg[mode];
+    this.domains = cfg.domains;
+    this.isWriting = !!cfg.isWriting;
+
+    this.totalQuestions = this.params.sessions * this.params.itemsPerSession;
+    this.sessionIndex = 0;             // current session (0-based)
+    this.qInSession = 0;               // items answered in current session
+    this.globalIndex = 0;              // items answered overall
+
+    this.difficulty = 3;               // adaptive level, 1..5 (starts medium)
+    this.setCount = 0;                 // items answered in the current set
+    this.setCorrect = 0;               // weighted correct in the current set
+
+    this.usedIds = new Set();
+    this.usedStems = [];
+    this.answers = [];
+    this.passages = { ...PASSAGES };
+    this.currentQuestion = null;
+
+    this.domainPlan = this._buildDomainPlan();
+  }
+
+  _buildDomainPlan() {
+    const plan = [];
+    const n = this.params.itemsPerSession;
+    for (let i = 0; i < n; i++) plan.push(this.domains[i % this.domains.length]);
+    return plan;
+  }
+
+  // ----- progress helpers (NJSLA "session" terminology) -----
+  get sessionNumber() { return this.sessionIndex + 1; }
+  get sessions() { return this.params.sessions; }
+  get sessionMinutes() { return this.params.minutesPerSession; }
+  get itemsPerSession() { return this.params.itemsPerSession; }
+  get questionNumberInSession() { return this.qInSession + 1; }
+
+  isSessionComplete() { return this.qInSession >= this.params.itemsPerSession; }
+  isTestComplete() { return this.globalIndex >= this.totalQuestions; }
+
+  advanceSession() {
+    this.sessionIndex += 1;
+    this.qInSession = 0;
+    this.difficulty = 3;     // re-establish a medium starting point each session
+    this.setCount = 0;
+    this.setCorrect = 0;
+  }
+
+  getPassage(id) { return this.passages[id]; }
+
+  // ----- save / resume support -----
+  serialize() {
+    return {
+      subject: this.subject,
+      mode: this.mode,
+      sessionIndex: this.sessionIndex,
+      qInSession: this.qInSession,
+      globalIndex: this.globalIndex,
+      difficulty: this.difficulty,
+      setCount: this.setCount,
+      setCorrect: this.setCorrect,
+      usedIds: [...this.usedIds],
+      usedStems: this.usedStems,
+      answers: this.answers,
+      passages: this.passages,
+      domainPlan: this.domainPlan,
+      currentQuestion: this.currentQuestion,
+    };
+  }
+
+  static fromJSON(o, settings) {
+    const s = new TestSession(o.subject, o.mode, settings);
+    s.sessionIndex = o.sessionIndex || 0;
+    s.qInSession = o.qInSession || 0;
+    s.globalIndex = o.globalIndex || 0;
+    s.difficulty = o.difficulty || 3;
+    s.setCount = o.setCount || 0;
+    s.setCorrect = o.setCorrect || 0;
+    s.usedIds = new Set(o.usedIds || []);
+    s.usedStems = o.usedStems || [];
+    s.answers = o.answers || [];
+    s.passages = o.passages || { ...PASSAGES };
+    s.domainPlan = o.domainPlan || s.domainPlan;
+    s.currentQuestion = o.currentQuestion || null;
+    return s;
+  }
+
+  async nextQuestion() {
+    const targetDomain = this.domainPlan[this.qInSession] || this.domains[0];
+    const target = this.difficulty;
+
+    let question = null;
+    const apiReady = this.settings.useApi && this.settings.apiKey;
+
+    if (this.isWriting) {
+      question = await this._pickWriting(apiReady);
+    } else {
+      if (apiReady) {
+        try {
+          question = await generateQuestion({
+            settings: this.settings,
+            subject: this.subject,
+            domain: targetDomain,
+            difficulty: target,
+            history: this.usedStems,
+          });
+          if (question._passageText) {
+            this.passages[question.passage] = { title: 'Reading Passage', text: question._passageText };
+          }
+        } catch (err) {
+          console.warn('Claude generation failed, falling back to bank:', err.message);
+          question = null;
+        }
+      }
+      if (!question) question = this._pickFromBank(targetDomain, target);
+    }
+
+    this.currentQuestion = question;
+    if (question) {
+      this.usedIds.add(question.id);
+      this.usedStems.push(question.stem);
+    }
+    return question;
+  }
+
+  async _pickWriting(apiReady) {
+    if (apiReady) {
+      try {
+        const q = await generateQuestion({
+          settings: this.settings, subject: 'writing', domain: 'W', difficulty: 3, history: this.usedStems,
+        });
+        return q;
+      } catch (err) {
+        console.warn('Claude writing-prompt generation failed, using bank:', err.message);
+      }
+    }
+    const pool = QUESTIONS.filter((q) => q.subject === 'writing' && !this.usedIds.has(q.id));
+    const list = pool.length ? pool : QUESTIONS.filter((q) => q.subject === 'writing');
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  _pickFromBank(domain, target) {
+    const pool = QUESTIONS.filter((q) => q.subject === this.subject && !this.usedIds.has(q.id));
+    if (!pool.length) {
+      this.usedIds.clear();
+      return this._pickFromBank(domain, target);
+    }
+    const score = (q) => (q.domain === domain ? 0 : 10) + Math.abs((q.difficulty || 3) - target);
+    pool.sort((a, b) => score(a) - score(b) || Math.random() - 0.5);
+    return pool[0];
+  }
+
+  // Grade the current question, update the running set, and adapt at set ends.
+  async submitAnswer(response) {
+    const q = this.currentQuestion;
+    let correct = false;
+    let partial = 0;
+    let feedback = '';
+    let writingScores = null;
+
+    if (q.type === 'mc') {
+      correct = Number(response) === Number(q.answer);
+    } else if (q.type === 'ms') {
+      correct = arraysEqualAsSets(response, q.answer);
+    } else if (q.type === 'num') {
+      const r = parseFloat(String(response).replace(/[^0-9.\-]/g, ''));
+      correct = !Number.isNaN(r) && r === Number(q.answer);
+    } else if (q.type === 'essay' || q.type === 'writing') {
+      const text = String(response || '').trim();
+      if (this.settings.useApi && this.settings.apiKey && text.length > 0) {
+        try {
+          const g = await gradeWriting({ settings: this.settings, question: q, response: text });
+          writingScores = { composition: g.composition, conventions: g.conventions };
+          partial = g.overall;
+          feedback = g.feedback;
+          correct = partial >= 0.85;
+        } catch (err) {
+          const est = this._estimateWriting(text);
+          writingScores = est.scores; partial = est.overall; feedback = est.feedback;
+        }
+      } else {
+        const est = this._estimateWriting(text);
+        writingScores = est.scores; partial = est.overall; feedback = est.feedback;
+      }
+    }
+
+    const credit = correct ? 1 : partial;
+    this.answers.push({
+      question: q,
+      response,
+      correct,
+      partial: credit,
+      difficulty: q.difficulty || 3,
+      feedback,
+      writingScores,
+    });
+
+    // Set-based adaptation (skip for the single-task writing test).
+    if (!this.isWriting) {
+      this.setCount += 1;
+      this.setCorrect += credit;
+      if (this.setCount >= this.params.setSize) {
+        const setAcc = this.setCorrect / this.setCount;
+        if (setAcc >= SET_UP) this.difficulty = Math.min(5, this.difficulty + 1);
+        else if (setAcc <= SET_DOWN) this.difficulty = Math.max(1, this.difficulty - 1);
+        this.setCount = 0;
+        this.setCorrect = 0;
+      }
+    }
+
+    this.qInSession += 1;
+    this.globalIndex += 1;
+
+    return { correct, partial: credit, answer: q.answer, explanation: q.explanation, feedback, writingScores };
+  }
+
+  _estimateWriting(text) {
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    // Rough offline heuristic so the app is usable without the API.
+    const composition = words >= 80 ? 0.7 : words >= 40 ? 0.5 : words >= 15 ? 0.35 : 0.15;
+    const sentences = (text.match(/[.!?]/g) || []).length;
+    const conventions = sentences >= 4 ? 0.7 : sentences >= 2 ? 0.5 : 0.3;
+    const overall = Math.round((0.65 * composition + 0.35 * conventions) * 100) / 100;
+    return {
+      scores: { composition, conventions },
+      overall,
+      feedback: 'Saved your writing. Turn on the Claude API in Settings for a detailed, rubric-based score and feedback.',
+    };
+  }
+
+  getResultSummary() {
+    let scoreInfo;
+    if (this.isWriting) {
+      scoreInfo = scoreWriting(this.answers);
+    } else {
+      scoreInfo = scoreTest(this.answers);
+    }
+    const byDomain = scoreByDomain(this.answers, DOMAINS[this.subject]);
+    const avgDifficulty =
+      this.answers.reduce((s, a) => s + a.difficulty, 0) / (this.answers.length || 1);
+    const highestReached = this.answers.reduce((m, a) => Math.max(m, a.difficulty), 0);
+
+    return {
+      id: 'r_' + Date.now(),
+      date: new Date().toISOString(),
+      studentName: this.settings.studentName || 'Student',
+      subject: this.subject,
+      subjectName: this.cfg.name,
+      isWriting: this.isWriting,
+      mode: this.mode,
+      totalQuestions: this.answers.length,
+      correctCount: this.answers.filter((a) => a.correct).length,
+      scaleScore: scoreInfo.scaleScore,
+      level: scoreInfo.level.level,
+      levelLabel: scoreInfo.level.label,
+      accuracy: Math.round((scoreInfo.accuracy || 0) * 100),
+      perfIndex: Math.round((scoreInfo.perfIndex || 0) * 100) / 100,
+      avgDifficulty: Math.round(avgDifficulty * 10) / 10,
+      highestDifficultyReached: highestReached,
+      usedClaude: !!(this.settings.useApi && this.settings.apiKey),
+      writing: this.isWriting ? scoreInfo.dimensions : null,
+      byDomain: byDomain.map((d) => ({
+        domain: d.domain, name: d.name, total: d.total, correct: d.correct,
+        accuracy: Math.round(d.accuracy * 100), status: d.status,
+      })),
+      answers: this.answers.map((a) => ({
+        domain: a.question.domain,
+        difficulty: a.difficulty,
+        stem: a.question.stem,
+        correct: a.correct,
+        partial: a.partial,
+        writingScores: a.writingScores || null,
+      })),
+    };
+  }
+}
+
+/* ===== app.js ===== */
+// Main application controller: routing, screens, timer, and test flow.
+// Modeled on the 2026 NJSLA-Adaptive format (separate Math, Reading, Writing
+// assessments; timed sessions; set-based adaptivity).
+
+
+const app = document.getElementById('app');
+let settings = loadSettings();
+let session = null;
+let timer = null;
+let battery = null; // { queue:[subjects], index, mode, results:[] } when running the full battery
+
+const BATTERY_QUEUE = ['reading', 'writing', 'math'];
+
+const ICONS = { math: '➗', reading: '📖', writing: '✍️' };
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function clearTimer() {
+  if (timer && timer.intervalId) clearInterval(timer.intervalId);
+  timer = null;
+}
+
+// ---------------------------------------------------------------- Home
+function renderHome() {
+  clearTimer();
+  session = null;
+  battery = null;
+  const results = loadResults();
+  const apiOn = settings.useApi && settings.apiKey;
+  const providerLabel = (PROVIDERS[settings.provider] || PROVIDERS.anthropic).label;
+  const name = settings.studentName ? esc(settings.studentName) : null;
+  const prog = loadProgress();
+
+  app.innerHTML = `
+    <header class="app-header">
+      <div class="brand">🎓 <span>NJSLA-Adaptive · Grade 3</span></div>
+      <button class="btn ghost" id="go-settings">⚙️ Settings</button>
+    </header>
+    <main class="home">
+      ${prog ? renderResumeBanner(prog) : ''}
+      <div class="hero">
+        <h1>${name ? `Hi ${name}! ` : ''}Ready to practice? 🌟</h1>
+        <p class="sub">Adaptive Grade 3 practice tests modeled on the 2026 NJSLA-Adaptive (computer-adaptive) format.</p>
+        <div class="api-pill ${apiOn ? 'on' : 'off'}">${apiOn ? '🧠 ' + esc(providerLabel) + ' live questions: ON' : '📚 Offline question bank'}</div>
+      </div>
+
+      <div class="cards three">
+        ${subjectCard('math')}
+        ${subjectCard('reading')}
+        ${subjectCard('writing')}
+      </div>
+
+      <button class="battery-card" data-battery>
+        <span class="battery-icon">🏆</span>
+        <span class="battery-text">
+          <strong>Full Battery</strong>
+          <span class="muted">All three tests in a row — Reading → Writing → Math</span>
+        </span>
+        <span class="card-go">Start ▶</span>
+      </button>
+
+      <div class="mode-row">
+        <label class="mode-label">Test length:</label>
+        <label class="radio"><input type="radio" name="mode" value="full" checked> Official length</label>
+        <label class="radio"><input type="radio" name="mode" value="practice"> Short practice</label>
+      </div>
+
+      <section class="history-block">
+        <h2>📊 Saved Results <span class="muted">(${results.length})</span>${results.length ? ' <button class="btn ghost danger" id="clear-all">🗑 Clear all</button>' : ''}</h2>
+        ${results.length ? renderHistoryList(results) : '<p class="muted">No saved tests yet. Finish a test and tap <strong>Save Results</strong> to track progress here.</p>'}
+      </section>
+    </main>
+    <footer class="app-footer">Practice tool · not affiliated with NJ DOE or Cambium · models the 2026 NJSLA-Adaptive format</footer>
+  `;
+
+  document.getElementById('go-settings').onclick = renderSettings;
+  app.querySelectorAll('[data-subject]').forEach((el) => {
+    el.onclick = () => {
+      const mode = app.querySelector('input[name="mode"]:checked').value;
+      startTest(el.dataset.subject, mode);
+    };
+  });
+  const batteryBtn = app.querySelector('[data-battery]');
+  if (batteryBtn) batteryBtn.onclick = () => {
+    const mode = app.querySelector('input[name="mode"]:checked').value;
+    startBattery(mode);
+  };
+  const resumeBtn = document.getElementById('resume-test');
+  if (resumeBtn) resumeBtn.onclick = resumeTest;
+  const discardBtn = document.getElementById('discard-progress');
+  if (discardBtn) discardBtn.onclick = () => { if (confirm('Discard the in-progress test?')) { clearProgress(); renderHome(); } };
+  const clearAllBtn = document.getElementById('clear-all');
+  if (clearAllBtn) clearAllBtn.onclick = () => { if (confirm('Delete ALL saved results? This cannot be undone.')) { clearResults(); renderHome(); } };
+  app.querySelectorAll('[data-result]').forEach((el) => {
+    el.onclick = () => renderAnalytics(loadResults().find((r) => r.id === el.dataset.result));
+  });
+  app.querySelectorAll('[data-delete]').forEach((el) => {
+    el.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this saved result?')) { deleteResult(el.dataset.delete); renderHome(); } };
+  });
+}
+
+function renderResumeBanner(prog) {
+  const cfg = TEST_CONFIG[prog.session.subject];
+  const done = prog.session.globalIndex || 0;
+  const where = prog.battery
+    ? `Full Battery · ${esc(cfg.name)}`
+    : `${esc(cfg.name)}`;
+  const detail = prog.session.subject === 'writing'
+    ? 'writing task in progress'
+    : `${done} of ${prog.session.totalQuestions || (TEST_CONFIG[prog.session.subject][prog.session.mode].sessions * TEST_CONFIG[prog.session.subject][prog.session.mode].itemsPerSession)} questions done`;
+  return `
+    <div class="resume-banner">
+      <div class="resume-text"><strong>⏸ Resume your test</strong><span class="muted">${where} — ${detail}</span></div>
+      <div class="resume-actions">
+        <button class="btn primary" id="resume-test">Resume ▶</button>
+        <button class="btn ghost danger" id="discard-progress">Discard</button>
+      </div>
+    </div>`;
+}
+
+function subjectCard(subject) {
+  const cfg = TEST_CONFIG[subject];
+  const f = cfg.full;
+  let meta;
+  if (subject === 'writing') meta = `1 session · ${f.minutesPerSession} min · one writing task`;
+  else meta = `${f.sessions} sessions · ${f.minutesPerSession} min each · adaptive`;
+  return `
+    <button class="subject-card" data-subject="${subject}">
+      <div class="card-icon">${ICONS[subject]}</div>
+      <div class="card-title">${esc(cfg.name)}</div>
+      <div class="card-meta">${meta}</div>
+      <div class="card-go">Start ▶</div>
+    </button>`;
+}
+
+function renderHistoryList(results) {
+  return `<div class="history-list">${results
+    .map((r) => `
+      <div class="history-item" data-result="${r.id}">
+        <div class="hi-main">
+          <span class="hi-subject">${ICONS[r.subject] || '📝'} ${esc(r.subjectName)}</span>
+          <span class="hi-score level-${r.level}">${r.scaleScore} · L${r.level}</span>
+        </div>
+        <div class="hi-sub">
+          <span>${new Date(r.date).toLocaleDateString()} · ${r.isWriting ? ('Composition ' + (r.writing ? r.writing.composition : 0) + '%') : (r.accuracy + '% · ' + r.correctCount + '/' + r.totalQuestions)}</span>
+          <button class="link-del" data-delete="${r.id}">delete</button>
+        </div>
+      </div>`)
+    .join('')}</div>`;
+}
+
+// ---------------------------------------------------------------- Settings
+function renderSettings() {
+  clearTimer();
+  app.innerHTML = `
+    <header class="app-header">
+      <button class="btn ghost" id="back">← Back</button>
+      <div class="brand"><span>Settings</span></div>
+      <span></span>
+    </header>
+    <main class="settings">
+      <label class="field">
+        <span>Student's name</span>
+        <input id="s-name" type="text" placeholder="e.g. Ava" value="${esc(settings.studentName)}">
+      </label>
+
+      <div class="divider">AI provider (optional)</div>
+      <p class="muted small">Add an API key to generate fresh adaptive questions, grade writing on the two-dimension rubric, and get a written performance analysis. The key is stored only on this device and sent directly to your chosen provider. Leave blank to use the offline question bank.</p>
+
+      <label class="field">
+        <span>Provider</span>
+        <select id="s-provider">
+          ${Object.entries(PROVIDERS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}
+        </select>
+      </label>
+      <label class="field">
+        <span>API key</span>
+        <input id="s-key" type="password" placeholder="${esc((PROVIDERS[settings.provider] || PROVIDERS.anthropic).keyHint)}" value="${esc(settings.apiKey)}">
+      </label>
+      <label class="field">
+        <span>Model</span>
+        <input id="s-model" type="text" placeholder="model name" value="${esc(settings.model)}">
+      </label>
+      <label class="check">
+        <input id="s-useapi" type="checkbox" ${settings.useApi ? 'checked' : ''}>
+        Use the AI provider for live questions &amp; analysis when a key is set
+      </label>
+
+      <div class="btn-row">
+        <button class="btn" id="s-test">Test connection</button>
+        <button class="btn primary" id="s-save">Save</button>
+      </div>
+      <div id="s-status" class="status"></div>
+    </main>
+  `;
+  const providerSel = document.getElementById('s-provider');
+  providerSel.value = settings.provider || 'anthropic';
+  document.getElementById('back').onclick = renderHome;
+
+  // When the provider changes, suggest its default model and key hint.
+  providerSel.onchange = () => {
+    const p = providerSel.value;
+    const modelEl = document.getElementById('s-model');
+    modelEl.value = defaultModelFor(p);
+    document.getElementById('s-key').placeholder = (PROVIDERS[p] || PROVIDERS.anthropic).keyHint;
+  };
+
+  document.getElementById('s-save').onclick = () => {
+    settings = {
+      ...settings,
+      studentName: document.getElementById('s-name').value.trim(),
+      provider: providerSel.value,
+      apiKey: document.getElementById('s-key').value.trim(),
+      model: document.getElementById('s-model').value.trim() || defaultModelFor(providerSel.value),
+      useApi: document.getElementById('s-useapi').checked,
+    };
+    saveSettings(settings);
+    setStatus('s-status', '✅ Saved!', 'ok');
+    setTimeout(renderHome, 700);
+  };
+
+  document.getElementById('s-test').onclick = async () => {
+    const probe = {
+      ...settings,
+      provider: providerSel.value,
+      apiKey: document.getElementById('s-key').value.trim(),
+      model: document.getElementById('s-model').value.trim() || defaultModelFor(providerSel.value),
+    };
+    if (!probe.apiKey) return setStatus('s-status', 'Enter an API key first.', 'err');
+    setStatus('s-status', 'Testing…', '');
+    try {
+      const ok = await testConnection(probe);
+      setStatus('s-status', ok ? '✅ Connected!' : '⚠️ Connected, unexpected reply.', ok ? 'ok' : 'err');
+    } catch (e) {
+      setStatus('s-status', '❌ ' + e.message, 'err');
+    }
+  };
+}
+
+function setStatus(id, msg, cls) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.className = 'status ' + (cls || ''); }
+}
+
+// ---------------------------------------------------------------- Test flow
+async function startTest(subject, mode) {
+  session = new TestSession(subject, mode, settings);
+  await renderSessionIntro();
+}
+
+async function renderSessionIntro() {
+  clearTimer();
+  const cfg = session.cfg;
+  const points = session.isWriting
+    ? `
+      <li>⏱️ You have <strong>${session.sessionMinutes} minutes</strong> to write.</li>
+      <li>✍️ <strong>One writing task</strong> — plan, write, and check your work.</li>
+      <li>📋 You're scored on <strong>Composition</strong> (ideas) and <strong>Conventions</strong> (grammar &amp; spelling).</li>`
+    : `
+      <li>⏱️ You have <strong>${session.sessionMinutes} minutes</strong> for this session.</li>
+      <li>❓ <strong>${session.itemsPerSession} questions</strong> in this session.</li>
+      <li>📈 The test adapts: a set of questions gets harder if you do well, easier if not.</li>
+      ${cfg.calculator === false ? '<li>🚫 No calculator (just like the real Grade 3 math test).</li>' : ''}`;
+  app.innerHTML = `
+    <main class="unit-intro">
+      <div class="intro-card">
+        <div class="card-icon">${ICONS[session.subject]}</div>
+        <h1>${esc(cfg.name)}</h1>
+        <h2>${session.isWriting ? 'Writing Task' : `Session ${session.sessionNumber} of ${session.sessions}`}</h2>
+        <ul class="intro-points">${points}</ul>
+        <button class="btn primary big" id="begin">${session.isWriting ? 'Start Writing ▶' : `Start Session ${session.sessionNumber} ▶`}</button>
+        <button class="btn ghost" id="quit">Quit to Home</button>
+      </div>
+    </main>`;
+  document.getElementById('quit').onclick = () => { if (confirm('Quit this test? Progress will be lost.')) { clearProgress(); renderHome(); } };
+  document.getElementById('begin').onclick = async () => {
+    startSessionTimer();
+    await nextQuestion();
+  };
+}
+
+function startSessionTimer(remaining) {
+  clearTimer();
+  timer = { remaining: remaining != null ? remaining : session.sessionMinutes * 60, intervalId: null };
+  timer.intervalId = setInterval(() => {
+    timer.remaining -= 1;
+    updateTimerDisplay();
+    if (timer.remaining <= 0) {
+      clearTimer();
+      finishSession(true);
+    }
+  }, 1000);
+}
+
+// Persist a resumable snapshot of the current test (and battery) state.
+function persistProgress(phase) {
+  if (!session) return;
+  saveProgress({
+    phase,
+    remaining: timer ? timer.remaining : null,
+    session: session.serialize(),
+    battery,
+  });
+}
+
+function resumeTest() {
+  const p = loadProgress();
+  if (!p) return renderHome();
+  session = TestSession.fromJSON(p.session, settings);
+  battery = p.battery || null;
+  if (p.phase === 'interstitial') return renderBatteryInterstitial();
+  if (p.phase === 'break') return renderSessionBreak(false);
+  // 'question' phase: re-show the exact question the student was on.
+  startSessionTimer(p.remaining);
+  if (session.currentQuestion) renderQuestion(session.currentQuestion);
+  else nextQuestion();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  if (!el || !timer) return;
+  const m = Math.floor(timer.remaining / 60);
+  const s = timer.remaining % 60;
+  el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+  el.classList.toggle('low', timer.remaining <= 60);
+}
+
+function progressLabel() {
+  if (session.isWriting) return 'Writing Task';
+  return `Session ${session.sessionNumber}/${session.sessions} · Q ${session.questionNumberInSession}/${session.itemsPerSession}`;
+}
+
+async function nextQuestion() {
+  app.innerHTML = `
+    <header class="test-header">
+      <div class="th-left">${progressLabel()}</div>
+      <div class="th-right">⏱️ <span id="timer">--:--</span></div>
+    </header>
+    <main class="loading"><div class="spinner"></div><p>${session.isWriting ? 'Preparing your writing task…' : 'Preparing your next question…'}</p></main>`;
+  updateTimerDisplay();
+  const q = await session.nextQuestion();
+  renderQuestion(q);
+}
+
+function renderQuestion(q) {
+  const progress = (session.qInSession / session.itemsPerSession) * 100;
+  const passage = q.passage ? session.getPassage(q.passage) : null;
+  const isEssay = q.type === 'essay' || q.type === 'writing';
+  app.innerHTML = `
+    <header class="test-header">
+      <div class="th-left">${progressLabel()}</div>
+      <div class="th-mid">${isEssay ? `<span class="diff-pill">${esc(q.mode || 'Writing')} task</span>` : `<span class="diff-pill">Level ${q.difficulty}/5</span>`}</div>
+      <div class="th-right"><button class="btn ghost tiny" id="exit-test">⏸ Save &amp; Exit</button> ⏱️ <span id="timer">--:--</span></div>
+    </header>
+    <div class="progress"><div class="progress-fill" style="width:${progress}%"></div></div>
+    <main class="question-screen">
+      ${passage ? `<div class="passage"><h3>${esc(passage.title)}</h3><p>${esc(passage.text)}</p></div>` : ''}
+      <div class="stem">${esc(q.stem)}</div>
+      <form id="answer-form" class="answer-area">${renderInput(q)}</form>
+      <div id="feedback" class="feedback hidden"></div>
+      <div class="action-row">
+        <button class="btn primary big" id="submit">${isEssay ? 'Submit Writing' : 'Submit Answer'}</button>
+        <button class="btn primary big hidden" id="next">${session.isWriting ? 'See Results ▶' : 'Next ▶'}</button>
+      </div>
+    </main>`;
+  updateTimerDisplay();
+  wireQuestion(q);
+  // Checkpoint: this exact (unanswered) question is the resume point.
+  persistProgress('question');
+}
+
+function renderInput(q) {
+  if (q.type === 'mc' || q.type === 'ms') {
+    const inputType = q.type === 'ms' ? 'checkbox' : 'radio';
+    const hint = q.type === 'ms' ? '<div class="hint">Select all that apply.</div>' : '';
+    return hint + q.choices.map((c, i) => `
+      <label class="choice">
+        <input type="${inputType}" name="choice" value="${i}">
+        <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
+        <span class="choice-text">${esc(c)}</span>
+      </label>`).join('');
+  }
+  if (q.type === 'num') {
+    return `<input class="num-input" id="num" type="text" inputmode="numeric" placeholder="Type your answer" autocomplete="off">`;
+  }
+  if (q.type === 'essay' || q.type === 'writing') {
+    return `<textarea class="writing-input" id="writing" rows="12" placeholder="Plan your ideas, then write your answer in complete paragraphs…"></textarea>`;
+  }
+  return '';
+}
+
+function wireQuestion(q) {
+  const form = document.getElementById('answer-form');
+  const submitBtn = document.getElementById('submit');
+  const nextBtn = document.getElementById('next');
+  const exitBtn = document.getElementById('exit-test');
+  // The auto-saved checkpoint (this unanswered question) is the resume point.
+  if (exitBtn) exitBtn.onclick = () => { alert('Progress saved. You can resume from the home screen.'); renderHome(); };
+
+  form.querySelectorAll('.choice input').forEach((inp) => {
+    inp.onchange = () => {
+      form.querySelectorAll('.choice').forEach((c) => {
+        const i = c.querySelector('input');
+        c.classList.toggle('selected', i.checked);
+      });
+    };
+  });
+
+  submitBtn.onclick = async () => {
+    const response = collectResponse(q);
+    if (response == null || (Array.isArray(response) && response.length === 0) || response === '') {
+      flash(submitBtn, q.type === 'essay' || q.type === 'writing' ? 'Write something first' : 'Pick or type an answer first');
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = (q.type === 'essay' || q.type === 'writing') ? 'Scoring…' : 'Submitting…';
+    const result = await session.submitAnswer(response);
+    showFeedback(q, result);
+    submitBtn.classList.add('hidden');
+    nextBtn.classList.remove('hidden');
+    nextBtn.focus();
+  };
+
+  nextBtn.onclick = async () => {
+    if (session.isTestComplete()) finishSession(false);
+    else if (session.isSessionComplete()) finishSession(false);
+    else await nextQuestion();
+  };
+}
+
+function collectResponse(q) {
+  const form = document.getElementById('answer-form');
+  if (q.type === 'mc') {
+    const sel = form.querySelector('input[name="choice"]:checked');
+    return sel ? Number(sel.value) : null;
+  }
+  if (q.type === 'ms') {
+    return [...form.querySelectorAll('input[name="choice"]:checked')].map((i) => Number(i.value));
+  }
+  if (q.type === 'num') return document.getElementById('num').value.trim();
+  if (q.type === 'essay' || q.type === 'writing') return document.getElementById('writing').value.trim();
+  return null;
+}
+
+function showFeedback(q, result) {
+  const form = document.getElementById('answer-form');
+  form.querySelectorAll('input, textarea').forEach((i) => (i.disabled = true));
+  const isEssay = q.type === 'essay' || q.type === 'writing';
+  if (q.type === 'mc' || q.type === 'ms') {
+    const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
+    form.querySelectorAll('.choice').forEach((c, i) => {
+      if (correctSet.includes(i)) c.classList.add('correct');
+      const inp = c.querySelector('input');
+      if (inp.checked && !correctSet.includes(i)) c.classList.add('wrong');
+    });
+  }
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('hidden');
+  let head;
+  if (isEssay) {
+    const ws = result.writingScores || { composition: 0, conventions: 0 };
+    head = `<div class="fb-head writing">📝 Composition ${Math.round(ws.composition * 100)}% · Conventions ${Math.round(ws.conventions * 100)}%</div>`;
+  } else {
+    head = result.correct
+      ? `<div class="fb-head ok">✅ Correct!</div>`
+      : `<div class="fb-head no">❌ Not quite.</div>`;
+  }
+  fb.innerHTML = `
+    ${head}
+    ${result.explanation ? `<div class="fb-exp"><strong>Why:</strong> ${esc(result.explanation)}</div>` : ''}
+    ${result.feedback ? `<div class="fb-exp">${esc(result.feedback)}</div>` : ''}`;
+  fb.className = 'feedback ' + (isEssay ? 'writing' : result.correct ? 'ok' : 'no');
+}
+
+function flash(btn, msg) {
+  const old = btn.textContent;
+  btn.textContent = msg;
+  btn.classList.add('shake');
+  setTimeout(() => { btn.textContent = old; btn.classList.remove('shake'); }, 1200);
+}
+
+function finishSession(timedOut) {
+  clearTimer();
+  if (!session.isTestComplete() && session.sessionNumber < session.sessions) {
+    session.advanceSession();
+    return renderSessionBreak(timedOut);
+  }
+  finishTest();
+}
+
+function renderSessionBreak(timedOut) {
+  app.innerHTML = `
+    <main class="unit-intro">
+      <div class="intro-card">
+        <div class="card-icon">🎉</div>
+        <h1>${timedOut ? "Time's up for that session!" : 'Session complete!'}</h1>
+        <h2>Take a short break</h2>
+        <p>Great work. Remember: answers from the last session are locked now. When you're ready, start Session ${session.sessionNumber}.</p>
+        <button class="btn primary big" id="cont">Start Session ${session.sessionNumber} ▶</button>
+      </div>
+    </main>`;
+  document.getElementById('cont').onclick = async () => {
+    startSessionTimer();
+    await nextQuestion();
+  };
+  persistProgress('break');
+}
+
+// ---------------------------------------------------------------- Battery
+function startBattery(mode) {
+  battery = { queue: BATTERY_QUEUE.slice(), index: 0, mode, results: [] };
+  startTest(battery.queue[0], mode);
+}
+
+function renderBatteryInterstitial() {
+  const done = battery.queue[battery.index - 1];
+  const next = battery.queue[battery.index];
+  app.innerHTML = `
+    <main class="unit-intro">
+      <div class="intro-card">
+        <div class="card-icon">✅</div>
+        <h1>${esc(TEST_CONFIG[done].name)} done!</h1>
+        <h2>Test ${battery.index} of ${battery.queue.length} complete</h2>
+        <p>Take a breath. Next up: <strong>${esc(TEST_CONFIG[next].name)}</strong> ${ICONS[next]}</p>
+        <button class="btn primary big" id="cont">Start ${esc(TEST_CONFIG[next].name)} ▶</button>
+        <button class="btn ghost" id="quit">Save progress &amp; quit</button>
+      </div>
+    </main>`;
+  document.getElementById('cont').onclick = () => startTest(next, battery.mode);
+  document.getElementById('quit').onclick = () => {
+    if (confirm('Quit the battery? Tests you already finished can still be saved from the results screen.')) renderBatteryResults();
+  };
+  persistProgress('interstitial');
+}
+
+function renderBatteryResults() {
+  clearTimer();
+  clearProgress();
+  const results = battery.results;
+  const avg = results.length ? Math.round(results.reduce((s, r) => s + r.scaleScore, 0) / results.length) : 0;
+  const cards = results.map((r) => `
+    <div class="battery-result">
+      <h2>${ICONS[r.subject]} ${esc(r.subjectName)}</h2>
+      ${scoreCard(r)}
+      ${r.isWriting ? '' : domainBars(r)}
+    </div>`).join('');
+  app.innerHTML = `
+    <header class="app-header">
+      <div class="brand"><span>Full Battery Complete! 🏆</span></div>
+      <button class="btn ghost" id="home">🏠 Home</button>
+    </header>
+    <main class="results">
+      <h1 class="results-title">${esc(results[0] ? results[0].studentName : 'Student')}</h1>
+      <div class="score-card">
+        <div class="score-big">${avg}</div>
+        <div class="score-scale">average scale score across ${results.length} test${results.length === 1 ? '' : 's'}</div>
+      </div>
+      ${cards}
+      <div class="save-row">
+        <button class="btn primary big" id="save-all">💾 Save All Results</button>
+        <button class="btn ghost" id="discard">Discard</button>
+      </div>
+    </main>`;
+  document.getElementById('home').onclick = renderHome;
+  document.getElementById('save-all').onclick = (e) => {
+    results.forEach((r) => saveResult(r));
+    e.target.textContent = '✅ Saved!';
+    e.target.disabled = true;
+  };
+  document.getElementById('discard').onclick = () => { if (confirm('Discard all battery results?')) renderHome(); };
+}
+
+// ---------------------------------------------------------------- Results
+let pendingResult = null;
+
+function finishTest() {
+  clearTimer();
+  const summary = session.getResultSummary();
+  if (battery) {
+    battery.results.push(summary);
+    battery.index += 1;
+    if (battery.index < battery.queue.length) return renderBatteryInterstitial();
+    return renderBatteryResults();
+  }
+  clearProgress(); // single test finished — nothing to resume
+  pendingResult = summary;
+  renderResults(pendingResult, false);
+}
+
+function renderResults(result, saved) {
+  const writingPanel = result.isWriting && result.writing
+    ? `<div class="panel claude-panel"><h3>✍️ Writing Dimensions</h3>
+        <div class="dom-list">
+          <div class="dom-row strength"><div class="dom-name">Composition (ideas)</div><div class="dom-bar"><div class="dom-fill" style="width:${result.writing.composition}%"></div></div><div class="dom-val">${result.writing.composition}%</div></div>
+          <div class="dom-row"><div class="dom-name">Conventions (grammar)</div><div class="dom-bar"><div class="dom-fill" style="width:${result.writing.conventions}%"></div></div><div class="dom-val">${result.writing.conventions}%</div></div>
+        </div></div>`
+    : '';
+  app.innerHTML = `
+    <header class="app-header">
+      <div class="brand"><span>${saved ? 'Saved Result' : 'Test Complete! 🎉'}</span></div>
+      <button class="btn ghost" id="home">🏠 Home</button>
+    </header>
+    <main class="results">
+      <h1 class="results-title">${esc(result.studentName)} · ${esc(result.subjectName)}</h1>
+      ${scoreCard(result)}
+      ${writingPanel}
+      ${result.isWriting ? '' : '<h2>By Topic</h2>' + domainBars(result) + strengthsImprovements(result)}
+      ${!saved ? `
+        <div class="save-row">
+          <button class="btn primary big" id="save">💾 Save Results</button>
+          <button class="btn ghost" id="discard">Discard</button>
+        </div>` : `
+        <div class="save-row" id="analysis-slot">
+          <button class="btn primary" id="analyze">🧠 Analyze with AI</button>
+        </div>`}
+    </main>`;
+
+  document.getElementById('home').onclick = renderHome;
+
+  if (!saved) {
+    document.getElementById('save').onclick = () => {
+      saveResult(result);
+      renderResults(result, true);
+    };
+    document.getElementById('discard').onclick = () => { if (confirm('Discard this result without saving?')) renderHome(); };
+  } else {
+    wireAnalyze(result);
+  }
+}
+
+function renderAnalytics(result) {
+  if (!result) return renderHome();
+  renderResults(result, true);
+}
+
+function wireAnalyze(result) {
+  const btn = document.getElementById('analyze');
+  if (!btn) return;
+  if (!(settings.useApi && settings.apiKey)) {
+    btn.disabled = true;
+    btn.title = 'Add an API key in Settings to enable this.';
+    btn.textContent = '🧠 Analyze with AI (add API key in Settings)';
+    return;
+  }
+  btn.onclick = async () => {
+    btn.disabled = true;
+    btn.textContent = '🧠 Analyzing…';
+    try {
+      const summary = {
+        student: result.studentName,
+        subject: result.subjectName,
+        scaleScore: result.scaleScore,
+        level: result.levelLabel,
+        accuracy: result.accuracy,
+        writing: result.writing || undefined,
+        byDomain: result.byDomain.map((d) => ({ topic: d.name, accuracy: d.accuracy, correct: d.correct, total: d.total })),
+      };
+      const analysis = await analyzePerformance({ settings, summary });
+      const slot = document.getElementById('analysis-slot');
+      slot.insertAdjacentHTML('beforebegin', claudeAnalysis(analysis));
+      btn.remove();
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = '🧠 Analyze with AI';
+      alert('Analysis failed: ' + e.message);
+    }
+  };
+}
+
+// ---------------------------------------------------------------- boot
+renderHome();
+
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+    }
+  </script>
+</body>
+</html>
