@@ -129,6 +129,7 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .claude-panel{border-color:var(--indigo);background:#f5f3ff}.claude-panel h3{margin-bottom:8px}
 .wfb{margin-top:12px;background:#fff;border-left:4px solid var(--indigo);border-radius:8px;padding:10px 14px}
 .status{margin-top:12px;font-weight:600;min-height:22px}.status.ok{color:var(--green)}.status.err{color:var(--red)}
+.form-divider{margin:22px 0 6px;font-weight:800;color:var(--indigo);border-top:2px solid var(--line);padding-top:16px;text-align:left}
 .spinner{width:48px;height:48px;border:6px solid var(--line);border-top-color:var(--indigo);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -1984,7 +1985,7 @@ function settingsScreen() {
   app.innerHTML = `
     <div class="flow"><div class="flow-card" style="max-width:600px">
       <h1>⚙️ Settings</h1>
-      <div class="divider">AI provider — auto-scores the Writing essay</div>
+      <div class="form-divider">AI provider — auto-scores the Writing essay</div>
       <p class="muted small">Add an API key to grade the ELA-Writing essay on the two-dimension rubric (Composition + Conventions). The key is stored only on this device and sent directly to your chosen provider. Without a key, the writing test is saved but not auto-scored.</p>
       <label class="field"><span>Provider</span>
         <select id="s-provider">${Object.entries(PROVIDERS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}</select></label>
