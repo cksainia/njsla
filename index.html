@@ -124,6 +124,14 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .std-row.strength{border-color:var(--green)}.std-row.needs{border-color:var(--red)}
 .std-bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}.std-bar>span{display:block;height:100%;background:var(--indigo)}.std-val{white-space:nowrap;font-weight:700}
 .item-table{border-collapse:collapse;width:100%;margin-top:8px;font-size:.9rem}.item-table th,.item-table td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+/* panels / status / writing feedback / spinner */
+.panel{background:#fff;border:2px solid var(--line);border-radius:14px;padding:16px 20px;margin:16px 0}
+.claude-panel{border-color:var(--indigo);background:#f5f3ff}.claude-panel h3{margin-bottom:8px}
+.wfb{margin-top:12px;background:#fff;border-left:4px solid var(--indigo);border-radius:8px;padding:10px 14px}
+.status{margin-top:12px;font-weight:600;min-height:22px}.status.ok{color:var(--green)}.status.err{color:var(--red)}
+.spinner{width:48px;height:48px;border:6px solid var(--line);border-top-color:var(--indigo);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* dashboard */
 .dash-cards{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 6px}.dash-card{flex:1;min-width:130px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow)}.dc-num{font-size:2rem;font-weight:900;color:var(--indigo)}.dc-lbl{color:var(--muted);font-size:.85rem}
 .dash-subjects{display:flex;flex-direction:column;gap:12px}
@@ -496,28 +504,37 @@ const FORMS = {
   'math__formA': { subject: 'math', title: 'NJSLA-A Grade 3 Mathematics Practice Test (Form A)', items: ['mA-1', 'mA-2', 'mA-3', 'mA-4', 'mA-5', 'mA-6', 'mA-7', 'mA-8', 'mA-9', 'mA-10', 'mA-11'] },
 };
 
+// Full official blueprint lengths: Math 41, Reading 32, Writing 1.
+const MOCK_LEN = { math: 41, ela_reading: 32 };
+
 (function buildMockForms() {
-  // MATH: round-robin the five domains, ~12 items, advancing a cursor so the
-  // five mocks draw largely distinct items.
+  // MATH: round-robin the five domains to 41 items; a cursor advances across the
+  // five mocks so they draw largely distinct items (the pool is reused as needed).
   const mdoms = ['OA', 'NBT', 'NF', 'MD', 'G'];
   const mpool = {}; mdoms.forEach((d) => { mpool[d] = shuffle(ITEMS.filter((it) => it.subject === 'math' && domainCodeOf(it) === d), seeded(7 + d.length)); });
   const mcur = { OA: 0, NBT: 0, NF: 0, MD: 0, G: 0 };
   for (let m = 1; m <= 5; m++) {
     const items = []; let di = 0;
-    while (items.length < 12 && di < 300) { const d = mdoms[di % 5]; di++; const arr = mpool[d]; if (!arr.length) continue; const it = arr[mcur[d] % arr.length]; mcur[d]++; if (!items.includes(it.id)) items.push(it.id); }
+    while (items.length < MOCK_LEN.math && di < 4000) { const d = mdoms[di % 5]; di++; const arr = mpool[d]; if (!arr.length) continue; const it = arr[mcur[d] % arr.length]; mcur[d]++; if (!items.includes(it.id)) items.push(it.id); }
     FORMS['math__mock' + m] = { subject: 'math', title: 'Mock Test ' + m + ' — Mathematics', items };
   }
-  // READING: two passages (with up to 4 items each) + two language items per mock.
+  // READING: passage-grouped (~24 reading items across several passage sets) +
+  // language/vocabulary items to fill to 32.
   const byPassage = {};
   ITEMS.filter((it) => it.subject === 'ela_reading' && it.stimulus_ref && (domainCodeOf(it) === 'RL' || domainCodeOf(it) === 'RI'))
     .forEach((it) => { (byPassage[it.stimulus_ref] = byPassage[it.stimulus_ref] || []).push(it); });
   const passages = shuffle(Object.keys(byPassage), seeded(11));
   const lpool = shuffle(ITEMS.filter((it) => it.subject === 'ela_reading' && domainCodeOf(it) === 'L'), seeded(13));
   let pc = 0, lc = 0;
+  const READING_PASSAGE_ITEMS = 24;
   for (let m = 1; m <= 5; m++) {
-    const items = [];
-    for (let k = 0; k < 2 && passages.length; k++) { const pid = passages[pc % passages.length]; pc++; (byPassage[pid] || []).slice(0, 4).forEach((it) => items.push(it.id)); }
-    for (let k = 0; k < 2 && lpool.length; k++) { items.push(lpool[lc % lpool.length].id); lc++; }
+    const items = []; let guard = 0;
+    while (items.length < READING_PASSAGE_ITEMS && guard++ < 60) {
+      const pid = passages[pc % passages.length]; pc++;
+      (byPassage[pid] || []).slice(0, 6).forEach((it) => { if (items.length < READING_PASSAGE_ITEMS && !items.includes(it.id)) items.push(it.id); });
+    }
+    let lg = 0;
+    while (items.length < MOCK_LEN.ela_reading && lg++ < lpool.length * 3) { const it = lpool[lc % lpool.length]; lc++; if (!items.includes(it.id)) items.push(it.id); }
     FORMS['ela_reading__mock' + m] = { subject: 'ela_reading', title: 'Mock Test ' + m + ' — Reading', items };
   }
   // WRITING: one distinct prompt per mock.
@@ -680,6 +697,98 @@ function speak(text) {
 
 const DEFAULT_ATTRIBUTES = { forced: true, tts: false, contrast: 'bw', masking: false };
 const DEFAULT_A11Y = { contrast: 'bw', zoom: 1, lineReader: false, masking: false };
+
+/* ===== app/ai.js ===== */
+// Multi-provider AI client (Anthropic / OpenAI / Gemini), used to auto-score the
+// ELA-Writing extended response on the NJSLA two-dimension rubric (Composition +
+// Conventions). The key lives only in this device's localStorage and is sent
+// directly to the chosen provider (personal/at-home use).
+
+const ANTHROPIC_VERSION = '2023-06-01';
+
+const PROVIDERS = {
+  anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-6', keyHint: 'sk-ant-...' },
+  openai: { label: 'OpenAI (ChatGPT)', defaultModel: 'gpt-4o', keyHint: 'sk-...' },
+  gemini: { label: 'Google Gemini', defaultModel: 'gemini-2.5-flash', keyHint: 'AIza...' },
+};
+function defaultModelFor(p) { return (PROVIDERS[p] || PROVIDERS.anthropic).defaultModel; }
+
+async function callAnthropic({ apiKey, model, system, user, maxTokens }) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': ANTHROPIC_VERSION, 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] }),
+  });
+  if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`);
+  const d = await res.json();
+  return (d.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+}
+async function callOpenAI({ apiKey, model, system, user, maxTokens }) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+  });
+  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`);
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+async function callGemini({ apiKey, model, system, user, maxTokens }) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: { maxOutputTokens: maxTokens } }),
+  });
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`);
+  const d = await res.json();
+  return (d.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
+}
+async function callLLM({ settings, system, user, maxTokens = 600 }) {
+  const provider = settings.provider || 'anthropic';
+  const args = { apiKey: settings.apiKey, model: settings.model || defaultModelFor(provider), system, user, maxTokens };
+  if (provider === 'openai') return callOpenAI(args);
+  if (provider === 'gemini') return callGemini(args);
+  return callAnthropic(args);
+}
+
+function extractJson(text) {
+  if (!text) throw new Error('Empty response');
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const cand = fenced ? fenced[1] : text;
+  const start = cand.search(/[[{]/);
+  if (start === -1) throw new Error('No JSON in response');
+  return JSON.parse(cand.slice(start).trim().replace(/,\s*([}\]])/g, '$1'));
+}
+
+function aiEnabled(settings) { return !!(settings && settings.useApi && settings.apiKey); }
+
+// Grade a Grade-3 extended-response essay on the NJSLA two-dimension rubric.
+// Returns { composition, conventions, overall (0..1), feedback }.
+async function gradeWriting({ settings, prompt, rubric, sources, response }) {
+  const system =
+    'You are a kind but fair Grade 3 writing rater using the NJSLA-Adaptive holistic rubric, which has TWO ' +
+    'dimensions: COMPOSITION (ideas, development, organization, use of details/sources) and CONVENTIONS ' +
+    '(grammar, spelling, capitalization, punctuation, complete sentences). Respond with ONLY JSON: ' +
+    '{"composition": <0 to 1>, "conventions": <0 to 1>, "feedback": "2-4 sentences of warm, specific, age-appropriate feedback for a child and parent"}.';
+  const user =
+    (sources ? `Source(s) the student could use:\n${sources}\n\n` : '') +
+    `Writing prompt: ${prompt}\n\n` +
+    `What a strong Grade 3 response includes: ${rubric || 'clear ideas with details, logical organization, and correct conventions.'}\n\n` +
+    `Student's response:\n"""${response}"""\n\n` +
+    `Score each dimension from 0 (off task/blank) to 1 (fully proficient for Grade 3). Partial values like 0.5 are fine. Judge gently — this is a 3rd grader.`;
+  const text = await callLLM({ settings, system, user, maxTokens: 500 });
+  const out = extractJson(text);
+  const clamp = (v) => { const n = Number(v); return Number.isNaN(n) ? 0 : Math.max(0, Math.min(1, n)); };
+  const composition = clamp(out.composition);
+  const conventions = clamp(out.conventions);
+  const overall = Math.round((0.65 * composition + 0.35 * conventions) * 100) / 100;
+  return { composition, conventions, overall, feedback: out.feedback || '' };
+}
+
+async function testConnection(settings) {
+  const text = await callLLM({ settings, system: 'Reply with the single word: OK', user: 'ping', maxTokens: 10 });
+  return /ok/i.test(text);
+}
 
 /* ===== app/mathui.js ===== */
 // Math rendering (LaTeX-lite), figures (number line / area grid / rectangle),
@@ -1265,14 +1374,28 @@ class TestRun {
     // so a fully-correct test reaches the 850 ceiling while partial work still
     // differentiates. (θ drives adaptive routing; this drives the parent-facing score.)
     let earned = 0, possible = 0;
+    let wComp = 0, wConv = 0, wN = 0;
     for (const d of this.delivered) {
       const it = ITEMS_BY_ID[d.id];
       const r = this.responses[d.id];
-      if (!r || !r.score || r.score.correct == null) continue; // skip writing/unscored
+      if (it.type === 'extended_writing') {                     // AI-rubric-scored writing
+        if (r && r.writingScore) {
+          const ws = r.writingScore, w = 3;
+          possible += w; earned += w * (ws.overall || 0);
+          wComp += ws.composition; wConv += ws.conventions; wN += 1;
+        }
+        continue;
+      }
+      if (!r || !r.score || r.score.correct == null) continue;  // unscored
       const w = (it.difficulty || 0) + 3;                       // weight 1..5 (easy..hard)
       possible += w;
       earned += w * (r.score.correct ? 1 : (r.score.partial || 0));
     }
+    const writing = wN ? {
+      composition: Math.round((wComp / wN) * 100),
+      conventions: Math.round((wConv / wN) * 100),
+      feedback: (this.responses[this.delivered.find((d) => ITEMS_BY_ID[d.id].type === 'extended_writing')?.id] || {}).writingScore?.feedback || '',
+    } : null;
     const perf = possible > 0 ? earned / possible : null;
     const scale = perf == null ? scaleFromTheta(theta) // writing-only: neutral until AI scoring
       : Math.max(650, Math.min(850, Math.round(650 + 200 * perf)));
@@ -1303,14 +1426,19 @@ class TestRun {
     const scored = perItem.filter((p) => p.correct != null);
     const correctCount = scored.filter((p) => p.correct).length;
     return {
-      subject: this.subject, mode: this.mode, theta: Math.round(theta * 100) / 100,
+      subject: this.subject, mode: this.mode, formKey: this.formKey, theta: Math.round(theta * 100) / 100,
       scaleScore: scale, level: level.level, levelLabel: level.label,
       total: this.delivered.length, scoredCount: scored.length, correctCount,
       accuracy: scored.length ? Math.round((correctCount / scored.length) * 100) : 0,
+      writing, isWriting: this.subject === 'ela_writing',
       path, byStandard: Object.values(byStandard), perItem,
       flagged: perItem.filter((p) => p.flagged).map((p) => p.n),
     };
   }
+
+  // store an AI rubric score for a writing item (used before report()).
+  setWritingScore(itemId, ws) { const r = this.responses[itemId] || (this.responses[itemId] = {}); r.writingScore = ws; }
+  writingItems() { return this.delivered.map((d) => ITEMS_BY_ID[d.id]).filter((it) => it.type === 'extended_writing'); }
 }
 
 /* ===== app/player.js ===== */
@@ -1525,10 +1653,31 @@ function startPlayer(opts) {
     };
   }
 
-  function finish() {
+  async function finish() {
+    recordTime();
+    const wItems = run.writingItems();
+    if (wItems.length && aiEnabled(opts.aiSettings)) {
+      app.innerHTML = `<div class="flow"><div class="flow-card"><div class="spinner"></div><h2>Scoring the writing…</h2><p class="muted">Grading on Composition and Conventions with your AI provider.</p></div></div>`;
+      for (const it of wItems) {
+        const resp = (run.responses[it.id] || {}).response || '';
+        const text = htmlToText(resp);
+        if (!text.trim()) { run.setWritingScore(it.id, { composition: 0, conventions: 0, overall: 0, feedback: 'No response was written.' }); continue; }
+        try {
+          const stim = it.stimulus_ref ? getStimulus(it.stimulus_ref) : null;
+          const sources = stim ? (stim.title + '\n' + (stim.paragraphs || []).join(' ')) : '';
+          const ws = await gradeWriting({ settings: opts.aiSettings, prompt: it.stem, rubric: it.rubric, sources, response: text });
+          run.setWritingScore(it.id, ws);
+        } catch (e) { /* leave unscored; report will note it */ }
+      }
+    }
     const report = run.report();
     if (opts.onSaveAttempt) opts.onSaveAttempt({ ...report, student: opts.student, date: new Date().toISOString(), title });
     reportScreen(report);
+  }
+
+  function htmlToText(html) {
+    const tmp = document.createElement('div'); tmp.innerHTML = html || '';
+    return (tmp.innerText || tmp.textContent || '').trim();
   }
 
   function reportScreen(rep) {
@@ -1570,6 +1719,31 @@ function renderReport(rep, title, student) {
       <td>${p.n}</td><td>${esc(p.standard || p.domain)}</td><td>${p.band}</td>
       <td>${p.correct == null ? '—' : p.correct ? '✓' : '✗'}</td>
       <td>${(p.timeMs / 1000).toFixed(0)}s</td><td>${p.flagged ? '⚑' : ''}</td></tr>`).join('');
+  const stats = rep.isWriting
+    ? (rep.writing
+        ? `<span>Composition: <strong>${rep.writing.composition}%</strong></span><span>Conventions: <strong>${rep.writing.conventions}%</strong></span>`
+        : `<span class="muted">essay saved — add an AI provider in Settings to auto-score</span>`)
+    : `<span><strong>${rep.correctCount}/${rep.scoredCount}</strong> correct</span><span><strong>${rep.accuracy}%</strong> accuracy</span>`;
+
+  const writingPanel = rep.writing ? `
+    <div class="panel claude-panel">
+      <h3>✍️ Writing — two-dimension rubric</h3>
+      <div class="std-list">
+        <div class="std-row strength"><span class="std-name">Composition <span class="muted">ideas, organization, details</span></span><span class="std-bar"><span style="width:${rep.writing.composition}%"></span></span><span class="std-val">${rep.writing.composition}%</span></div>
+        <div class="std-row"><span class="std-name">Conventions <span class="muted">grammar, spelling, punctuation</span></span><span class="std-bar"><span style="width:${rep.writing.conventions}%"></span></span><span class="std-val">${rep.writing.conventions}%</span></div>
+      </div>
+      ${rep.writing.feedback ? `<p class="wfb">🗣️ ${esc(rep.writing.feedback)}</p>` : ''}
+    </div>` : '';
+
+  const objective = rep.isWriting ? '' : `
+      <h2>📈 Difficulty path (how the test adapted)</h2>
+      <div class="path">${pathHTML}</div>
+      <h2>🎯 By standard</h2>
+      <div class="std-list">${stdRows || '<p class="muted">—</p>'}</div>
+      <h2>🧾 Item details</h2>
+      <table class="item-table"><tr><th>#</th><th>Standard</th><th>Band</th><th>Correct</th><th>Time</th><th>Flag</th></tr>${itemRows}</table>
+      ${rep.flagged.length ? `<p class="muted">Marked for review: ${rep.flagged.map((n) => 'Q' + n).join(', ')}</p>` : ''}`;
+
   return `<div class="report">
     <header class="app-header"><div class="brand"><span>Practice Report</span></div></header>
     <main class="report-main">
@@ -1580,15 +1754,10 @@ function renderReport(rep, title, student) {
         <div class="meter level-meter"><div class="meter-fill" style="width:${rep.level * 20}%"></div></div>
         <div class="scale-row">practice scale estimate <strong>${rep.scaleScore}</strong> <span class="muted">/ 850</span></div>
         <div class="muted small">The real NJSLA reports a performance level (1–5); the scale here is a practice estimate, not an official score.</div>
-        <div class="score-stats"><span><strong>${rep.correctCount}/${rep.scoredCount}</strong> correct</span><span><strong>${rep.accuracy}%</strong> accuracy</span></div>
+        <div class="score-stats">${stats}</div>
       </div>
-      <h2>📈 Difficulty path (how the test adapted)</h2>
-      <div class="path">${pathHTML}</div>
-      <h2>🎯 By standard</h2>
-      <div class="std-list">${stdRows || '<p class="muted">—</p>'}</div>
-      <h2>🧾 Item details</h2>
-      <table class="item-table"><tr><th>#</th><th>Standard</th><th>Band</th><th>Correct</th><th>Time</th><th>Flag</th></tr>${itemRows}</table>
-      ${rep.flagged.length ? `<p class="muted">Marked for review: ${rep.flagged.map((n) => 'Q' + n).join(', ')}</p>` : ''}
+      ${writingPanel}
+      ${objective}
     </main>
   </div>`;
 }
@@ -1711,6 +1880,9 @@ function renderDashboard(attempts, student) {
 
 const app = document.getElementById('app');
 const ATTEMPTS_KEY = 'njslaA.attempts.v1';
+const AI_KEY = 'njslaA.ai.v1';
+function loadAI() { try { return { provider: 'anthropic', apiKey: '', model: '', useApi: true, ...JSON.parse(localStorage.getItem(AI_KEY) || '{}') }; } catch { return { provider: 'anthropic', apiKey: '', model: '', useApi: true }; } }
+function saveAI(a) { localStorage.setItem(AI_KEY, JSON.stringify(a)); }
 
 const TESTS = [
   { subject: 'ela_reading', label: 'Reading', icon: '📖', avCheck: true },
@@ -1730,6 +1902,7 @@ const state = {
   a11y: { ...DEFAULT_A11Y },
   mode: 'adaptive',
   length: 'full',
+  ai: loadAI(),
 };
 
 function loadAttempts() { try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '[]'); } catch { return []; } }
@@ -1761,7 +1934,7 @@ function catalog() {
   const attempts = loadAttempts();
   app.innerHTML = `
     <div class="flow wide">
-      <header class="app-header"><div class="brand">🏛️ <span>New Jersey Practice Tests</span></div><span class="muted">${esc(state.student)}</span></header>
+      <header class="app-header"><div class="brand">🏛️ <span>New Jersey Practice Tests</span></div><div><button class="btn ghost" id="go-settings">⚙️ Settings ${state.ai.useApi && state.ai.apiKey ? '🟢' : ''}</button> <span class="muted">${esc(state.student)}</span></div></header>
       <main class="catalog">
         <div class="catalog-top">
           <label class="inline">Grade Level <select id="grade"><option>3</option><option disabled>4</option><option disabled>5</option></select></label>
@@ -1802,7 +1975,54 @@ function catalog() {
   document.querySelectorAll('[data-del]').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); deleteAttempt(el.dataset.del); catalog(); }; });
   const clr = document.getElementById('clear'); if (clr) clr.onclick = () => { if (confirm('Delete all saved attempts?')) { localStorage.removeItem(ATTEMPTS_KEY); catalog(); } };
   const od = document.getElementById('open-dash'); if (od) od.onclick = dashboardScreen;
+  document.getElementById('go-settings').onclick = settingsScreen;
 }
+
+// ---------------- Settings (AI provider for writing scoring) ----------------
+function settingsScreen() {
+  const ai = state.ai;
+  app.innerHTML = `
+    <div class="flow"><div class="flow-card" style="max-width:600px">
+      <h1>⚙️ Settings</h1>
+      <div class="divider">AI provider — auto-scores the Writing essay</div>
+      <p class="muted small">Add an API key to grade the ELA-Writing essay on the two-dimension rubric (Composition + Conventions). The key is stored only on this device and sent directly to your chosen provider. Without a key, the writing test is saved but not auto-scored.</p>
+      <label class="field"><span>Provider</span>
+        <select id="s-provider">${Object.entries(PROVIDERS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}</select></label>
+      <label class="field"><span>API key</span><input id="s-key" type="password" placeholder="${esc((PROVIDERS[ai.provider] || PROVIDERS.anthropic).keyHint)}" value="${esc(ai.apiKey)}"></label>
+      <label class="field"><span>Model</span><input id="s-model" type="text" placeholder="model name" value="${esc(ai.model)}"></label>
+      <label class="check"><input id="s-useapi" type="checkbox" ${ai.useApi ? 'checked' : ''}> Use the AI provider to score writing</label>
+      <div class="btn-row">
+        <button class="btn" id="s-test">Test connection</button>
+        <button class="btn primary" id="s-save">Save</button>
+        <button class="btn ghost" id="s-back">Back</button>
+      </div>
+      <div id="s-status" class="status"></div>
+    </div></div>`;
+  document.getElementById('s-provider').value = ai.provider;
+  document.getElementById('s-provider').onchange = (e) => {
+    document.getElementById('s-model').value = defaultModelFor(e.target.value);
+    document.getElementById('s-key').placeholder = (PROVIDERS[e.target.value] || PROVIDERS.anthropic).keyHint;
+  };
+  document.getElementById('s-back').onclick = catalog;
+  document.getElementById('s-save').onclick = () => {
+    state.ai = {
+      provider: document.getElementById('s-provider').value,
+      apiKey: document.getElementById('s-key').value.trim(),
+      model: document.getElementById('s-model').value.trim() || defaultModelFor(document.getElementById('s-provider').value),
+      useApi: document.getElementById('s-useapi').checked,
+    };
+    saveAI(state.ai);
+    setStatus('✅ Saved!', 'ok'); setTimeout(catalog, 700);
+  };
+  document.getElementById('s-test').onclick = async () => {
+    const probe = { provider: document.getElementById('s-provider').value, apiKey: document.getElementById('s-key').value.trim(), model: document.getElementById('s-model').value.trim() || defaultModelFor(document.getElementById('s-provider').value), useApi: true };
+    if (!probe.apiKey) return setStatus('Enter an API key first.', 'err');
+    setStatus('Testing…', '');
+    try { const ok = await testConnection(probe); setStatus(ok ? '✅ Connected!' : '⚠️ Connected, unexpected reply.', ok ? 'ok' : 'err'); }
+    catch (e) { setStatus('❌ ' + e.message, 'err'); }
+  };
+}
+function setStatus(msg, cls) { const el = document.getElementById('s-status'); if (el) { el.textContent = msg; el.className = 'status ' + (cls || ''); } }
 
 function dashboardScreen() {
   app.innerHTML = renderDashboard(loadAttempts(), state.student);
@@ -1904,6 +2124,7 @@ function beginTest(t) {
     student: state.student,
     attributes: state.attributes,
     a11y: { ...state.a11y },
+    aiSettings: state.ai,
     onSaveAttempt: (rep) => saveAttempt(rep),
     onExit: catalog,
   });
