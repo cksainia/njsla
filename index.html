@@ -1243,8 +1243,22 @@ class TestRun {
   }
 
   report() {
-    const theta = this.finalTheta();
-    const scale = scaleFromTheta(theta);
+    const theta = this.finalTheta(); // kept as an internal ability estimate
+    // Reported scale = difficulty-weighted performance (harder items weigh more),
+    // so a fully-correct test reaches the 850 ceiling while partial work still
+    // differentiates. (θ drives adaptive routing; this drives the parent-facing score.)
+    let earned = 0, possible = 0;
+    for (const d of this.delivered) {
+      const it = ITEMS_BY_ID[d.id];
+      const r = this.responses[d.id];
+      if (!r || !r.score || r.score.correct == null) continue; // skip writing/unscored
+      const w = (it.difficulty || 0) + 3;                       // weight 1..5 (easy..hard)
+      possible += w;
+      earned += w * (r.score.correct ? 1 : (r.score.partial || 0));
+    }
+    const perf = possible > 0 ? earned / possible : null;
+    const scale = perf == null ? scaleFromTheta(theta) // writing-only: neutral until AI scoring
+      : Math.max(650, Math.min(850, Math.round(650 + 200 * perf)));
     const level = levelForScore(scale);
     const perItem = this.delivered.map((d, i) => {
       const it = ITEMS_BY_ID[d.id];
