@@ -111,6 +111,10 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .score-card{text-align:center;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border-top:8px solid var(--indigo)}
 .score-card.level-1,.score-card.level-2{border-top-color:var(--red)}.score-card.level-3{border-top-color:var(--amber)}.score-card.level-4,.score-card.level-5{border-top-color:var(--green)}
 .score-big{font-size:3.6rem;font-weight:900;color:var(--indigo);line-height:1}.score-scale{color:var(--muted);font-size:.85rem}
+.level-headline{font-size:2.6rem;font-weight:900;color:var(--indigo);line-height:1.05}
+.score-card.level-1 .level-headline,.score-card.level-2 .level-headline{color:var(--red)}.score-card.level-3 .level-headline{color:var(--amber)}.score-card.level-4 .level-headline,.score-card.level-5 .level-headline{color:var(--green)}
+.level-name{font-size:1.2rem;font-weight:700;margin-top:2px}.scale-row{margin-top:6px;color:var(--muted)}.scale-row strong{color:var(--ink);font-size:1.1rem}
+.level-meter .meter-fill{background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}
 .meter{height:14px;background:var(--line);border-radius:99px;max-width:480px;margin:14px auto;overflow:hidden}.meter-fill{height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}
 .level-badge{display:inline-block;font-weight:800;background:#eef2ff;color:var(--indigo);padding:8px 16px;border-radius:99px}
 .score-stats{display:flex;gap:18px;justify-content:center;margin-top:12px;color:var(--muted)}
@@ -464,10 +468,13 @@ function getStimulus(id) { return STIMULI[id]; }
 // ---- blueprint + forms ----
 // Domains to sample per subject (content balancing — adaptivity changes
 // difficulty, never which standards are covered).
+// 'full' matches the real Grade 3 NJSLA-Adaptive blueprint lengths
+// (Reading = 32 items across 2 sessions; Math = 41 items across 2 sessions;
+// Writing = 1 extended task). 'short' is a quick at-home practice length.
 const BLUEPRINT = {
-  ela_reading: { domains: ['RL', 'RI', 'L'], sessions: 2, itemsPerSession: 7, setSize: 3 },
-  math: { domains: ['OA', 'NBT', 'NF', 'MD', 'G'], sessions: 2, itemsPerSession: 8, setSize: 4 },
-  ela_writing: { domains: ['W'], sessions: 1, itemsPerSession: 1, setSize: 1 },
+  ela_reading: { domains: ['RL', 'RI', 'L'], setSize: 4, full: { sessions: 2, sessionSizes: [16, 16] }, short: { sessions: 1, sessionSizes: [12] } },
+  math: { domains: ['OA', 'NBT', 'NF', 'MD', 'G'], setSize: 4, full: { sessions: 2, sessionSizes: [21, 20] }, short: { sessions: 1, sessionSizes: [12] } },
+  ela_writing: { domains: ['W'], setSize: 1, full: { sessions: 1, sessionSizes: [1] }, short: { sessions: 1, sessionSizes: [1] } },
 };
 
 // ---- forms ----
@@ -1100,15 +1107,21 @@ function stepBand(band, dir) {
   return BANDS[i];
 }
 
+function splitEven(n, k) {
+  const base = Math.floor(n / k), rem = n % k;
+  return Array.from({ length: k }, (_, i) => base + (i < rem ? 1 : 0));
+}
+
 class TestRun {
-  constructor({ subject, mode = 'adaptive', settings = {} }) {
+  constructor({ subject, mode = 'adaptive', length = 'full', settings = {} }) {
     this.subject = subject;
-    this.mode = mode;                 // 'adaptive' | 'formA'
+    this.mode = mode;                 // 'adaptive' | 'formA' | 'mock1'..'mock5'
     this.settings = settings;
     this.bp = BLUEPRINT[subject];
     this.domains = this.bp.domains;
     this.setSize = this.bp.setSize;
-    this.sessions = this.bp.sessions;
+    const lenCfg = this.bp[length] || this.bp.full;
+    this.length = this.bp[length] ? length : 'full';
 
     this.theta = 0;
     this.band = 'medium';
@@ -1124,16 +1137,20 @@ class TestRun {
       const form = FORMS[`${subject}__${mode}`] || Object.values(FORMS).find((f) => f.subject === subject);
       this.form = form;
       this.formItems = form ? form.items.slice() : [];
-      this.itemsPerSession = Math.max(1, Math.ceil(this.formItems.length / this.sessions));
+      this.sessions = Math.max(1, Math.min(lenCfg.sessions, this.formItems.length));
+      this.sessionSizes = splitEven(this.formItems.length, this.sessions);
       this.totalItems = this.formItems.length;
     } else {
-      this.itemsPerSession = this.bp.itemsPerSession;
-      this.totalItems = this.sessions * this.itemsPerSession;
+      this.sessions = lenCfg.sessions;
+      this.sessionSizes = lenCfg.sessionSizes.slice();
+      this.totalItems = this.sessionSizes.reduce((a, b) => a + b, 0);
     }
   }
 
   // ---- progress ----
   get sessionNumber() { return this.sessionIndex + 1; }
+  // items in the CURRENT session (sessions can be uneven, e.g. math 21 + 20)
+  get itemsPerSession() { return this.sessionSizes[this.sessionIndex] || this.sessionSizes[this.sessionSizes.length - 1] || 1; }
   sessionDelivered() { return this.delivered.filter((d) => d.session === this.sessionIndex); }
   deliveredCountInSession() { return this.sessionDelivered().length; }
   isSessionComplete() { return this.deliveredCountInSession() >= this.itemsPerSession; }
@@ -1305,7 +1322,7 @@ class TestRun {
 
 function startPlayer(opts) {
   const app = document.getElementById('app');
-  const run = new TestRun({ subject: opts.subject, mode: opts.mode || 'adaptive' });
+  const run = new TestRun({ subject: opts.subject, mode: opts.mode || 'adaptive', length: opts.length || 'full' });
   const SUBJ = { ela_reading: 'Reading', ela_writing: 'Writing', math: 'Mathematics' };
   const fk = run.formKey || '';
   const formLabel = fk === 'formA' ? ' (Form A)' : /^mock\d$/.test(fk) ? ' (Mock Test ' + fk.slice(4) + ')' : '';
@@ -1558,11 +1575,11 @@ function renderReport(rep, title, student) {
     <main class="report-main">
       <h1>${esc(student || 'Student')} · ${esc(title)}</h1>
       <div class="score-card level-${rep.level}">
-        <div class="score-big">${rep.scaleScore}</div>
-        <div class="score-scale">practice scale estimate (650–850)</div>
-        <div class="meter"><div class="meter-fill" style="width:${pct}%"></div></div>
-        <div class="level-badge">Level ${rep.level} — ${esc(rep.levelLabel)}</div>
-        <div class="muted small">Practice estimate — not an official NJSLA score.</div>
+        <div class="level-headline">Level ${rep.level} of 5</div>
+        <div class="level-name">${esc(rep.levelLabel)}</div>
+        <div class="meter level-meter"><div class="meter-fill" style="width:${rep.level * 20}%"></div></div>
+        <div class="scale-row">practice scale estimate <strong>${rep.scaleScore}</strong> <span class="muted">/ 850</span></div>
+        <div class="muted small">The real NJSLA reports a performance level (1–5); the scale here is a practice estimate, not an official score.</div>
         <div class="score-stats"><span><strong>${rep.correctCount}/${rep.scoredCount}</strong> correct</span><span><strong>${rep.accuracy}%</strong> accuracy</span></div>
       </div>
       <h2>📈 Difficulty path (how the test adapted)</h2>
@@ -1712,6 +1729,7 @@ const state = {
   attributes: { ...DEFAULT_ATTRIBUTES },
   a11y: { ...DEFAULT_A11Y },
   mode: 'adaptive',
+  length: 'full',
 };
 
 function loadAttempts() { try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '[]'); } catch { return []; } }
@@ -1754,6 +1772,12 @@ function catalog() {
               ${MOCKS.map((m) => `<option value="mock${m}" ${state.mode === 'mock' + m ? 'selected' : ''}>Mock Test ${m}</option>`).join('')}
             </select>
           </label>
+          <label class="inline">Length
+            <select id="length">
+              <option value="full" ${state.length === 'full' ? 'selected' : ''}>Official (Reading 32 · Math 41)</option>
+              <option value="short" ${state.length === 'short' ? 'selected' : ''}>Short practice</option>
+            </select>
+          </label>
         </div>
         <h2>NJSLA-Adaptive — choose a test</h2>
         <div class="test-cards">
@@ -1772,6 +1796,7 @@ function catalog() {
       </main>
     </div>`;
   document.getElementById('mode').onchange = (e) => (state.mode = e.target.value);
+  document.getElementById('length').onchange = (e) => (state.length = e.target.value);
   document.querySelectorAll('.test-card').forEach((c) => { c.onclick = () => { const t = TESTS.find((x) => x.subject === c.dataset.subject); attributesScreen(t); }; });
   document.querySelectorAll('[data-report]').forEach((el) => { el.onclick = () => { const a = loadAttempts().find((x) => x.id === el.dataset.report); showReport(a); }; });
   document.querySelectorAll('[data-del]').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); deleteAttempt(el.dataset.del); catalog(); }; });
@@ -1875,6 +1900,7 @@ function beginTest(t) {
   startPlayer({
     subject: t.subject,
     mode: state.mode,
+    length: state.length,
     student: state.student,
     attributes: state.attributes,
     a11y: { ...state.a11y },
