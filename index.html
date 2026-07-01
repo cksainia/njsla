@@ -1351,6 +1351,12 @@ class TestRun {
     if (!r) return false;
     const v = r.response;
     if (v == null) return false;
+    const it = ITEMS_BY_ID[itemId];
+    if (it && it.type === 'multi_select') {
+      // "Choose N" — require the exact number of selections, like the real test
+      const need = it.interaction.selectCount || 1;
+      return Array.isArray(v) && v.length === need;
+    }
     if (Array.isArray(v)) return v.length > 0;
     if (typeof v === 'object') return Object.values(v).some((x) => String(x).trim() !== '');
     return String(v).trim() !== '';
@@ -1431,7 +1437,7 @@ class TestRun {
       scaleScore: scale, level: level.level, levelLabel: level.label,
       total: this.delivered.length, scoredCount: scored.length, correctCount,
       accuracy: scored.length ? Math.round((correctCount / scored.length) * 100) : 0,
-      writing, isWriting: this.subject === 'ela_writing',
+      writing, isWriting: this.subject === 'ela_writing', unscored: this.subject === 'ela_writing' && !writing,
       path, byStandard: Object.values(byStandard), perItem,
       flagged: perItem.filter((p) => p.flagged).map((p) => p.n),
     };
@@ -1528,7 +1534,7 @@ function startPlayer(opts) {
         </main>
 
         <footer class="tds-bottom">
-          <button class="tds-btn" id="back-btn" ${cur === 0 && run.sessionIndex === 0 ? 'disabled' : ''}>◀ Back</button>
+          <button class="tds-btn" id="back-btn" ${cur === 0 ? 'disabled' : ''}>◀ Back</button>
           <button class="tds-btn" id="save-btn">Save</button>
           <span id="save-msg" class="save-msg"></span>
           <button class="tds-btn primary" id="next-btn">${nextLabel()} ▶</button>
@@ -1672,7 +1678,8 @@ function startPlayer(opts) {
       }
     }
     const report = run.report();
-    if (opts.onSaveAttempt) opts.onSaveAttempt({ ...report, student: opts.student, date: new Date().toISOString(), title });
+    // Don't pollute the dashboard/trend with an essay that was never scored.
+    if (opts.onSaveAttempt && !report.unscored) opts.onSaveAttempt({ ...report, student: opts.student, date: new Date().toISOString(), title });
     reportScreen(report);
   }
 
@@ -1749,6 +1756,12 @@ function renderReport(rep, title, student) {
     <header class="app-header"><div class="brand"><span>Practice Report</span></div></header>
     <main class="report-main">
       <h1>${esc(student || 'Student')} · ${esc(title)}</h1>
+      ${rep.unscored ? `
+      <div class="score-card">
+        <div class="level-headline" style="color:var(--amber)">✍️ Essay saved</div>
+        <div class="level-name">Not scored yet</div>
+        <div class="muted" style="margin-top:10px">This writing test needs an AI provider to score the essay on Composition &amp; Conventions. Open <strong>⚙️ Settings</strong>, add a key, then take the Writing test again for a scored report.</div>
+      </div>` : `
       <div class="score-card level-${rep.level}">
         <div class="level-headline">Level ${rep.level} of 5</div>
         <div class="level-name">${esc(rep.levelLabel)}</div>
@@ -1756,7 +1769,7 @@ function renderReport(rep, title, student) {
         <div class="scale-row">practice scale estimate <strong>${rep.scaleScore}</strong> <span class="muted">/ 850</span></div>
         <div class="muted small">The real NJSLA reports a performance level (1–5); the scale here is a practice estimate, not an official score.</div>
         <div class="score-stats">${stats}</div>
-      </div>
+      </div>`}
       ${writingPanel}
       ${objective}
     </main>
@@ -2033,7 +2046,7 @@ function dashboardScreen() {
 function attemptRow(a) {
   return `<div class="attempt" data-report="${a.id}">
     <div class="att-main"><span>${esc(a.title)}</span><span class="att-score level-${a.level}">${a.scaleScore} · L${a.level}</span></div>
-    <div class="att-sub"><span>${new Date(a.date).toLocaleDateString()} · ${a.accuracy}% · ${a.correctCount}/${a.scoredCount}</span><button class="link-del" data-del="${a.id}">delete</button></div>
+    <div class="att-sub"><span>${new Date(a.date).toLocaleDateString()} · ${a.isWriting && a.writing ? ('Composition ' + a.writing.composition + '% · Conventions ' + a.writing.conventions + '%') : (a.accuracy + '% · ' + a.correctCount + '/' + a.scoredCount)}</span><button class="link-del" data-del="${a.id}">delete</button></div>
   </div>`;
 }
 
