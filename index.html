@@ -71,7 +71,11 @@ h1{font-size:1.8rem;margin:.2em 0 .4em}h2{font-size:1.3rem;margin:1em 0 .4em}h3{
 .tds-body{flex:1;display:flex;flex-direction:column;padding:18px;max-width:1100px;margin:0 auto;width:100%}
 .tds-body.two-pane{flex-direction:row;gap:0;max-width:1300px}
 .pane{flex:1;overflow:auto;padding:6px 18px}.stimulus-pane{border-right:0}.divider{width:3px;background:var(--line);cursor:col-resize}
-.tds-body.line-reader .question-pane{background:linear-gradient(transparent 0,transparent 100%)}
+/* Line Reader: a movable ruler that dims the page except a reading band */
+.line-reader-band{position:fixed;left:0;right:0;height:48px;top:0;box-shadow:0 0 0 9999px rgba(15,23,42,.30);pointer-events:none;z-index:40}
+/* Masking: movable, closable opaque cards the student drags over content */
+.mask-rect{position:fixed;width:240px;height:140px;background:#334155;border:2px solid #0f172a;border-radius:10px;z-index:45;cursor:move;box-shadow:var(--shadow);touch-action:none}
+.mask-rect .mask-close{position:absolute;top:2px;right:4px;background:none;border:none;color:#fff;font-size:1.3rem;font-weight:800;cursor:pointer;line-height:1;padding:2px 6px}
 .passage-title{color:var(--indigo);font-size:1.1rem}.passage-author{color:var(--muted);margin-bottom:10px}
 .para{position:relative;padding-left:30px;margin:10px 0}.pnum{position:absolute;left:0;color:var(--muted);font-size:.8rem;font-weight:700}
 .passage-credit{margin-top:14px;color:var(--muted);font-size:.78rem;font-style:italic}
@@ -599,7 +603,7 @@ function scoreItem(item, response) {
         const bad = response.filter((r) => !ak.correct.includes(r)).length;
         partial = Math.max(0, (good - bad) / ak.correct.length);
       }
-      return { correct, partial, points: correct ? max : 0, max };
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'numeric_entry':
     case 'fraction_entry': {
@@ -623,7 +627,8 @@ function scoreItem(item, response) {
       let got = 0;
       for (const c of cats) if (response && Number(response[c]) === Number(ak[c])) got += 1;
       const correct = got === cats.length;
-      return { correct, partial: cats.length ? got / cats.length : 0, points: correct ? max : 0, max };
+      const partial = cats.length ? got / cats.length : 0;
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'extended_writing': {
       // Not auto-scored for correctness; handled by rubric/LLM elsewhere.
@@ -635,7 +640,8 @@ function scoreItem(item, response) {
       const bExp = ak.partB;
       const bOK = aOK && (Array.isArray(bExp) ? setsEqual(response.b, bExp) : (response.b === bExp));
       const correct = aOK && bOK;
-      return { correct, partial: aOK ? (bOK ? 1 : 0.5) : 0, points: correct ? max : 0, max };
+      const partial = aOK ? (bOK ? 1 : 0.5) : 0;
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'hot_text': {
       const correct = setsEqual(response, ak.correct);
@@ -645,25 +651,28 @@ function scoreItem(item, response) {
         const bad = response.filter((r) => !ak.correct.includes(r)).length;
         partial = Math.max(0, (good - bad) / ak.correct.length);
       }
-      return { correct, partial, points: correct ? max : 0, max };
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'inline_dropdown': {
       const keys = Object.keys(ak); let got = 0;
       for (const k of keys) if (response && response[k] === ak[k]) got += 1;
       const correct = got === keys.length && keys.length > 0;
-      return { correct, partial: keys.length ? got / keys.length : 0, points: correct ? max : 0, max };
+      const partial = keys.length ? got / keys.length : 0;
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'drag_and_drop': {
       const zones = Object.keys(ak); let got = 0;
       for (const z of zones) { const exp = [].concat(ak[z]); const cur = [].concat((response && response[z]) || []); if (setsEqual(cur, exp)) got += 1; }
       const correct = got === zones.length && zones.length > 0;
-      return { correct, partial: zones.length ? got / zones.length : 0, points: correct ? max : 0, max };
+      const partial = zones.length ? got / zones.length : 0;
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'matching_grid': {
       const rows = Object.keys(ak); let got = 0;
       for (const r of rows) { const exp = ak[r]; const cur = response && response[r]; const okk = Array.isArray(exp) ? setsEqual([].concat(cur || []), exp) : cur === exp; if (okk) got += 1; }
       const correct = got === rows.length && rows.length > 0;
-      return { correct, partial: rows.length ? got / rows.length : 0, points: correct ? max : 0, max };
+      const partial = rows.length ? got / rows.length : 0;
+      return { correct, partial, points: Math.round(partial * max), max };
     }
     case 'graph_point_plot': {
       const tol = ak.tol != null ? ak.tol : 1e-9;
@@ -708,7 +717,7 @@ const DEFAULT_A11Y = { contrast: 'bw', zoom: 1, lineReader: false, masking: fals
 const ANTHROPIC_VERSION = '2023-06-01';
 
 const PROVIDERS = {
-  anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-6', keyHint: 'sk-ant-...' },
+  anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-5', keyHint: 'sk-ant-...' },
   openai: { label: 'OpenAI (ChatGPT)', defaultModel: 'gpt-4o', keyHint: 'sk-...' },
   gemini: { label: 'Google Gemini', defaultModel: 'gemini-2.5-flash', keyHint: 'AIza...' },
 };
@@ -834,7 +843,7 @@ function numberLine(f) {
   const px = x((f.point - f.min) / (f.max - f.min));
   parts += `<circle cx="${px}" cy="${y}" r="7" fill="var(--indigo,#4f46e5)"/>`;
   if (f.label) parts += `<text x="${px}" y="${y - 16}" text-anchor="middle" font-size="16" font-weight="700">${esc(f.label)}</text>`;
-  return `<svg class="figure" viewBox="0 0 ${W} 70" role="img" aria-label="number line with a plotted point">${parts}</svg>`;
+  return `<svg class="figure" viewBox="0 0 ${W} 70" width="${W}" height="70" role="img" aria-label="number line with a plotted point">${parts}</svg>`;
 }
 
 function areaGrid(f) {
@@ -845,13 +854,13 @@ function areaGrid(f) {
     const shaded = i < (f.shaded || 0);
     cells += `<rect x="${c * cell}" y="${r * cell}" width="${cell}" height="${cell}" fill="${shaded ? 'var(--indigo,#4f46e5)' : '#fff'}" stroke="#94a3b8"/>`;
   }
-  return `<svg class="figure" viewBox="0 0 ${cols * cell} ${rows * cell}" role="img" aria-label="area grid">${cells}</svg>`;
+  return `<svg class="figure" viewBox="0 0 ${cols * cell} ${rows * cell}" width="${cols * cell}" height="${rows * cell}" role="img" aria-label="area grid">${cells}</svg>`;
 }
 
 function rectangle(f) {
   const W = 240, H = 150, x = 40, y = 25, w = 150, h = 90;
   const unit = f.unit || '';
-  return `<svg class="figure" viewBox="0 0 ${W} ${H}" role="img" aria-label="rectangle figure">
+  return `<svg class="figure" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="rectangle figure">
     <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#eef2ff" stroke="currentColor" stroke-width="2"/>
     <text x="${x + w / 2}" y="${y - 8}" text-anchor="middle" font-size="14">${esc(String(f.w))} ${esc(unit)}</text>
     <text x="${x - 10}" y="${y + h / 2}" text-anchor="end" font-size="14">${esc(String(f.h))} ${esc(unit)}</text>
@@ -907,11 +916,13 @@ function barGraphHTML(item) {
       <text x="${x + cw / 2}" y="${H - 8}" text-anchor="middle" font-size="13">${esc(c)}</text>
     </g>`;
   });
-  return `<svg class="figure bargraph" viewBox="0 0 ${W} ${H}" data-ymax="${yMax}" data-h="${h}" data-padt="${padT}" role="group" aria-label="bar graph builder">${grid}${cols}</svg>`;
+  return `<svg class="figure bargraph" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-ymax="${yMax}" data-h="${h}" data-padt="${padT}" role="group" aria-label="bar graph builder">${grid}${cols}</svg>`;
 }
-function wireBarGraph(svg, onChange) {
+function wireBarGraph(svg, onChange, initial) {
   const yMax = +svg.dataset.ymax, h = +svg.dataset.h, padT = +svg.dataset.padt;
-  const state = {};
+  // Seed from a previously-saved answer so editing one bar merges instead of
+  // wiping the others (bar_graph_build scores against ALL categories).
+  const state = (initial && typeof initial === 'object') ? { ...initial } : {};
   svg.querySelectorAll('.bg-col').forEach((g) => {
     const cat = g.dataset.cat;
     g.querySelector('.bg-hit').addEventListener('click', (e) => {
@@ -1045,7 +1056,7 @@ function plotLineHTML(f) {
     parts += `<circle class="plot-hit" data-i="${i}" cx="${x(i)}" cy="${y}" r="14" fill="transparent" style="cursor:pointer"/>`;
   }
   parts += `<circle class="plot-pt hidden" cx="0" cy="${y}" r="8" fill="var(--indigo,#4f46e5)"/>`;
-  return `<svg class="figure plotline" viewBox="0 0 ${W} 80" data-ticks="${ticks}" data-pad="${pad}" data-w="${W}" role="group" aria-label="number line — tap to plot">${parts}</svg>`;
+  return `<svg class="figure plotline" viewBox="0 0 ${W} 80" width="${W}" height="80" data-ticks="${ticks}" data-pad="${pad}" data-w="${W}" role="group" aria-label="number line — tap to plot">${parts}</svg>`;
 }
 
 function choiceHTML(item, kind) {
@@ -1100,7 +1111,14 @@ function wireItem(item, run, qEl, onChange) {
     if (prev != null) inp.value = prev;
     inp.addEventListener('focus', () => setActiveInput(inp));
     setActiveInput(inp);
-    inp.addEventListener('input', () => report(inp.value.trim()));
+    // Keep a physical keyboard as restricted as the on-screen keypad: digits +
+    // sign, plus "." for decimals or "/" for fractions.
+    const allow = item.type === 'fraction_entry' ? /[^0-9/\-]/g : /[^0-9.\-]/g;
+    inp.addEventListener('input', () => {
+      const clean = inp.value.replace(allow, '');
+      if (clean !== inp.value) inp.value = clean;
+      report(inp.value.trim());
+    });
     wireKeypad(qEl);
   } else if (item.type === 'multi_part_entry') {
     const inputs = [...qEl.querySelectorAll('input[data-blank]')];
@@ -1108,7 +1126,7 @@ function wireItem(item, run, qEl, onChange) {
     inputs.forEach((i) => {
       if (prev && prev[i.dataset.blank] != null) i.value = prev[i.dataset.blank];
       i.addEventListener('focus', () => setActiveInput(i));
-      i.addEventListener('input', () => report(collect()));
+      i.addEventListener('input', () => { const clean = i.value.replace(/[^0-9.\-/]/g, ''); if (clean !== i.value) i.value = clean; report(collect()); });
     });
     if (inputs[0]) setActiveInput(inputs[0]);
     wireKeypad(qEl);
@@ -1123,7 +1141,7 @@ function wireItem(item, run, qEl, onChange) {
         bar.setAttribute('y', padT + h - barH); bar.setAttribute('height', barH);
       });
     }
-    wireBarGraph(svg, (state) => report(state));
+    wireBarGraph(svg, (state) => report(state), (prev && typeof prev === 'object') ? prev : null);
   } else if (item.type === 'extended_writing') {
     const ed = qEl.querySelector('#weditor');
     if (prev) ed.innerHTML = prev;
@@ -1352,14 +1370,50 @@ class TestRun {
     const v = r.response;
     if (v == null) return false;
     const it = ITEMS_BY_ID[itemId];
-    if (it && it.type === 'multi_select') {
-      // "Choose N" — require the exact number of selections, like the real test
-      const need = it.interaction.selectCount || 1;
-      return Array.isArray(v) && v.length === need;
+    const filled = (x) => x != null && String(x).trim() !== '';
+    // Composite items require ALL sub-parts before "forced response" is satisfied
+    // (a partial attempt shouldn't unlock Next, like the real test).
+    switch (it && it.type) {
+      case 'multi_select': {
+        const need = it.interaction.selectCount || 1;
+        return Array.isArray(v) && v.length === need;
+      }
+      case 'hot_text':
+        return Array.isArray(v) && v.length > 0;
+      case 'multi_part_entry': {
+        const blanks = (it.interaction.blanks || []).map((b) => b.id);
+        return blanks.length > 0 && blanks.every((id) => v && filled(v[id]));
+      }
+      case 'inline_dropdown': {
+        const keys = Object.keys(it.interaction.dropdowns || {});
+        return keys.length > 0 && keys.every((k) => v && filled(v[k]));
+      }
+      case 'evidence_two_part':
+        return !!v && filled(v.a) && (Array.isArray(v.b) ? v.b.length > 0 : filled(v.b));
+      case 'matching_grid': {
+        const rows = (it.interaction.rows || []).map((row) => row.id);
+        return rows.length > 0 && rows.every((rid) => {
+          const cell = v && v[rid];
+          return Array.isArray(cell) ? cell.length > 0 : filled(cell);
+        });
+      }
+      case 'bar_graph_build': {
+        const cats = it.interaction.categories || [];
+        return cats.length > 0 && cats.every((c) => v && v[c] != null);
+      }
+      case 'drag_and_drop': {
+        const tokens = (it.interaction.tokens || []).map((t) => t.id);
+        const placed = new Set([].concat(...Object.values(v || {})));
+        return tokens.length > 0 && tokens.every((id) => placed.has(id));
+      }
+      case 'graph_point_plot':
+        return !!v && v.pos != null;
+      default:
+        break;
     }
     if (Array.isArray(v)) return v.length > 0;
-    if (typeof v === 'object') return Object.values(v).some((x) => String(x).trim() !== '');
-    return String(v).trim() !== '';
+    if (typeof v === 'object') return Object.values(v).some((x) => filled(x));
+    return filled(v);
   }
 
   // ---- scoring / report ----
@@ -1404,8 +1458,18 @@ class TestRun {
       feedback: (this.responses[this.delivered.find((d) => ITEMS_BY_ID[d.id].type === 'extended_writing')?.id] || {}).writingScore?.feedback || '',
     } : null;
     const perf = possible > 0 ? earned / possible : null;
-    const scale = perf == null ? scaleFromTheta(theta) // writing-only: neutral until AI scoring
-      : Math.max(650, Math.min(850, Math.round(650 + 200 * perf)));
+    const perfScale = perf == null ? null : Math.max(650, Math.min(850, Math.round(650 + 200 * perf)));
+    let scale;
+    if (perf == null) {
+      scale = scaleFromTheta(theta);                 // writing-only: neutral until AI scoring
+    } else if (this.mode === 'adaptive') {
+      // Adaptive: reflect the difficulty track by blending difficulty-weighted
+      // performance with the Rasch ability estimate (θ). Acing an EASY route
+      // therefore scores below acing a HARD route. (Fixed forms keep perfect=850.)
+      scale = Math.max(650, Math.min(850, Math.round(0.5 * perfScale + 0.5 * scaleFromTheta(theta))));
+    } else {
+      scale = perfScale;                             // fixed forms (Form A / Mocks): perfect => 850
+    }
     const level = levelForScore(scale);
     const perItem = this.delivered.map((d, i) => {
       const it = ITEMS_BY_ID[d.id];
@@ -1475,6 +1539,35 @@ function startPlayer(opts) {
 
   function recordTime() { const it = curItem(); if (it) run.addTime(it.id, Date.now() - itemStart); itemStart = Date.now(); }
 
+  // ---- accessibility overlays (Line Reader + Masking) ----
+  // Overlays live on <body> so they survive per-item re-renders of #app.
+  let lrBand = null, masks = [];
+  function moveBand(e) { if (lrBand) lrBand.style.top = Math.max(0, e.clientY - 24) + 'px'; }
+  function setLineReader(on) {
+    opts.a11y.lineReader = on;
+    if (on && !lrBand) { lrBand = document.createElement('div'); lrBand.className = 'line-reader-band'; document.body.appendChild(lrBand); document.addEventListener('pointermove', moveBand); }
+    else if (!on && lrBand) { document.removeEventListener('pointermove', moveBand); lrBand.remove(); lrBand = null; }
+  }
+  function makeDraggable(el) {
+    let ox = 0, oy = 0, drag = false;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.classList.contains('mask-close')) return;
+      drag = true; ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop; el.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    el.addEventListener('pointermove', (e) => { if (!drag) return; el.style.left = (e.clientX - ox) + 'px'; el.style.top = (e.clientY - oy) + 'px'; });
+    el.addEventListener('pointerup', (e) => { drag = false; try { el.releasePointerCapture(e.pointerId); } catch { /* ignore */ } });
+  }
+  function addMask() {
+    const m = document.createElement('div'); m.className = 'mask-rect';
+    m.style.left = (window.innerWidth / 2 - 120 + masks.length * 18) + 'px';
+    m.style.top = (window.innerHeight / 2 - 70 + masks.length * 18) + 'px';
+    m.innerHTML = '<button type="button" class="mask-close" aria-label="remove mask">×</button>';
+    document.body.appendChild(m); makeDraggable(m);
+    m.querySelector('.mask-close').onclick = () => { m.remove(); masks = masks.filter((x) => x !== m); };
+    masks.push(m);
+  }
+  function cleanupOverlays() { setLineReader(false); masks.forEach((m) => m.remove()); masks = []; }
+
   function render() {
     const list = sessionList();
     const item = curItem();
@@ -1499,8 +1592,8 @@ function startPlayer(opts) {
           </div>
           <div class="tds-mid">${esc(title)}</div>
           <div class="tds-right">
-            <span class="tds-stu">${esc(opts.student || 'Guest')} · GUEST SESSION</span>
-            <button class="tds-btn" id="pause-btn" title="Pause">⏸ Pause</button>
+            <span class="tds-stu">${esc(opts.student || 'Guest')} · ${opts.student && opts.student !== 'Guest' ? 'PRACTICE' : 'GUEST'} SESSION</span>
+            <button class="tds-btn" id="pause-btn" title="Exit the test (progress is not saved)">⏹ Exit</button>
           </div>
         </header>
 
@@ -1508,6 +1601,7 @@ function startPlayer(opts) {
           <button class="tds-tool" id="line-reader" title="Line Reader">▭ Line Reader</button>
           <button class="tds-tool" id="zoom-out" title="Zoom out">A−</button>
           <button class="tds-tool" id="zoom-in" title="Zoom in">A+</button>
+          ${opts.a11y && opts.a11y.masking ? '<button class="tds-tool" id="mask-btn" title="Add a mask to cover part of the screen">▢ Mask</button>' : ''}
           ${opts.attributes && opts.attributes.tts ? '<button class="tds-tool" id="tts" title="Read aloud">🔊 Read</button>' : ''}
         </div>
 
@@ -1560,10 +1654,16 @@ function startPlayer(opts) {
   }
 
   function updateChrome() {
-    // refresh Next enabled state + item map without full re-render
+    // refresh Next enabled state + item map + progress without a full re-render
     const item = curItem();
     const nextBtn = document.getElementById('next-btn');
     if (nextBtn) nextBtn.disabled = forced && !run.isAnswered(item.id);
+    const answeredCount = run.delivered.filter((d) => run.isAnswered(d.id)).length;
+    const pct = Math.round((answeredCount / run.totalItems) * 100);
+    const fill = document.querySelector('.tds-progress-fill');
+    if (fill) fill.style.width = pct + '%';
+    const pctEl = document.querySelector('.tds-pct');
+    if (pctEl) pctEl.textContent = pct + '%';
     const pop = document.getElementById('items-pop');
     if (pop) pop.querySelector('.items-chips').innerHTML = sessionList().map((d, i) => chip(d, i)).join('');
     wirePop();
@@ -1579,12 +1679,16 @@ function startPlayer(opts) {
     const item = curItem();
     document.getElementById('items-btn').onclick = () => document.getElementById('items-pop').classList.toggle('hidden');
     document.getElementById('ctx-btn').onclick = () => document.getElementById('ctx-pop').classList.toggle('hidden');
-    document.getElementById('pause-btn').onclick = () => { if (confirm('Are you sure you want to pause the test?')) { recordTime(); opts.onExit && opts.onExit(); } };
+    document.getElementById('pause-btn').onclick = () => { if (confirm('Exit the test now? Your progress on this practice test will NOT be saved.')) { recordTime(); cleanupOverlays(); opts.onExit && opts.onExit(); } };
     document.getElementById('zoom-in').onclick = () => { opts.a11y.zoom = Math.min(2, (opts.a11y.zoom || 1) + 0.15); render(); };
     document.getElementById('zoom-out').onclick = () => { opts.a11y.zoom = Math.max(1, (opts.a11y.zoom || 1) - 0.15); render(); };
-    document.getElementById('line-reader').onclick = (e) => { opts.a11y.lineReader = !opts.a11y.lineReader; e.currentTarget.classList.toggle('active'); document.querySelector('.tds-body').classList.toggle('line-reader', opts.a11y.lineReader); };
+    document.getElementById('line-reader').onclick = (e) => { setLineReader(!opts.a11y.lineReader); e.currentTarget.classList.toggle('active', opts.a11y.lineReader); };
+    const maskBtn = document.getElementById('mask-btn');
+    if (maskBtn) maskBtn.onclick = () => addMask();
     const ttsBtn = document.getElementById('tts');
-    if (ttsBtn) ttsBtn.onclick = () => speak(stripForTTS(item));
+    if (ttsBtn) ttsBtn.onclick = () => speak(ttsText(item));
+    const divider = document.querySelector('.divider');
+    if (divider) wireDivider(divider);
 
     document.querySelectorAll('#ctx-pop button').forEach((b) => {
       b.onclick = () => {
@@ -1662,6 +1766,7 @@ function startPlayer(opts) {
 
   async function finish() {
     recordTime();
+    cleanupOverlays();
     const wItems = run.writingItems();
     if (wItems.length && aiEnabled(opts.aiSettings)) {
       app.innerHTML = `<div class="flow"><div class="flow-card"><div class="spinner"></div><h2>Scoring the writing…</h2><p class="muted">Grading on Composition and Conventions with your AI provider.</p></div></div>`;
@@ -1697,12 +1802,42 @@ function startPlayer(opts) {
   function highlightSelection() {
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const mark = document.createElement('mark'); mark.className = 'user-hl';
     try {
-      const range = sel.getRangeAt(0);
-      const span = document.createElement('mark'); span.className = 'user-hl';
-      range.surroundContents(span);
-      sel.removeAllRanges();
-    } catch { /* cross-node selection — ignore */ }
+      // Clean path for a selection within a single text node.
+      range.surroundContents(mark);
+    } catch {
+      // Selection spans multiple nodes — pull the contents out and wrap them.
+      try { mark.appendChild(range.extractContents()); range.insertNode(mark); }
+      catch { return; }
+    }
+    sel.removeAllRanges();
+  }
+
+  // Drag-to-resize the two-pane divider (stimulus | question).
+  function wireDivider(div) {
+    const body = document.querySelector('.tds-body');
+    const sp = body && body.querySelector('.stimulus-pane');
+    const qp = body && body.querySelector('.question-pane');
+    if (!sp || !qp) return;
+    let dragging = false;
+    div.addEventListener('pointerdown', (e) => { dragging = true; div.setPointerCapture(e.pointerId); e.preventDefault(); });
+    div.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const rect = body.getBoundingClientRect();
+      let r = (e.clientX - rect.left) / rect.width;
+      r = Math.max(0.25, Math.min(0.75, r));
+      sp.style.flex = String(r); qp.style.flex = String(1 - r);
+    });
+    div.addEventListener('pointerup', (e) => { dragging = false; try { div.releasePointerCapture(e.pointerId); } catch { /* ignore */ } });
+  }
+
+  // Read-aloud text: include the passage for two-pane items, then the question.
+  function ttsText(item) {
+    const stim = item.stimulus_ref ? getStimulus(item.stimulus_ref) : null;
+    const passage = stim ? (stim.title + '. ' + (stim.paragraphs || []).join(' ') + '. ') : '';
+    return passage + stripForTTS(item);
   }
 
   render();
@@ -1743,9 +1878,13 @@ function renderReport(rep, title, student) {
       ${rep.writing.feedback ? `<p class="wfb">🗣️ ${esc(rep.writing.feedback)}</p>` : ''}
     </div>` : '';
 
+  // The difficulty path only means something for the computer-adaptive form —
+  // fixed forms (Form A / Mock Tests) don't adapt, so we hide it there.
+  const pathSection = rep.mode === 'adaptive'
+    ? `<h2>📈 Difficulty path (how the test adapted)</h2><div class="path">${pathHTML}</div>`
+    : '';
   const objective = rep.isWriting ? '' : `
-      <h2>📈 Difficulty path (how the test adapted)</h2>
-      <div class="path">${pathHTML}</div>
+      ${pathSection}
       <h2>🎯 By standard</h2>
       <div class="std-list">${stdRows || '<p class="muted">—</p>'}</div>
       <h2>🧾 Item details</h2>
